@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { UserAuth } from '../context/AuthContext'
@@ -128,6 +129,9 @@ const Dashboard = () => {
             </div>
           ))
         )}
+        <Link to="/mappreview">
+          <button className="mappreview">Go to Map</button>
+        </Link>
       </div>
     </div>
   )
