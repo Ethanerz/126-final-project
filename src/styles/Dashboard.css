@@ -1,0 +1,77 @@
+.dashboard-title {
+  font-family: var(--heading);
+  font-weight: 400;
+  font-size: 88px;
+  line-height: 1;
+  letter-spacing: 2px;
+  color: var(--brand-fg);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+@media (max-width: 1024px) {
+  .dashboard-title {
+    font-size: 64px;
+  }
+}
+
+.signout-btn {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  padding: 10px 22px;
+  border-radius: 999px;
+  border: 1.5px solid var(--brand-fg);
+  background: transparent;
+  color: var(--brand-fg);
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.signout-btn:hover {
+  background: var(--brand-fg);
+  color: var(--brand-bg);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px -6px rgba(163, 31, 51, 0.55);
+}
+
+.signout-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.mappreview {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  padding: 14px 28px;
+  border-radius: 999px;
+  border: none;
+  background: var(--brand-fg);
+  color: var(--brand-bg);
+  cursor: pointer;
+  box-shadow: 0 10px 22px -14px rgba(163, 31, 51, 0.75);
+  transition:
+    background 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.mappreview:hover {
+  background: var(--brand-fg-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px -14px rgba(163, 31, 51, 0.85);
+}
+
+.mappreview:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 14px -10px rgba(163, 31, 51, 0.75);
+}

@@ -1,23 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
+  --brand-bg: #FFF7F0;
+  --brand-fg: #A31F33;
+  --brand-fg-hover: #871726;
+  --brand-fg-soft: rgba(163, 31, 51, 0.12);
+  --brand-outline: rgba(163, 31, 51, 0.35);
+
+  --text: #4a3c40;
+  --text-h: #1F141B;
+  --bg: var(--brand-bg);
+  --border: #e5d9d2;
   --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
+  --accent: var(--brand-fg);
+  --accent-bg: var(--brand-fg-soft);
+  --accent-border: var(--brand-outline);
   --social-bg: rgba(244, 243, 236, 0.5);
   --shadow:
     rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --sans: 'Montserrat', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --heading: 'Agency FB', 'Agency', 'Impact', 'Oswald', 'Bebas Neue', sans-serif;
   --mono: ui-monospace, Consolas, monospace;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
+  font: 400 16px/150% var(--sans);
+  letter-spacing: 0.1px;
+  color-scheme: light;
   color: var(--text);
   background: var(--bg);
   font-synthesis: none;
@@ -26,32 +34,16 @@
   -moz-osx-font-smoothing: grayscale;
 
   @media (max-width: 1024px) {
-    font-size: 16px;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
+    font-size: 15px;
   }
 }
 
 body {
   margin: 0;
+  font-family: var(--sans);
+  font-weight: 400;
+  background: var(--bg);
+  color: var(--text);
 }
 
 #root {
@@ -64,24 +56,30 @@ body {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  background: var(--bg);
 }
 
 h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--sans);
+  font-weight: 600;
   color: var(--text-h);
 }
 
 h1 {
   font-size: 56px;
-  letter-spacing: -1.68px;
+  letter-spacing: -1px;
   margin: 32px 0;
   @media (max-width: 1024px) {
     font-size: 36px;
     margin: 20px 0;
   }
 }
+
 h2 {
   font-size: 24px;
   line-height: 118%;
@@ -91,8 +89,24 @@ h2 {
     font-size: 20px;
   }
 }
+
 p {
   margin: 0;
+  font-family: var(--sans);
+  font-weight: 400;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: var(--sans);
+  font-weight: 400;
+}
+
+.font-display {
+  font-family: var(--heading);
+  letter-spacing: 1px;
 }
 
 code,

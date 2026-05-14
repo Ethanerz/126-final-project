@@ -11,3 +11,52 @@
   width: 100%;
   height: 100%;
 }
+
+.map-page {
+  position: relative;
+}
+
+.map-back-btn {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 10;
+  font-family: var(--sans, 'Montserrat', system-ui, sans-serif);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px 9px 12px;
+  border-radius: 999px;
+  border: 1.5px solid var(--brand-fg, #A31F33);
+  background: #ffffff;
+  color: var(--brand-fg, #A31F33);
+  cursor: pointer;
+  box-shadow: 0 8px 20px -12px rgba(0, 0, 0, 0.35);
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.map-back-btn::before {
+  content: '\2190';
+  font-size: 15px;
+  line-height: 1;
+}
+
+.map-back-btn:hover {
+  background: var(--brand-fg, #A31F33);
+  color: var(--brand-bg, #FFF7F0);
+  transform: translateX(-1px);
+  box-shadow: 0 10px 22px -10px rgba(163, 31, 51, 0.65);
+}
+
+.map-back-btn:active {
+  transform: translateX(0);
+  box-shadow: 0 6px 14px -10px rgba(163, 31, 51, 0.6);
+}

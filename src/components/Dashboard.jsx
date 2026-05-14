@@ -92,7 +92,7 @@ const Dashboard = () => {
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
-        <h1>RateMyCampus</h1>
+        <h1 className="dashboard-title">Rate UPV</h1>
         <p>Welcome, {session?.user?.email}</p>
         <button onClick={handleSignOut} className="signout-btn">
           Sign Out

@@ -1,48 +1,106 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { UserAuth } from '../context/AuthContext'
-
+import '../styles/Auth.css'
 
 const Signup = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
-  const [loading, setLoading] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const {session, signUpNewUser} = UserAuth();
+  const { session, signUpNewUser } = UserAuth()
   const navigate = useNavigate()
-  console.log(session);
+  console.log(session)
 
   const handleSignUp = async (e) => {
     e.preventDefault()
-    setLoading(true)
-    try{
-      const result = await signUpNewUser(email, password);
+    setError('')
 
-      if(result.success){
+    if (password !== confirmPassword) {
+      setError('Passwords do not match')
+      return
+    }
+
+    setLoading(true)
+    try {
+      const result = await signUpNewUser(email, password)
+      if (result.success) {
         navigate('/dashboard')
+      } else {
+        setError(result.error?.message || 'Unable to register')
       }
-    }catch(err){
-      setError(err.message || "an error occured during sign-up")
-    }finally{
+    } catch (err) {
+      setError(err.message || 'an error occured during sign-up')
+    } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div>
-      <form onSubmit={handleSignUp}action="">
-        <h2>Sign Up!</h2>
-        <p>Already have an account? <Link to='/signin'>Sign in!</Link></p>
-        <div>
-          <input onChange={(e) => setEmail(e.target.value)} placeholder='Email' type="email" name="" id="" />
-          <br />
-          <input onChange={(e) => setPassword(e.target.value)} placeholder='Password' type="password" name="" id="" />
-          <br />
-          <button type='submit' disabled={loading}>Sign up</button>
-        </div>
-        {error && <p>{error}</p>}
-      </form>
+    <div className="auth-page">
+      <div className="auth-card">
+        <img
+          src="/rmc-logo-red.png"
+          alt="Rate UPV logo"
+          className="auth-logo"
+        />
+
+        <h2 className="auth-title">
+          Register to
+          <span className="brand">Rate UPV</span>
+        </h2>
+
+        <form className="auth-form" onSubmit={handleSignUp}>
+          <div className="auth-field">
+            <label htmlFor="signup-email">Email</label>
+            <input
+              id="signup-email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+            />
+          </div>
+
+          <div className="auth-field">
+            <label htmlFor="signup-password">Password</label>
+            <input
+              id="signup-password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="new-password"
+            />
+          </div>
+
+          <div className="auth-field">
+            <label htmlFor="signup-confirm">Confirm Password</label>
+            <input
+              id="signup-confirm"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              autoComplete="new-password"
+            />
+          </div>
+
+          {error && <div className="auth-error">{error}</div>}
+
+          <button
+            type="submit"
+            className="auth-btn auth-btn-primary"
+            disabled={loading}
+          >
+            {loading ? 'Registering…' : 'Register'}
+          </button>
+        </form>
+
+        <p className="auth-helper">
+          Already have an account? <Link to="/signin">Sign in</Link>
+        </p>
+      </div>
     </div>
   )
 }
