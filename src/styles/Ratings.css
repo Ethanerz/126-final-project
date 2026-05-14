@@ -1,0 +1,31 @@
+textarea {
+    resize: none;  /* Prevents any resizing */
+}
+
+.vote-btn {
+    cursor: pointer;
+    background: none;
+    border: 1px solid #ddd;
+    padding: 5px 10px;
+    margin: 0 5px;
+    border-radius: 5px;
+    transition: all 0.2s;
+}
+
+.vote-btn.active {
+    background-color: #4CAF50;
+    color: white;
+    border-color: #4CAF50;
+}
+
+.vote-btn.upvote.active {
+    background-color: #4CAF50;
+}
+
+.vote-btn.downvote.active {
+    background-color: #f44336;
+}
+
+.vote-btn:hover {
+    transform: scale(1.05);
+}
