@@ -231,7 +231,6 @@ const Rating = () => {
 			>
 				Back
 			</button>
-			<h1>{currentEntity.name}</h1>
             <h1>{currentEntity.name}</h1>
             <p>{currentEntity.description}</p>
             
