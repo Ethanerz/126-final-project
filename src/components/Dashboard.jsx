@@ -115,7 +115,7 @@ const Dashboard = () => {
               </div>
 
               <div className="entity-info">
-                <h3>{entity.name}</h3>
+                <h3><Link to={`/rating/${entity.id}`}>{entity.name}</Link></h3>
                 <p className="entity-type">{entity.entity_type === 'facility' ? '🏛️ Facility' : '🛎️ Service'}</p>
                 <p className="entity-description">{entity.description || 'No description available'}</p>
                 <p className="entity-location">📍 {entity.address || 'Location not specified'}</p>
