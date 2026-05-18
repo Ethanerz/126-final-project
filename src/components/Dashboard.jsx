@@ -94,7 +94,12 @@ const Dashboard = () => {
       <div className="dashboard-header">
         <h1 className="dashboard-title">Rate UPV</h1>
         <p>Welcome, {session?.user?.email}</p>
-        <button onClick={handleSignOut} className="signout-btn">Sign Out</button>
+        <button onClick={() => navigate('/profile')} className="profile-btn">
+          My Profile
+        </button>
+        <button onClick={handleSignOut} className="signout-btn">
+          Sign Out
+        </button>
       </div>
 
       <div className="entities-grid">

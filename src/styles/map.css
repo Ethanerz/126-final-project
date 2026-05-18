@@ -2,7 +2,6 @@
   position: relative;
   width: 100%;
   height: 100%;
-  min-height: 1000px;
 }
 
 .map {
@@ -12,8 +11,19 @@
   height: 100%;
 }
 
+.map-area {
+  position: relative;
+  flex: 1;
+  height: 100vh;
+}
+
 .map-page {
   position: relative;
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
 }
 
 .map-back-btn {
@@ -59,4 +69,57 @@
 .map-back-btn:active {
   transform: translateX(0);
   box-shadow: 0 6px 14px -10px rgba(163, 31, 51, 0.6);
+}
+
+.popUpMarker {
+  font-family: var(--sans, 'Montserrat', system-ui, sans-serif);
+  min-width: 160px;
+}
+
+.popUpTitle {
+  font-size: 14px;
+}
+
+.popUpStars {
+  margin: 4px 0;
+  color: var(--brand-fg, #A31F33);
+  font-size: 16px;
+}
+
+.popUpReviews {
+  font-size: 12px;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+.popUpLink {
+  display: block;
+  text-align: center;
+  background: var(--brand-fg, #A31F33);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.sidebar {
+  min-width: 450px;
+  max-width: 450px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  z-index: 1;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+}
+
+.sidebar-content-info {
+  display: flex;
+  flex-direction: column;
+  font-size: 1rem;
+  width: 100%;
+  word-break: break-word;
+  overflow-y: auto;
+  max-height: 100vh;
 }
