@@ -75,3 +75,54 @@
   transform: translateY(0);
   box-shadow: 0 6px 14px -10px rgba(163, 31, 51, 0.75);
 }
+
+/* ── Add to bottom of Dashboard.css ── */
+
+.entity-card {
+  position: relative;
+}
+
+.entity-admin-actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 6px;
+  z-index: 1;
+}
+
+.entity-admin-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1.5px solid;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, box-shadow 0.15s;
+  font-family: 'Courier New', monospace;
+}
+
+.entity-admin-btn--edit {
+  background: #1a1a2e;
+  border-color: #4a7adb;
+  color: #7aaaf0;
+}
+.entity-admin-btn--edit:hover {
+  background: #4a7adb;
+  color: #fff;
+  box-shadow: 0 0 8px #4a7adb60;
+}
+
+.entity-admin-btn--delete {
+  background: #1a1a2e;
+  border-color: #b02020;
+  color: #e05555;
+}
+.entity-admin-btn--delete:hover {
+  background: #b02020;
+  color: #fff;
+  box-shadow: 0 0 8px #b0202060;
+}
