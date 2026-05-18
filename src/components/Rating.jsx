@@ -9,6 +9,9 @@ const Rating = () => {
     const [currentEntity, setCurrentEntity] = useState(null)
     const [loading, setLoading] = useState(true)
     const [userVotes, setUserVotes] = useState({})
+    const [userReview, setUserReview] = useState(null)
+    const [isEditing, setIsEditing] = useState(false)
+    const [reviewError, setReviewError] = useState(null)
     const { session } = UserAuth()
     const navigate = useNavigate()
     const { entityId } = useParams()
@@ -31,10 +34,16 @@ const Rating = () => {
         }
     }, [session, entityId])
 
-    // Load user's votes when reviews load
+    // Load user's votes when reviews load + find user's own review
     useEffect(() => {
-        if (session && currentEntity?.reviews) {
+        if (session && currentEntity?.reviews?.length > 0) {
             loadUserVotes()
+        }
+        if (session && currentEntity?.reviews) {
+            const existing = currentEntity.reviews.find(
+                (r) => r.user_id === session.user.id
+            )
+            setUserReview(existing || null)
         }
     }, [currentEntity?.reviews, session])
 
@@ -43,7 +52,6 @@ const Rating = () => {
         try {
             setLoading(true)
             
-            // Fetch the specific entity
             const { data: entity, error: entityError } = await supabase
                 .from('entities')
                 .select('*')
@@ -52,12 +60,11 @@ const Rating = () => {
             
             if (entityError) throw entityError
             
-            // Fetch reviews for this entity
             const { data: reviews, error: reviewsError } = await supabase
                 .from('reviews')
                 .select('*')
                 .eq('entity_id', entityId)
-                .order('created_at', { ascending: false }) // Show newest first
+                .order('created_at', { ascending: false })
 
             if (reviewsError) throw reviewsError
 
@@ -89,32 +96,23 @@ const Rating = () => {
         }
     }
 
-    // Check if user has already voted on a review
-    const checkUserVote = async (reviewId) => {
-        try {
-            const { data, error } = await supabase
-                .from('votes')
-                .select('vote_type')
-                .eq('target_id', reviewId)
-                .eq('user_id', session.user.id)
-                .eq('target_type', 'review')
-                .maybeSingle()
-            
-            if (error) throw error
-            return data?.vote_type || null
-        } catch (error) {
-            console.error('Error checking vote:', error)
-            return null
-        }
-    }
-
-    // Load all user votes for current reviews
+    // Load all user votes in a single batch query
     const loadUserVotes = async () => {
         try {
+            const reviewIds = currentEntity.reviews.map((r) => r.id)
+
+            const { data, error } = await supabase
+                .from('votes')
+                .select('target_id, vote_type')
+                .eq('user_id', session.user.id)
+                .eq('target_type', 'review')
+                .in('target_id', reviewIds)
+
+            if (error) throw error
+
             const votesMap = {}
-            for (const review of currentEntity.reviews) {
-                const vote = await checkUserVote(review.id)
-                if (vote) votesMap[review.id] = vote
+            for (const vote of data) {
+                votesMap[vote.target_id] = vote.vote_type
             }
             setUserVotes(votesMap)
         } catch (error) {
@@ -127,9 +125,7 @@ const Rating = () => {
         try {
             const existingVote = userVotes[reviewId]
             
-            // If clicking the same vote type -> remove vote
             if (existingVote === voteType) {
-                // Delete from votes table
                 const { error: deleteError } = await supabase
                     .from('votes')
                     .delete()
@@ -138,14 +134,10 @@ const Rating = () => {
                     .eq('target_type', 'review')
                 
                 if (deleteError) throw deleteError
-                
-                // Just refresh - don't manually update counts since they'll be fetched
                 await fetchSingleEntityWithRatings()
                 
             } else {
-                // If changing vote type or new vote, handle accordingly
                 if (existingVote) {
-                    // Remove old vote first
                     await supabase
                         .from('votes')
                         .delete()
@@ -154,7 +146,6 @@ const Rating = () => {
                         .eq('target_type', 'review')
                 }
                 
-                // Add new vote
                 const { error: insertError } = await supabase
                     .from('votes')
                     .insert([{
@@ -166,8 +157,6 @@ const Rating = () => {
                     }])
                 
                 if (insertError) throw insertError
-                
-                // Just refresh - don't manually update counts
                 await fetchSingleEntityWithRatings()
             }
             
@@ -179,32 +168,158 @@ const Rating = () => {
     // Submit a new review
     const submitRating = async (ratingData) => {
         try {
+            setReviewError(null)
+
             const { error } = await supabase
                 .from('reviews')
-                .insert([
-                    {
-                        entity_id: entityId,
-                        user_id: session.user.id,
-                        rating: ratingData.rating,
-                        title: ratingData.title,
-                        review_text: ratingData.review,
-                        upvote_count: 0,
-                        downvote_count: 0,
-                        created_at: new Date(),
-                        updated_at: new Date()
-                    }
-                ])
+                .insert([{
+                    entity_id: entityId,
+                    user_id: session.user.id,
+                    rating: ratingData.rating,
+                    title: ratingData.title,
+                    review_text: ratingData.review,
+                    upvote_count: 0,
+                    downvote_count: 0,
+                    created_at: new Date(),
+                    updated_at: new Date()
+                }])
             
-            if (error) throw error
+            if (error) {
+                if (error.code === '23505') {
+                    setReviewError("You've already reviewed this.")
+                    return
+                }
+                throw error
+            }
             
-            // Refresh the reviews after submission
             await fetchSingleEntityWithRatings()
         } catch (error) {
             console.error('Error submitting review:', error)
         }
     }
 
-    // Render single entity page
+    // Update existing review
+    const updateRating = async (ratingData) => {
+        try {
+            setReviewError(null)
+
+            const { error } = await supabase
+                .from('reviews')
+                .update({
+                    rating: ratingData.rating,
+                    title: ratingData.title,
+                    review_text: ratingData.review,
+                    updated_at: new Date()
+                })
+                .eq('id', userReview.id)
+                .eq('user_id', session.user.id)
+
+            if (error) throw error
+
+            setIsEditing(false)
+            await fetchSingleEntityWithRatings()
+        } catch (error) {
+            console.error('Error updating review:', error)
+        }
+    }
+
+    // Delete own review
+    const deleteRating = async () => {
+        if (!window.confirm('Are you sure you want to delete your review?')) return
+
+        try {
+            const { error } = await supabase
+                .from('reviews')
+                .delete()
+                .eq('id', userReview.id)
+                .eq('user_id', session.user.id)
+
+            if (error) throw error
+
+            setUserReview(null)
+            setIsEditing(false)
+            await fetchSingleEntityWithRatings()
+        } catch (error) {
+            console.error('Error deleting review:', error)
+        }
+    }
+
+    // Shared form — used for both submit and edit
+    const ReviewForm = ({ initial, onSubmit, onCancel }) => {
+        const [formState, setFormState] = useState({
+            rating: initial?.rating || '',
+            title: initial?.title || '',
+            review_text: initial?.review_text || ''
+        })
+
+        const handleSubmit = (e) => {
+            e.preventDefault()
+            onSubmit({
+                rating: parseInt(formState.rating),
+                title: formState.title,
+                review: formState.review_text
+            })
+        }
+
+        return (
+            <form onSubmit={handleSubmit}>
+                <label>
+                    Rating (1-5):
+                    <select
+                        name="rating"
+                        required
+                        value={formState.rating}
+                        onChange={(e) => setFormState({ ...formState, rating: e.target.value })}
+                    >
+                        <option value="">Select rating</option>
+                        {[1, 2, 3, 4, 5].map((r) => (
+                            <option key={r} value={r}>{r} ★</option>
+                        ))}
+                    </select>
+                </label>
+
+                <br />
+
+                <label>
+                    Review Title:
+                    <br />
+                    <input
+                        type="text"
+                        name="title"
+                        required
+                        placeholder="Summarize your experience"
+                        value={formState.title}
+                        onChange={(e) => setFormState({ ...formState, title: e.target.value })}
+                    />
+                </label>
+
+                <br />
+
+                <label>
+                    Your Review:
+                    <br />
+                    <textarea
+                        name="review_text"
+                        rows="4"
+                        required
+                        placeholder="Share your experience..."
+                        style={{ resize: 'none' }}
+                        value={formState.review_text}
+                        onChange={(e) => setFormState({ ...formState, review_text: e.target.value })}
+                    ></textarea>
+                </label>
+                <br />
+
+                <button type="submit">{initial ? 'Save Changes' : 'Submit Review'}</button>
+                {onCancel && (
+                    <button type="button" onClick={onCancel} style={{ marginLeft: '8px' }}>
+                        Cancel
+                    </button>
+                )}
+            </form>
+        )
+    }
+
     if (loading) {
         return (
             <div className="rating-container">
@@ -223,14 +338,14 @@ const Rating = () => {
 
     return (
         <div className="rating-container">
-			<button
-				type="button"
-				className="map-back-btn"
-				onClick={() => navigate(-1)}
-				aria-label="Go back"
-			>
-				Back
-			</button>
+            <button
+                type="button"
+                className="map-back-btn"
+                onClick={() => navigate(-1)}
+                aria-label="Go back"
+            >
+                Back
+            </button>
             <h1>{currentEntity.name}</h1>
             <p>{currentEntity.description}</p>
             
@@ -263,6 +378,26 @@ const Rating = () => {
                                     👎 {review.downvote_count || 0}
                                 </button>
                             </div>
+
+                            {/* Edit/Delete buttons — only show on user's own review */}
+                            {review.user_id === session?.user?.id && (
+                                <div className="review-actions">
+                                    <button
+                                        type="button"
+                                        className="edit-btn"
+                                        onClick={() => setIsEditing(true)}
+                                    >
+                                        Edit
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="delete-btn"
+                                        onClick={deleteRating}
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
+                            )}
                             
                             <small>Posted: {new Date(review.created_at).toLocaleDateString()}</small>
                         </div>
@@ -270,59 +405,21 @@ const Rating = () => {
                 )}
             </div>
             
-            {/* Review form */}
+            {/* Review form section */}
             <div className="rating-form">
-                <h2>Leave a Review</h2>
-                <form onSubmit={(e) => {
-                    e.preventDefault();
-                    const formData = new FormData(e.target);
-                    submitRating({
-                        rating: parseInt(formData.get('rating')),
-                        title: formData.get('title'),
-                        review: formData.get('review_text')
-                    });
-                    e.target.reset();
-                }}>
-                    <label>
-                        Rating (1-5):
-                        <select name="rating" required>
-                            <option value="">Select rating</option>
-                            {[1,2,3,4,5].map(rating => (
-                                <option key={rating} value={rating}>{rating} ★</option>
-                            ))}
-                        </select>
-                    </label>
-
-                    <br />
-
-                    <label>
-                        Review Title:
-                        <br />
-                        <input 
-                            type="text" 
-                            name="title" 
-                            required 
-                            placeholder="Summarize your experience"
+                {reviewError && (
+                    <p className="review-error" style={{ color: 'red' }}>{reviewError}</p>
+                )}
+                {!userReview || isEditing ? (
+                    <>
+                        <h2>{isEditing ? 'Edit Your Review' : 'Leave a Review'}</h2>
+                        <ReviewForm
+                            initial={isEditing ? userReview : null}
+                            onSubmit={isEditing ? updateRating : submitRating}
+                            onCancel={isEditing ? () => setIsEditing(false) : null}
                         />
-                    </label>
-                    
-                    <br />
-
-                    <label>
-                        Your Review:
-                        <br />
-                        <textarea 
-                            name="review_text"
-                            rows="4" 
-                            required
-                            placeholder="Share your experience..."
-                            style={{ resize: 'none' }}
-                        ></textarea>
-                    </label>
-                    <br />
-                    
-                    <button type="submit">Submit Review</button>
-                </form>
+                    </>
+                ) : null}
             </div>
         </div>
     )
