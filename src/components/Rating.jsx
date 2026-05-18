@@ -223,6 +223,14 @@ const Rating = () => {
 
     return (
         <div className="rating-container">
+			<button
+				type="button"
+				className="map-back-btn"
+				onClick={() => navigate(-1)}
+				aria-label="Go back"
+			>
+				Back
+			</button>
             <h1>{currentEntity.name}</h1>
             <p>{currentEntity.description}</p>
             
