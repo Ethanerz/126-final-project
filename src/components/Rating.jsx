@@ -47,7 +47,7 @@ const Rating = () => {
         }
     }, [currentEntity?.reviews, session])
 
-    // Fetch a single entity with its reviews
+    // Fetch a single entity with its reviews + reviewer names
     const fetchSingleEntityWithRatings = async () => {
         try {
             setLoading(true)
@@ -60,9 +60,10 @@ const Rating = () => {
             
             if (entityError) throw entityError
             
+            // Join user_profiles to get full_name for each review
             const { data: reviews, error: reviewsError } = await supabase
                 .from('reviews')
-                .select('*')
+                .select('*, user_profiles(full_name)')
                 .eq('entity_id', entityId)
                 .order('created_at', { ascending: false })
 
@@ -228,6 +229,15 @@ const Rating = () => {
         if (!window.confirm('Are you sure you want to delete your review?')) return
 
         try {
+            // Delete associated votes first
+            const { error: votesError } = await supabase
+                .from('votes')
+                .delete()
+                .eq('target_id', userReview.id)
+                .eq('target_type', 'review')
+
+            if (votesError) throw votesError
+
             const { error } = await supabase
                 .from('reviews')
                 .delete()
@@ -357,10 +367,13 @@ const Rating = () => {
                 ) : (
                     currentEntity.reviews.map((review) => (
                         <div key={review.id} className="review-card">
-                            <div className="review-rating">
-                                Rating: {review.rating}/5
-                            </div>
+                            <small className="review-author">
+                                {review.user_profiles?.full_name || 'User'}
+                            </small>
                             <h3 className="review-title">{review.title}</h3>
+                            <div className="review-rating">
+                                <strong>Rating: {review.rating}/5</strong>
+                            </div>
                             <p className="review-text">{review.review_text}</p>
                             
                             {/* Vote buttons */}
