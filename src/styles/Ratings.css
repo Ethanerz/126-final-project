@@ -12,6 +12,12 @@ textarea {
     transition: all 0.2s;
 }
 
+.review-card {
+  background:rgba(from #EBF4FF r g b);
+  margin: 20px 50px 20px 50px ;
+  border-radius: 30px;
+}
+
 .vote-btn.active {
     background-color: #4CAF50;
     color: white;

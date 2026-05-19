@@ -1,3 +1,6 @@
+# Access our website
+The website is deployed using vercel [here](https://126-final-project-orpin.vercel.app/)
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
