@@ -6,6 +6,8 @@ import '../styles/map.css';
 const MapPreview = () => {
   const navigate = useNavigate();
   const [entities, setEntities] = useState([]);
+  const mapRefExternal = useRef(null);
+  const markersRef = useRef({});
 
   return (
     <div className="map-page">
@@ -37,7 +39,11 @@ const MapPreview = () => {
         >
           Back
         </button>
-        <Map onEntitiesLoaded={setEntities} />
+        <Map
+          onEntitiesLoaded={setEntities}
+          mapRefExternal={mapRefExternal}
+          markersRef={markersRef}
+        />
       </div>
     </div>
   );

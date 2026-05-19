@@ -4,7 +4,7 @@ import "@maptiler/sdk/dist/maptiler-sdk.css";
 import '../styles/map.css';
 import { supabase } from '../supabaseClient';
 
-const Map = ({onEntitiesLoaded}) => {
+const Map = ({onEntitiesLoaded, mapRefExternal, markersRef}) => {
   const mapContainer = useRef(null);
   const mapRef = useRef(null);
   const upv = { lng: 122.230924083072, lat: 10.6419865561452 };
@@ -21,6 +21,8 @@ const Map = ({onEntitiesLoaded}) => {
       center: [upv.lng, upv.lat],
       zoom: zoom,
     });
+
+    if (mapRefExternal) mapRefExternal.current = mapRef.current;
 
     mapRef.current.on('mouseenter', 'Map marker', (e) => {
         mapRef.current.getCanvas().style.cursor = 'pointer';
