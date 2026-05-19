@@ -108,6 +108,12 @@ const Dashboard = () => {
         ) : (
           entities.map((entity) => (
             <div key={entity.id} className="entity-card">
+              <div className="entity-info">
+                <h3><Link to={`/rating/${entity.id}`}>{entity.name}</Link></h3>
+                <p className="entity-type">{entity.entity_type === 'facility' ? '🏛️ Facility' : '🛎️ Service'}</p>
+                <p className="entity-description">{entity.description || 'No description available'}</p>
+                <p className="entity-location">📍 {entity.address || 'Location not specified'}</p>
+              </div>
               <div className="rating-section">
                 <div className="rating-number">{entity.avgRating}</div>
                 <div className="rating-stars">
@@ -115,13 +121,6 @@ const Dashboard = () => {
                   {'☆'.repeat(5 - Math.floor(entity.avgRating))}
                 </div>
                 <div className="review-count">({entity.reviewCount} reviews)</div>
-              </div>
-
-              <div className="entity-info">
-                <h3><Link to={`/rating/${entity.id}`}>{entity.name}</Link></h3>
-                <p className="entity-type">{entity.entity_type === 'facility' ? '🏛️ Facility' : '🛎️ Service'}</p>
-                <p className="entity-description">{entity.description || 'No description available'}</p>
-                <p className="entity-location">📍 {entity.address || 'Location not specified'}</p>
               </div>
 
               <div className="entity-image">
