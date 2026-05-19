@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Map from './Map';
 import '../styles/map.css';
@@ -6,12 +6,13 @@ import '../styles/map.css';
 const MapPreview = () => {
   const navigate = useNavigate();
   const [entities, setEntities] = useState([]);
-  const mapRefExternal = useRef(null);
-  const markersRef = useRef({});
 
   return (
     <div className="map-page">
       <aside className="sidebar">
+        <div className="sidebar-header">
+          <h2>Places</h2>
+        </div>
         <div className="sidebar-content-info">
           {entities.map((entity) => {
             const reviewCount = entity.reviews?.length ?? 0;
@@ -24,6 +25,9 @@ const MapPreview = () => {
               <div key={entity.id} className="sidebar-entity-card">
                 <strong>{entity.name}</strong>
                 <div className="sidebar-stars">{stars}</div>
+                <div className="sidebar-rating-text">
+                  {avgRating.toFixed(1)} / 5 ({reviewCount} review{reviewCount !== 1 ? 's' : ''})
+                </div>
                 <p>{entity.description || 'No description available'}</p>
                 <a href={`/rating/${entity.id}`}>View Reviews</a>
               </div>
@@ -39,11 +43,7 @@ const MapPreview = () => {
         >
           Back
         </button>
-        <Map
-          onEntitiesLoaded={setEntities}
-          mapRefExternal={mapRefExternal}
-          markersRef={markersRef}
-        />
+        <Map onEntitiesLoaded={setEntities} />
       </div>
     </div>
   );
