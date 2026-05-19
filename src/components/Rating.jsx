@@ -49,35 +49,42 @@ const Rating = () => {
 
     // Fetch a single entity with its reviews + reviewer names
     const fetchSingleEntityWithRatings = async () => {
-        try {
-            setLoading(true)
-            
-            const { data: entity, error: entityError } = await supabase
-                .from('entities')
-                .select('*')
-                .eq('id', entityId)
-                .single()
-            
-            if (entityError) throw entityError
-            
-            // Join user_profiles to get full_name for each review
-            const { data: reviews, error: reviewsError } = await supabase
-                .from('reviews')
-                .select('*, user_profiles(full_name)')
-                .eq('entity_id', entityId)
-                .order('created_at', { ascending: false })
-
-            if (reviewsError) throw reviewsError
-
-            setCurrentEntity({
-                ...entity,
-                reviews: reviews || []
-            })
-        } catch (error) {
-            console.error('Error fetching entity:', error)
-        } finally {
-            setLoading(false)
-        }
+    try {
+        setLoading(true)
+        
+        // Fetch entity
+        const { data: entity, error: entityError } = await supabase
+        .from('entities')
+        .select('*')
+        .eq('id', entityId)
+        .single()
+        
+        if (entityError) throw entityError
+        
+        // Fetch reviews (no sorting here)
+        const { data: reviews, error: reviewsError } = await supabase
+        .from('reviews')
+        .select('*, user_profiles(full_name)')
+        .eq('entity_id', entityId)
+        .order('created_at', { ascending: false })  // Keep newest first? Or remove .order() entirely
+        
+        if (reviewsError) throw reviewsError
+        
+        // ✅ SORT IN REACT by net votes (upvotes - downvotes)
+        const sortedReviews = reviews?.sort((a, b) => 
+        (b.upvote_count - b.downvote_count) - (a.upvote_count - a.downvote_count)
+        ) || []
+        
+        setCurrentEntity({
+        ...entity,
+        reviews: sortedReviews
+        })
+        
+    } catch (error) {
+        console.error('Error fetching entity:', error)
+    } finally {
+        setLoading(false)
+    }
     }
 
     // Fetch all entities (if needed)
