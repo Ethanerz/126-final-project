@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { UserAuth } from '../context/AuthContext'
 import '../styles/Ratings.css'
@@ -412,6 +412,10 @@ const Rating = () => {
                                 </div>
                             )}
                             
+                            <Link to={`/rating/${entityId}/${review.id}`} className="replies-link">
+                                <small>replies</small>
+                            </Link>
+                            <br />
                             <small>Posted: {new Date(review.created_at).toLocaleDateString()}</small>
                         </div>
                     ))
