@@ -8,15 +8,20 @@ const MapPreview = () => {
 
   return (
     <div className="map-page">
-      <button
-        type="button"
-        className="map-back-btn"
-        onClick={() => navigate(-1)}
-        aria-label="Go back"
-      >
-        Back
-      </button>
-      <Map />
+      <aside className="sidebar">
+        <div className="sidebar-content-info"></div>
+      </aside>
+      <div className="map-area">
+        <button
+          type="button"
+          className="map-back-btn"
+          onClick={() => navigate(-1)}
+          aria-label="Go back"
+        >
+          Back
+        </button>
+        <Map />
+      </div>
     </div>
   );
 };
