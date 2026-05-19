@@ -39,7 +39,8 @@
 }
 
 body {
-  margin: 0;
+  max-width: 900px;
+  margin: 0 auto;
   font-family: var(--sans);
   font-weight: 400;
   background: var(--bg);
