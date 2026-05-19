@@ -4,7 +4,7 @@ import "@maptiler/sdk/dist/maptiler-sdk.css";
 import '../styles/map.css';
 import { supabase } from '../supabaseClient';
 
-const Map = () => {
+const Map = ({ onEntitiesLoaded }) => {
   const mapContainer = useRef(null);
   const mapRef = useRef(null);
   const upv = { lng: 122.230924083072, lat: 10.6419865561452 };
@@ -25,25 +25,25 @@ const Map = () => {
     const addMarkers = async () => {
       const { data: entities, error } = await supabase
         .from('entities')
-        .select('id, name, latitude, longitude, reviews(rating)');
+        .select('id, name, description, latitude, longitude, reviews(rating)');
 
       if (error) {
         console.error('Error fetching entities:', error.message);
         return;
       }
 
+      if (onEntitiesLoaded) onEntitiesLoaded(entities);
+
       entities.forEach((entity) => {
         const { id, name, latitude, longitude, reviews } = entity;
         if (latitude == null || longitude == null) return;
 
-        // Calculate average rating
         const reviewCount = reviews?.length ?? 0;
         const avgRating = reviewCount > 0
           ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
           : 0;
         const stars = '★'.repeat(Math.floor(avgRating)) + '☆'.repeat(5 - Math.floor(avgRating));
 
-        // Build popup HTML
         const popupHTML = `
           <div class="popUpMarker">
             <strong class="popUpTitle">${name}</strong>
@@ -51,23 +51,22 @@ const Map = () => {
             <div class="popUpReviews">
               ${avgRating.toFixed(1)} / 5 (${reviewCount} review${reviewCount !== 1 ? 's' : ''})
             </div>
-            <a class="popUpLink"href="/rating/${id}">
-              View Reviews
-            </a>
+            <a class="popUpLink" href="/rating/${id}">View Reviews</a>
           </div>
         `;
 
-        const popup = new maptilersdk.Popup({ offset: 25 })
-          .setHTML(popupHTML);
+        const popup = new maptilersdk.Popup({ offset: 25 }).setHTML(popupHTML);
 
-        new maptilersdk.Marker({ color: '#FF0000' })
+        const marker = new maptilersdk.Marker({ color: '#FF0000' })
           .setLngLat([longitude, latitude])
           .setPopup(popup)
           .addTo(mapRef.current);
+
+        marker.getElement().style.cursor = 'pointer';
       });
     };
 
-    if (mapRef.current.loaded && typeof mapRef.current.loaded === 'function' ? mapRef.current.loaded() : false) {
+    if (mapRef.current.loaded?.()) {
       addMarkers();
     } else {
       mapRef.current.on('load', addMarkers);
