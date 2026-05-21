@@ -1,6 +1,5 @@
 /* ─── AdminPanel.css ─────────────────────────────────────────────────────── */
 
-/* FAB (collapsed state) */
 .ap-fab {
   display: flex;
   align-items: center;
@@ -16,7 +15,6 @@
   letter-spacing: 0.06em;
   cursor: pointer;
   transition: background 0.15s, color 0.15s, box-shadow 0.15s;
-  box-shadow: 0 0 0 0 #e8c54740;
 }
 .ap-fab:hover {
   background: #e8c547;
@@ -26,7 +24,6 @@
 .ap-fab-icon { font-size: 1rem; }
 .ap-fab-label { font-size: 0.8rem; text-transform: uppercase; }
 
-/* Panel wrapper */
 .ap-panel {
   background: #0f0f1a;
   border: 1.5px solid #2e2e4a;
@@ -37,7 +34,6 @@
   margin-bottom: 24px;
 }
 
-/* Header */
 .ap-header {
   display: flex;
   align-items: center;
@@ -46,11 +42,7 @@
   background: #1a1a2e;
   border-bottom: 1.5px solid #2e2e4a;
 }
-.ap-header-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+.ap-header-left { display: flex; align-items: center; gap: 10px; }
 .ap-badge {
   font-size: 0.65rem;
   font-weight: 800;
@@ -60,299 +52,92 @@
   padding: 3px 8px;
   border-radius: 4px;
 }
-.ap-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #f0f0f0;
-  margin: 0;
-  letter-spacing: 0.04em;
-}
+.ap-title { font-size: 1rem; font-weight: 700; color: #f0f0f0; margin: 0; letter-spacing: 0.04em; }
 .ap-close {
-  background: none;
-  border: none;
-  color: #888;
-  font-size: 1rem;
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 4px;
+  background: none; border: none; color: #888; font-size: 1rem;
+  cursor: pointer; padding: 4px 8px; border-radius: 4px;
   transition: color 0.15s, background 0.15s;
 }
-.ap-close:hover {
-  color: #fff;
-  background: #2e2e4a;
-}
+.ap-close:hover { color: #fff; background: #2e2e4a; }
 
-/* Tabs */
-.ap-tabs {
-  display: flex;
-  border-bottom: 1.5px solid #2e2e4a;
-}
+.ap-tabs { display: flex; border-bottom: 1.5px solid #2e2e4a; }
 .ap-tab {
-  flex: 1;
-  padding: 12px 0;
-  background: none;
-  border: none;
-  color: #666;
-  font-family: 'Courier New', monospace;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  cursor: pointer;
-  transition: color 0.15s, background 0.15s, border-bottom 0.15s;
+  flex: 1; padding: 12px 0; background: none; border: none;
+  color: #666; font-family: 'Courier New', monospace; font-size: 0.78rem;
+  font-weight: 700; letter-spacing: 0.08em; cursor: pointer;
+  transition: color 0.15s, background 0.15s;
   border-bottom: 3px solid transparent;
 }
 .ap-tab:hover { color: #bbb; background: #1a1a2e; }
-.ap-tab.active {
-  color: #e8c547;
-  border-bottom: 3px solid #e8c547;
-  background: #12121f;
-}
+.ap-tab.active { color: #e8c547; border-bottom: 3px solid #e8c547; background: #12121f; }
 
-/* Body */
-.ap-body {
-  padding: 20px;
-}
+.ap-body { padding: 20px; }
 
-/* Form */
-.ap-form {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-.ap-field {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-.ap-label {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: #888;
-  text-transform: uppercase;
-}
+.ap-form { display: flex; flex-direction: column; gap: 14px; }
+.ap-field { display: flex; flex-direction: column; gap: 5px; }
+.ap-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; color: #888; text-transform: uppercase; }
 .ap-required { color: #e05; margin-left: 3px; }
 
 .ap-input {
-  background: #1a1a2e;
-  border: 1.5px solid #2e2e4a;
-  border-radius: 6px;
-  color: #f0f0f0;
-  font-family: 'Courier New', monospace;
-  font-size: 0.9rem;
-  padding: 9px 12px;
-  outline: none;
-  transition: border-color 0.15s;
-  width: 100%;
-  box-sizing: border-box;
+  background: #1a1a2e; border: 1.5px solid #2e2e4a; border-radius: 6px;
+  color: #f0f0f0; font-family: 'Courier New', monospace; font-size: 0.9rem;
+  padding: 9px 12px; outline: none; transition: border-color 0.15s;
+  width: 100%; box-sizing: border-box;
 }
 .ap-input:focus { border-color: #e8c547; }
 .ap-input::placeholder { color: #444; }
 .ap-textarea { resize: vertical; min-height: 72px; }
 
-.ap-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
+.ap-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-/* Radio group */
-.ap-radio-group {
-  display: flex;
-  gap: 10px;
-}
+.ap-radio-group { display: flex; gap: 10px; }
 .ap-radio {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 10px;
-  background: #1a1a2e;
-  border: 1.5px solid #2e2e4a;
-  border-radius: 6px;
-  color: #888;
-  font-size: 0.82rem;
-  font-family: 'Courier New', monospace;
-  cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
-  user-select: none;
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px; background: #1a1a2e; border: 1.5px solid #2e2e4a; border-radius: 6px;
+  color: #888; font-size: 0.82rem; font-family: 'Courier New', monospace;
+  cursor: pointer; transition: border-color 0.15s, color 0.15s; user-select: none;
 }
 .ap-radio input[type="radio"] { display: none; }
-.ap-radio.active {
-  border-color: #e8c547;
-  color: #e8c547;
-  background: #1f1f30;
-}
+.ap-radio.active { border-color: #e8c547; color: #e8c547; background: #1f1f30; }
 
-/* Submit */
 .ap-submit {
-  margin-top: 4px;
-  padding: 12px;
-  background: #e8c547;
-  color: #1a1a2e;
-  border: none;
-  border-radius: 6px;
-  font-family: 'Courier New', monospace;
-  font-size: 0.85rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: opacity 0.15s, box-shadow 0.15s;
+  margin-top: 4px; padding: 12px; background: #e8c547; color: #1a1a2e;
+  border: none; border-radius: 6px; font-family: 'Courier New', monospace;
+  font-size: 0.85rem; font-weight: 800; letter-spacing: 0.08em;
+  text-transform: uppercase; cursor: pointer; transition: opacity 0.15s, box-shadow 0.15s;
 }
-.ap-submit:hover:not(:disabled) {
-  box-shadow: 0 0 14px #e8c54750;
-  opacity: 0.92;
-}
+.ap-submit:hover:not(:disabled) { box-shadow: 0 0 14px #e8c54750; opacity: 0.92; }
 .ap-submit:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* Status messages */
-.ap-status {
-  font-size: 0.8rem;
-  padding: 9px 12px;
-  border-radius: 6px;
-  font-family: 'Courier New', monospace;
-}
-.ap-status--success {
-  background: #0d2e1a;
-  border: 1px solid #2a7a4a;
-  color: #4cca80;
-}
-.ap-status--error {
-  background: #2e0d0d;
-  border: 1px solid #7a2a2a;
-  color: #e05555;
-}
+.ap-status { font-size: 0.8rem; padding: 9px 12px; border-radius: 6px; font-family: 'Courier New', monospace; }
+.ap-status--success { background: #0d2e1a; border: 1px solid #2a7a4a; color: #4cca80; }
+.ap-status--error { background: #2e0d0d; border: 1px solid #7a2a2a; color: #e05555; }
 
-/* Search section */
-.ap-hint {
-  color: #666;
-  font-size: 0.8rem;
-  margin: 0 0 10px;
-  font-family: 'Courier New', monospace;
-}
-.ap-search-section {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.ap-results {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  max-height: 200px;
-  overflow-y: auto;
-}
-.ap-result-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 14px;
-  background: #1a1a2e;
-  border: 1.5px solid #2e2e4a;
-  border-radius: 6px;
-  cursor: pointer;
-  text-align: left;
-  transition: border-color 0.15s, background 0.15s;
-}
-.ap-result-item:hover {
-  border-color: #e8c547;
-  background: #1f1f30;
-}
-.ap-result-item--danger:hover {
-  border-color: #e05555;
-  background: #1f1018;
-}
-.ap-result-name {
-  color: #f0f0f0;
-  font-family: 'Courier New', monospace;
-  font-size: 0.88rem;
-}
-.ap-result-type {
-  color: #555;
-  font-family: 'Courier New', monospace;
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
+.ap-hint { color: #666; font-size: 0.82rem; margin: 0 0 10px; font-family: 'Courier New', monospace; line-height: 1.5; }
+.ap-hint strong { font-weight: 700; }
 
-/* Back button */
-.ap-back {
-  background: none;
-  border: none;
-  color: #888;
-  font-family: 'Courier New', monospace;
-  font-size: 0.78rem;
-  cursor: pointer;
-  padding: 0;
-  margin-bottom: 6px;
-  transition: color 0.15s;
-  text-align: left;
-}
-.ap-back:hover { color: #e8c547; }
-
-/* Delete confirm */
 .ap-delete-confirm {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  text-align: center;
-  padding: 8px 0;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 14px; text-align: center; padding: 8px 0;
 }
-.ap-delete-warning {
-  font-size: 2.4rem;
-  line-height: 1;
-}
-.ap-delete-msg {
-  color: #ccc;
-  font-family: 'Courier New', monospace;
-  font-size: 0.88rem;
-  line-height: 1.6;
-  margin: 0;
-}
-.ap-delete-sub {
-  color: #666;
-  font-size: 0.78rem;
-}
-.ap-delete-actions {
-  display: flex;
-  gap: 10px;
-  width: 100%;
-}
+.ap-delete-warning { font-size: 2.4rem; line-height: 1; }
+.ap-delete-msg { color: #ccc; font-family: 'Courier New', monospace; font-size: 0.88rem; line-height: 1.6; margin: 0; }
+.ap-delete-sub { color: #666; font-size: 0.78rem; }
+.ap-delete-actions { display: flex; gap: 10px; width: 100%; }
+
 .ap-btn-ghost {
-  flex: 1;
-  padding: 11px;
-  background: none;
-  border: 1.5px solid #2e2e4a;
-  border-radius: 6px;
-  color: #888;
-  font-family: 'Courier New', monospace;
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
+  flex: 1; padding: 11px; background: none; border: 1.5px solid #2e2e4a;
+  border-radius: 6px; color: #888; font-family: 'Courier New', monospace;
+  font-size: 0.82rem; font-weight: 700; cursor: pointer;
   transition: border-color 0.15s, color 0.15s;
 }
 .ap-btn-ghost:hover { border-color: #aaa; color: #eee; }
 
 .ap-btn-danger {
-  flex: 1;
-  padding: 11px;
-  background: #7a1515;
-  border: 1.5px solid #b02020;
-  border-radius: 6px;
-  color: #ffcccc;
-  font-family: 'Courier New', monospace;
-  font-size: 0.82rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  cursor: pointer;
-  text-transform: uppercase;
-  transition: background 0.15s, box-shadow 0.15s;
+  flex: 1; padding: 11px; background: #7a1515; border: 1.5px solid #b02020;
+  border-radius: 6px; color: #ffcccc; font-family: 'Courier New', monospace;
+  font-size: 0.82rem; font-weight: 800; letter-spacing: 0.06em; cursor: pointer;
+  text-transform: uppercase; transition: background 0.15s, box-shadow 0.15s;
 }
-.ap-btn-danger:hover:not(:disabled) {
-  background: #a01c1c;
-  box-shadow: 0 0 12px #b0202050;
-}
+.ap-btn-danger:hover:not(:disabled) { background: #a01c1c; box-shadow: 0 0 12px #b0202050; }
 .ap-btn-danger:disabled { opacity: 0.5; cursor: not-allowed; }

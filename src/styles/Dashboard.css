@@ -15,7 +15,13 @@
   }
 }
 
-.signout-btn {
+.entity-card {
+  background:rgba(from #EBF4FF r g b);
+  margin: 20px 50px 20px 50px ;
+  border-radius: 30px;
+}
+
+.signout-btn, .profile-btn {
   font-family: var(--sans);
   font-weight: 600;
   font-size: 13px;
@@ -34,14 +40,14 @@
     box-shadow 160ms ease;
 }
 
-.signout-btn:hover {
+.signout-btn:hover, .profile-btn:hover {
   background: var(--brand-fg);
   color: var(--brand-bg);
   transform: translateY(-1px);
   box-shadow: 0 6px 14px -6px rgba(163, 31, 51, 0.55);
 }
 
-.signout-btn:active {
+.signout-btn:active, .profile-btn:active {
   transform: translateY(0);
   box-shadow: none;
 }

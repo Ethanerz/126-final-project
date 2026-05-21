@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
 import { UserAuth } from '../context/AuthContext'
 import '../styles/AdminPanel.css'
@@ -14,7 +14,7 @@ const emptyForm = {
   images_text: '',
 }
 
-// ── Defined OUTSIDE the component so they never get recreated on re-render ──
+// ── Defined OUTSIDE component so inputs never remount on re-render ────────────
 
 const Field = ({ label, name, type = 'text', placeholder, required, form, setForm }) => (
   <div className="ap-field">
@@ -87,18 +87,52 @@ const EntityForm = ({ form, setForm, onSubmit, submitLabel, status, loading }) =
   </form>
 )
 
-// ── Main component ───────────────────────────────────────────────────────────
+// ── Main component ────────────────────────────────────────────────────────────
+// pendingEdit / pendingDelete: entity object passed from Dashboard card buttons
+// onConsumed: called after panel has consumed the pending action (resets parent state)
 
-const AdminPanel = ({ onEntityChange }) => {
+const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) => {
   const { session } = UserAuth()
   const [open, setOpen] = useState(false)
-  const [mode, setMode] = useState('add') // 'add' | 'edit' | 'delete'
+  const [mode, setMode] = useState('add')
   const [form, setForm] = useState(emptyForm)
   const [editId, setEditId] = useState(null)
   const [deleteId, setDeleteId] = useState(null)
   const [deleteName, setDeleteName] = useState('')
   const [status, setStatus] = useState(null)
   const [loading, setLoading] = useState(false)
+
+  // When Dashboard passes a pendingEdit, load it and open panel
+  useEffect(() => {
+    if (!pendingEdit) return
+    setForm({
+      name: pendingEdit.name || '',
+      entity_type: pendingEdit.entity_type || 'facility',
+      latitude: pendingEdit.latitude ?? '',
+      longitude: pendingEdit.longitude ?? '',
+      description: pendingEdit.description || '',
+      images_text: pendingEdit.images_text || '',
+    })
+    setEditId(pendingEdit.id)
+    setDeleteId(null)
+    setMode('edit')
+    setStatus(null)
+    setOpen(true)
+    onConsumed()
+  }, [pendingEdit])
+
+  // When Dashboard passes a pendingDelete, load it and open panel
+  useEffect(() => {
+    if (!pendingDelete) return
+    setDeleteId(pendingDelete.id)
+    setDeleteName(pendingDelete.name)
+    setEditId(null)
+    setForm(emptyForm)
+    setMode('delete')
+    setStatus(null)
+    setOpen(true)
+    onConsumed()
+  }, [pendingDelete])
 
   const reset = () => {
     setForm(emptyForm)
@@ -113,31 +147,7 @@ const AdminPanel = ({ onEntityChange }) => {
     setMode(m)
   }
 
-  // Called from entity card buttons in Dashboard
-  const openEdit = (entity) => {
-    setForm({
-      name: entity.name || '',
-      entity_type: entity.entity_type || 'facility',
-      latitude: entity.latitude ?? '',
-      longitude: entity.longitude ?? '',
-      description: entity.description || '',
-      images_text: entity.images_text || '',
-    })
-    setEditId(entity.id)
-    setMode('edit')
-    setStatus(null)
-    setOpen(true)
-  }
-
-  const openDelete = (entity) => {
-    setDeleteId(entity.id)
-    setDeleteName(entity.name)
-    setMode('delete')
-    setStatus(null)
-    setOpen(true)
-  }
-
-  // ── CRUD ─────────────────────────────────────────────────────────────────
+  // ── CRUD ──────────────────────────────────────────────────────────────────
 
   const handleAdd = async (e) => {
     e.preventDefault()
@@ -202,11 +212,7 @@ const AdminPanel = ({ onEntityChange }) => {
     }
   }
 
-  // Expose openEdit / openDelete so Dashboard can call them via ref
-  AdminPanel.openEdit = openEdit
-  AdminPanel.openDelete = openDelete
-
-  // ── Collapsed FAB ────────────────────────────────────────────────────────
+  // ── Collapsed FAB ─────────────────────────────────────────────────────────
 
   if (!open) {
     return (
@@ -217,7 +223,7 @@ const AdminPanel = ({ onEntityChange }) => {
     )
   }
 
-  // ── Expanded panel ───────────────────────────────────────────────────────
+  // ── Expanded panel ────────────────────────────────────────────────────────
 
   return (
     <div className="ap-panel">
@@ -255,50 +261,48 @@ const AdminPanel = ({ onEntityChange }) => {
         )}
 
         {mode === 'edit' && (
-          <>
-            {editId ? (
-              <>
-                <p className="ap-hint">Editing: <strong style={{ color: '#e8c547' }}>{form.name || '—'}</strong></p>
-                <EntityForm
-                  form={form}
-                  setForm={setForm}
-                  onSubmit={handleEditSave}
-                  submitLabel="Save Changes"
-                  status={status}
-                  loading={loading}
-                />
-              </>
-            ) : (
-              <p className="ap-hint">Click the <strong>✎</strong> button on any entity card to edit it.</p>
-            )}
-          </>
+          editId ? (
+            <>
+              <p className="ap-hint">
+                Editing: <strong style={{ color: '#e8c547' }}>{form.name || '—'}</strong>
+              </p>
+              <EntityForm
+                form={form}
+                setForm={setForm}
+                onSubmit={handleEditSave}
+                submitLabel="Save Changes"
+                status={status}
+                loading={loading}
+              />
+            </>
+          ) : (
+            <p className="ap-hint">Click the <strong>✎</strong> button on any entity card to edit it.</p>
+          )
         )}
 
         {mode === 'delete' && (
-          <>
-            {deleteId ? (
-              <div className="ap-delete-confirm">
-                <div className="ap-delete-warning">⚠️</div>
-                <p className="ap-delete-msg">
-                  Permanently delete <strong>"{deleteName}"</strong>?<br />
-                  <span className="ap-delete-sub">This will also remove all associated reviews.</span>
-                </p>
-                {status && (
-                  <div className={`ap-status ap-status--${status.type}`}>{status.msg}</div>
-                )}
-                <div className="ap-delete-actions">
-                  <button className="ap-btn-ghost" onClick={() => { reset(); setMode('add') }}>
-                    Cancel
-                  </button>
-                  <button className="ap-btn-danger" onClick={handleDelete} disabled={loading}>
-                    {loading ? 'Deleting…' : 'Yes, Delete'}
-                  </button>
-                </div>
+          deleteId ? (
+            <div className="ap-delete-confirm">
+              <div className="ap-delete-warning">⚠️</div>
+              <p className="ap-delete-msg">
+                Permanently delete <strong>"{deleteName}"</strong>?<br />
+                <span className="ap-delete-sub">This will also remove all associated reviews.</span>
+              </p>
+              {status && (
+                <div className={`ap-status ap-status--${status.type}`}>{status.msg}</div>
+              )}
+              <div className="ap-delete-actions">
+                <button className="ap-btn-ghost" onClick={() => { reset(); setMode('add') }}>
+                  Cancel
+                </button>
+                <button className="ap-btn-danger" onClick={handleDelete} disabled={loading}>
+                  {loading ? 'Deleting…' : 'Yes, Delete'}
+                </button>
               </div>
-            ) : (
-              <p className="ap-hint">Click the <strong>✕</strong> button on any entity card to delete it.</p>
-            )}
-          </>
+            </div>
+          ) : (
+            <p className="ap-hint">Click the <strong>✕</strong> button on any entity card to delete it.</p>
+          )
         )}
 
       </div>
