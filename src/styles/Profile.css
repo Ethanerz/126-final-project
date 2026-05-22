@@ -1,0 +1,234 @@
+/* ─── Profile.css ──────────────────────────────────────────────────────── */
+
+.profile-page {
+  min-height: 100svh;
+  background: var(--brand-bg);
+  padding: 32px 16px 64px;
+  font-family: var(--sans);
+  color: var(--text);
+  text-align: left;
+}
+
+.profile-shell {
+  max-width: 520px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.profile-title {
+  font-family: var(--heading);
+  font-weight: 400;
+  font-size: 48px;
+  line-height: 1;
+  letter-spacing: 1.5px;
+  color: var(--brand-fg);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.profile-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 28px 28px 24px;
+  box-shadow: 0 24px 60px -40px rgba(31, 20, 27, 0.35);
+}
+
+.profile-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.profile-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.profile-field label {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--text);
+  text-transform: uppercase;
+}
+
+.profile-field p {
+  font-family: var(--sans);
+  font-size: 15px;
+  color: var(--text-h);
+  margin: 0;
+}
+
+.profile-field input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: #ffffff;
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--text-h);
+  outline: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.profile-field input:focus {
+  border-color: var(--brand-fg);
+  box-shadow: 0 0 0 3px var(--brand-fg-soft);
+}
+
+.role-badge {
+  display: inline-block;
+  align-self: flex-start;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--brand-bg);
+  background: var(--brand-fg);
+  padding: 4px 10px;
+  border-radius: 999px;
+  text-transform: uppercase;
+}
+
+.role-badge.role-user {
+  color: var(--brand-fg);
+  background: var(--brand-fg-soft);
+  border: 1px solid var(--brand-outline);
+}
+
+.profile-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+
+.profile-error {
+  background: var(--brand-fg-soft);
+  border: 1px solid var(--brand-outline);
+  color: var(--brand-fg);
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-top: 16px;
+}
+
+/* ── Buttons (shared visual with auth-btn) ─────────────────────────────── */
+
+.btn {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 11px 22px;
+  border-radius: 999px;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--brand-fg);
+  color: var(--brand-bg);
+  border-color: var(--brand-fg);
+  box-shadow: 0 10px 22px -14px rgba(163, 31, 51, 0.75);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--brand-fg-hover);
+  border-color: var(--brand-fg-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px -14px rgba(163, 31, 51, 0.85);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--brand-fg);
+  border-color: var(--brand-fg);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: var(--brand-fg);
+  color: var(--brand-bg);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px -14px rgba(163, 31, 51, 0.65);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--brand-fg-soft);
+  border-color: var(--brand-outline);
+  color: var(--brand-fg);
+}
+
+/* ── Back button — inline-flow, matches map-back-btn visual ────────────── */
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  padding: 9px 16px 9px 12px;
+  border-radius: 999px;
+  border: 1.5px solid var(--brand-fg);
+  background: #ffffff;
+  color: var(--brand-fg);
+  cursor: pointer;
+  box-shadow: 0 6px 14px -10px rgba(31, 20, 27, 0.35);
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.back-btn::before {
+  content: '\2190';
+  font-size: 15px;
+  line-height: 1;
+}
+
+.back-btn:hover {
+  background: var(--brand-fg);
+  color: var(--brand-bg);
+  transform: translateX(-1px);
+  box-shadow: 0 10px 22px -10px rgba(163, 31, 51, 0.65);
+}
+
+.back-btn:active {
+  transform: translateX(0);
+}

@@ -1,37 +1,456 @@
-textarea {
-    resize: none;  /* Prevents any resizing */
+/* ─── Ratings.css — shared by Rating + Replies pages ─────────────────────── */
+
+.rating-container {
+  min-height: 100svh;
+  background: var(--brand-bg);
+  padding: 32px 16px 64px;
+  font-family: var(--sans);
+  color: var(--text);
+  text-align: left;
+}
+
+.rating-shell {
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Header (back + page title) ────────────────────────────────────────── */
+
+.rating-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.rating-title {
+  font-family: var(--heading);
+  font-weight: 400;
+  font-size: 44px;
+  line-height: 1;
+  letter-spacing: 1.5px;
+  color: var(--brand-fg);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.rating-subtitle {
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.55;
+}
+
+/* ── Entity description block ──────────────────────────────────────────── */
+
+.entity-meta {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px;
+}
+
+.entity-meta p {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text);
+  margin: 0;
+}
+
+/* ── Section heading ───────────────────────────────────────────────────── */
+
+.section-heading {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text);
+  margin: 8px 0 -4px;
+}
+
+/* ── Review card ───────────────────────────────────────────────────────── */
+
+.review-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: box-shadow 160ms ease, transform 160ms ease;
+}
+
+.review-card:hover {
+  box-shadow: 0 14px 30px -22px rgba(31, 20, 27, 0.35);
+}
+
+.review-author {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brand-fg);
+}
+
+.review-title {
+  font-family: var(--sans);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-h);
+  margin: 0;
+}
+
+.review-rating {
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--text);
+}
+
+.review-rating strong {
+  color: var(--text-h);
+  font-weight: 600;
+}
+
+.review-stars {
+  color: var(--brand-fg);
+  letter-spacing: 1px;
+  margin-left: 4px;
+}
+
+.review-text {
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text);
+  margin: 4px 0 0;
+  white-space: pre-wrap;
+}
+
+/* Vote bar */
+
+.review-votes {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
 }
 
 .vote-btn {
-    cursor: pointer;
-    background: none;
-    border: 1px solid #ddd;
-    padding: 5px 10px;
-    margin: 0 5px;
-    border-radius: 5px;
-    transition: all 0.2s;
-}
-
-.review-card {
-  background:rgba(from #EBF4FF r g b);
-  margin: 20px 50px 20px 50px ;
-  border-radius: 30px;
-}
-
-.vote-btn.active {
-    background-color: #4CAF50;
-    color: white;
-    border-color: #4CAF50;
-}
-
-.vote-btn.upvote.active {
-    background-color: #4CAF50;
-}
-
-.vote-btn.downvote.active {
-    background-color: #f44336;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border);
+  background: #ffffff;
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
 }
 
 .vote-btn:hover {
-    transform: scale(1.05);
+  border-color: var(--brand-outline);
+  color: var(--brand-fg);
+  transform: translateY(-1px);
+}
+
+.vote-btn.upvote.active {
+  background: var(--brand-fg);
+  color: var(--brand-bg);
+  border-color: var(--brand-fg);
+}
+
+.vote-btn.downvote.active {
+  background: var(--text-h);
+  color: var(--brand-bg);
+  border-color: var(--text-h);
+}
+
+/* Review actions row (edit / delete on own review) */
+
+.review-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.review-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1.5px solid var(--brand-fg);
+  background: transparent;
+  color: var(--brand-fg);
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.review-action-btn:hover {
+  background: var(--brand-fg);
+  color: var(--brand-bg);
+  transform: translateY(-1px);
+}
+
+.review-action-btn.danger {
+  background: var(--brand-fg);
+  color: var(--brand-bg);
+}
+
+.review-action-btn.danger:hover {
+  background: var(--brand-fg-hover);
+  border-color: var(--brand-fg-hover);
+}
+
+/* Meta row (replies link + date) */
+
+.review-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+}
+
+.replies-link {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: var(--brand-fg);
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.replies-link:hover {
+  text-decoration: underline;
+}
+
+.review-date {
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--text);
+}
+
+/* Empty state */
+
+.empty-state {
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--text);
+  background: #ffffff;
+  border: 1px dashed var(--border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  text-align: center;
+}
+
+/* ── Form card (Leave a Review / Edit / Reply) ─────────────────────────── */
+
+.form-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 22px 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 18px 44px -32px rgba(31, 20, 27, 0.35);
+}
+
+.form-card-title {
+  font-family: var(--sans);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-h);
+  margin: 0;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-field label {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--text);
+  text-transform: uppercase;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: #ffffff;
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--text-h);
+  outline: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  border-color: var(--brand-fg);
+  box-shadow: 0 0 0 3px var(--brand-fg-soft);
+}
+
+.form-field textarea {
+  resize: vertical;
+  min-height: 90px;
+  line-height: 1.5;
+}
+
+.form-error {
+  background: var(--brand-fg-soft);
+  border: 1px solid var(--brand-outline);
+  color: var(--brand-fg);
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+/* ── Shared button utilities (mirrors Profile.css) ─────────────────────── */
+
+.btn {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 11px 22px;
+  border-radius: 999px;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--brand-fg);
+  color: var(--brand-bg);
+  border-color: var(--brand-fg);
+  box-shadow: 0 10px 22px -14px rgba(163, 31, 51, 0.75);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--brand-fg-hover);
+  border-color: var(--brand-fg-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px -14px rgba(163, 31, 51, 0.85);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--brand-fg);
+  border-color: var(--brand-fg);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: var(--brand-fg);
+  color: var(--brand-bg);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px -14px rgba(163, 31, 51, 0.65);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--brand-fg-soft);
+  border-color: var(--brand-outline);
+  color: var(--brand-fg);
+}
+
+/* ── Back button — same pattern as Profile / shared visual with map ────── */
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  padding: 9px 16px 9px 12px;
+  border-radius: 999px;
+  border: 1.5px solid var(--brand-fg);
+  background: #ffffff;
+  color: var(--brand-fg);
+  cursor: pointer;
+  box-shadow: 0 6px 14px -10px rgba(31, 20, 27, 0.35);
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.back-btn::before {
+  content: '\2190';
+  font-size: 15px;
+  line-height: 1;
+}
+
+.back-btn:hover {
+  background: var(--brand-fg);
+  color: var(--brand-bg);
+  transform: translateX(-1px);
+  box-shadow: 0 10px 22px -10px rgba(163, 31, 51, 0.65);
+}
+
+.back-btn:active {
+  transform: translateX(0);
 }
