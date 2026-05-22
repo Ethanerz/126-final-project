@@ -1,125 +1,275 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+/* ─────────────────────────────────────────────────────────────────
+   Rate UPV — design system tokens + base styles
+   ───────────────────────────────────────────────────────────────── */
+
+@font-face {
+  font-family: "Agency FB";
+  src: url("/fonts/AgencyFB-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Raleway:ital,wght@0,400;0,500;0,700;1,400&family=Roboto:wght@400;500&display=swap");
 
 :root {
-  --brand-bg: #FFF7F0;
-  --brand-fg: #A31F33;
-  --brand-fg-hover: #871726;
-  --brand-fg-soft: rgba(163, 31, 51, 0.12);
-  --brand-outline: rgba(163, 31, 51, 0.35);
+  /* ── Brand palette ─────────────────────────────────────────────── */
+  --rupv-maroon:        #A31F33;
+  --rupv-maroon-deep:   #8A0418;
+  --rupv-cream:         #FFF7F0;
+  --rupv-ink:           #1F141B;
+  --rupv-bone:          #F5F5F5;
 
-  --text: #4a3c40;
-  --text-h: #1F141B;
-  --bg: var(--brand-bg);
-  --border: #e5d9d2;
-  --code-bg: #f4f3ec;
-  --accent: var(--brand-fg);
-  --accent-bg: var(--brand-fg-soft);
-  --accent-border: var(--brand-outline);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  /* ── Secondary ─────────────────────────────────────────────────── */
+  --rupv-slate:         #3B4256;
+  --rupv-slate-soft:    #5A6480;
+  --rupv-sky:           #EBF4FF;
+  --rupv-sky-deep:      #D8E6F7;
 
-  --sans: 'Montserrat', system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: 'Agency FB', 'Agency', 'Impact', 'Oswald', 'Bebas Neue', sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  /* ── Semantic ──────────────────────────────────────────────────── */
+  --rupv-fg-1:          var(--rupv-ink);
+  --rupv-fg-2:          #4A3F46;
+  --rupv-fg-3:          #847A80;
+  --rupv-fg-inv:        var(--rupv-cream);
+  --rupv-fg-inv-2:      #C9C0C5;
 
-  font: 400 16px/150% var(--sans);
-  letter-spacing: 0.1px;
-  color-scheme: light;
-  color: var(--text);
-  background: var(--bg);
+  --rupv-bg:            #FFFFFF;
+  --rupv-bg-alt:        var(--rupv-bone);
+  --rupv-surface:       var(--rupv-sky);
+  --rupv-surface-warm:  var(--rupv-cream);
+  --rupv-surface-dark:  var(--rupv-ink);
+
+  --rupv-border:        #1F141B;
+  --rupv-border-soft:   #D9D9D9;
+  --rupv-divider:       var(--rupv-sky);
+
+  --rupv-accent:        var(--rupv-maroon);
+  --rupv-accent-fg:     var(--rupv-cream);
+  --rupv-rate-good:     #2E7D32;
+  --rupv-rate-ok:       #C78200;
+  --rupv-rate-bad:      var(--rupv-maroon);
+
+  /* ── Spacing scale (8-pt) ──────────────────────────────────────── */
+  --rupv-s-0:  0;
+  --rupv-s-1:  4px;
+  --rupv-s-2:  8px;
+  --rupv-s-3:  12px;
+  --rupv-s-4:  16px;
+  --rupv-s-5:  24px;
+  --rupv-s-6:  32px;
+  --rupv-s-7:  48px;
+  --rupv-s-8:  64px;
+  --rupv-s-9:  96px;
+
+  /* ── Radii ─────────────────────────────────────────────────────── */
+  --rupv-r-1:  4px;
+  --rupv-r-2:  10px;
+  --rupv-r-3:  20px;
+  --rupv-r-pill: 999px;
+
+  /* ── Borders ───────────────────────────────────────────────────── */
+  --rupv-bw-1: 1px;
+  --rupv-bw-2: 2px;
+  --rupv-bw-3: 4px;
+  --rupv-bw-4: 5px;
+
+  /* ── Shadows ───────────────────────────────────────────────────── */
+  --rupv-shadow-1: 0 1px 3px rgba(0, 0, 0, 0.12);
+  --rupv-shadow-2: 0 4px 4px rgba(0, 0, 0, 0.25);
+  --rupv-shadow-3: 0 4px 10px rgba(59, 66, 86, 0.35);
+  --rupv-shadow-4: 0 12px 28px rgba(31, 20, 27, 0.20);
+
+  /* ── Type families ─────────────────────────────────────────────── */
+  --rupv-font-display:  "Agency FB", "Oswald", "Impact", sans-serif;
+  --rupv-font-heading:  "Raleway", "Helvetica Neue", system-ui, sans-serif;
+  --rupv-font-body:     "Inter", system-ui, -apple-system, sans-serif;
+  --rupv-font-micro:    "Roboto", "Inter", system-ui, sans-serif;
+
+  /* ── Type ramp ─────────────────────────────────────────────────── */
+  --rupv-fs-display:    96px;
+  --rupv-fs-h1:         50px;
+  --rupv-fs-h2:         40px;
+  --rupv-fs-h3:         30px;
+  --rupv-fs-h4:         24px;
+  --rupv-fs-body:       20px;
+  --rupv-fs-body-sm:    16px;
+  --rupv-fs-caption:    13px;
+  --rupv-fs-micro:      11px;
+
+  --rupv-lh-tight:  1.0;
+  --rupv-lh-snug:   1.15;
+  --rupv-lh-body:   1.45;
+  --rupv-lh-loose:  1.6;
+
+  --rupv-tracking-display: -0.01em;
+
+  /* ── Backwards-compat aliases (kept for any unrewritten CSS) ──── */
+  --brand-bg:        var(--rupv-cream);
+  --brand-fg:        var(--rupv-maroon);
+  --brand-fg-hover:  var(--rupv-maroon-deep);
+  --brand-fg-soft:   rgba(163, 31, 51, 0.12);
+  --brand-outline:   rgba(163, 31, 51, 0.35);
+  --text:            var(--rupv-fg-2);
+  --text-h:          var(--rupv-fg-1);
+  --border:          var(--rupv-border-soft);
+  --sans:            var(--rupv-font-body);
+  --heading:         var(--rupv-font-display);
+
+  color: var(--rupv-fg-1);
+  background: var(--rupv-bone);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color-scheme: light;
+}
 
-  @media (max-width: 1024px) {
-    font-size: 15px;
-  }
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--rupv-bone);
+  color: var(--rupv-fg-1);
+  font-family: var(--rupv-font-body);
+  font-weight: 400;
+  font-size: var(--rupv-fs-body-sm);
+  line-height: var(--rupv-lh-body);
 }
 
 body {
-  max-width: 1100px;
-  margin: 0 auto;
-  font-family: var(--sans);
-  font-weight: 400;
-  background: var(--bg);
-  color: var(--text);
+  min-height: 100svh;
 }
 
 #root {
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
+  width: 100%;
   min-height: 100svh;
+  background: var(--rupv-bone);
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
-  background: var(--bg);
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--sans);
-  font-weight: 600;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--rupv-font-heading);
+  color: var(--rupv-fg-1);
+  margin: 0;
+  font-weight: 700;
+  line-height: var(--rupv-lh-snug);
 }
 
 p {
   margin: 0;
-  font-family: var(--sans);
-  font-weight: 400;
+  font-family: var(--rupv-font-body);
 }
 
 button,
 input,
 select,
 textarea {
-  font-family: var(--sans);
+  font-family: var(--rupv-font-body);
   font-weight: 400;
+  font-size: var(--rupv-fs-body-sm);
+  color: inherit;
 }
 
-.font-display {
-  font-family: var(--heading);
-  letter-spacing: 1px;
+a {
+  color: var(--rupv-maroon);
+  text-decoration: none;
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+a:hover {
+  color: var(--rupv-maroon-deep);
+  text-decoration: underline;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+/* ── Semantic element classes ───────────────────────────────────── */
+
+.rupv-display {
+  font-family: var(--rupv-font-display);
+  font-weight: 700;
+  font-size: var(--rupv-fs-display);
+  line-height: var(--rupv-lh-tight);
+  letter-spacing: var(--rupv-tracking-display);
+  color: var(--rupv-fg-1);
 }
+
+.rupv-h1 {
+  font-family: var(--rupv-font-heading);
+  font-weight: 700;
+  font-size: var(--rupv-fs-h1);
+  line-height: var(--rupv-lh-tight);
+  color: var(--rupv-fg-1);
+}
+
+.rupv-h2 {
+  font-family: var(--rupv-font-heading);
+  font-weight: 700;
+  font-size: var(--rupv-fs-h2);
+  line-height: var(--rupv-lh-tight);
+  color: var(--rupv-fg-1);
+}
+
+.rupv-h3 {
+  font-family: var(--rupv-font-heading);
+  font-weight: 700;
+  font-size: var(--rupv-fs-h3);
+  line-height: var(--rupv-lh-snug);
+  color: var(--rupv-fg-1);
+}
+
+.rupv-h4 {
+  font-family: var(--rupv-font-heading);
+  font-weight: 500;
+  font-size: var(--rupv-fs-h4);
+  line-height: var(--rupv-lh-snug);
+  color: var(--rupv-fg-1);
+}
+
+.rupv-body {
+  font-family: var(--rupv-font-body);
+  font-weight: 400;
+  font-size: var(--rupv-fs-body);
+  line-height: var(--rupv-lh-body);
+  color: var(--rupv-fg-1);
+}
+
+.rupv-body-sm {
+  font-family: var(--rupv-font-body);
+  font-weight: 400;
+  font-size: var(--rupv-fs-body-sm);
+  line-height: var(--rupv-lh-body);
+  color: var(--rupv-fg-2);
+}
+
+.rupv-caption {
+  font-family: var(--rupv-font-body);
+  font-weight: 500;
+  font-size: var(--rupv-fs-caption);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--rupv-fg-2);
+}
+
+.rupv-micro {
+  font-family: var(--rupv-font-micro);
+  font-weight: 400;
+  font-size: var(--rupv-fs-micro);
+  color: var(--rupv-fg-3);
+}
+
+.rupv-quote {
+  font-family: var(--rupv-font-heading);
+  font-style: italic;
+  font-weight: 400;
+  font-size: var(--rupv-fs-h3);
+  color: var(--rupv-fg-2);
+}
+
+/* ── Surfaces ───────────────────────────────────────────────────── */
+.rupv-card {
+  background: var(--rupv-surface);
+  border-radius: var(--rupv-r-2);
+  box-shadow: var(--rupv-shadow-3);
+}
+.rupv-card--warm  { background: var(--rupv-surface-warm); }
+.rupv-card--ink   { background: var(--rupv-surface-dark); color: var(--rupv-fg-inv); }

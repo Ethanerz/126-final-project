@@ -1,3 +1,5 @@
+/* ─── map.css ───────────────────────────────────────────────────── */
+
 .map-wrap {
   position: relative;
   width: 100%;
@@ -24,84 +26,94 @@
   height: 100vh;
   width: 100vw;
   overflow: hidden;
+  background: var(--rupv-bone);
 }
+
+/* Back button — pinned top-left of the map */
 
 .map-back-btn {
   position: absolute;
-  top: 16px;
-  left: 16px;
+  top: var(--rupv-s-4);
+  left: var(--rupv-s-4);
   z-index: 10;
-  font-family: var(--sans, 'Montserrat', system-ui, sans-serif);
-  font-weight: 600;
-  font-size: 13px;
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 9px 16px 9px 12px;
-  border-radius: 999px;
-  border: 1.5px solid var(--brand-fg, #A31F33);
-  background: #ffffff;
-  color: var(--brand-fg, #A31F33);
+  gap: var(--rupv-s-1);
+  font-family: var(--rupv-font-body);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 6px 14px 6px 12px;
+  border-radius: var(--rupv-r-pill);
+  border: var(--rupv-bw-1) solid var(--rupv-ink);
+  background: var(--rupv-cream);
+  color: var(--rupv-ink);
   cursor: pointer;
-  box-shadow: 0 8px 20px -12px rgba(0, 0, 0, 0.35);
-  transition:
-    background 160ms ease,
-    color 160ms ease,
-    transform 160ms ease,
-    box-shadow 160ms ease;
+  box-shadow: var(--rupv-shadow-2);
+  transition: background 120ms ease-out, color 120ms ease-out;
 }
 
 .map-back-btn::before {
-  content: '\2190';
-  font-size: 15px;
+  content: '←';
+  font-size: 14px;
   line-height: 1;
 }
 
 .map-back-btn:hover {
-  background: var(--brand-fg, #A31F33);
-  color: var(--brand-bg, #FFF7F0);
-  transform: translateX(-1px);
-  box-shadow: 0 10px 22px -10px rgba(163, 31, 51, 0.65);
+  background: var(--rupv-ink);
+  color: var(--rupv-cream);
 }
 
-.map-back-btn:active {
-  transform: translateX(0);
-  box-shadow: 0 6px 14px -10px rgba(163, 31, 51, 0.6);
-}
+/* ── Map marker popups ──────────────────────────────────────────── */
 
 .popUpMarker {
-  font-family: var(--sans, 'Montserrat', system-ui, sans-serif);
-  min-width: 160px;
+  font-family: var(--rupv-font-body);
+  min-width: 180px;
 }
 
 .popUpTitle {
-  font-size: 14px;
+  font-family: var(--rupv-font-heading);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--rupv-ink);
 }
 
 .popUpStars {
-  margin: 4px 0;
-  color: var(--brand-fg, #A31F33);
+  margin: var(--rupv-s-1) 0;
+  color: var(--rupv-maroon);
   font-size: 16px;
+  letter-spacing: 1px;
 }
 
 .popUpReviews {
-  font-size: 12px;
-  color: #555;
-  margin-bottom: 8px;
+  font-family: var(--rupv-font-micro);
+  font-size: var(--rupv-fs-micro);
+  color: var(--rupv-fg-3);
+  margin-bottom: var(--rupv-s-2);
 }
 
 .popUpLink {
   display: block;
   text-align: center;
-  background: var(--brand-fg, #A31F33);
-  color: white;
-  padding: 6px 10px;
-  border-radius: 4px;
+  background: var(--rupv-maroon);
+  color: var(--rupv-cream);
+  padding: 6px 12px;
+  border-radius: var(--rupv-r-1);
   text-decoration: none;
+  font-family: var(--rupv-font-body);
   font-size: 13px;
+  font-weight: 500;
+  transition: background 120ms ease-out;
 }
+
+.popUpLink:hover {
+  background: var(--rupv-maroon-deep);
+  color: var(--rupv-cream);
+  text-decoration: none;
+}
+
+/* ── Sidebar (entity list on map page) ──────────────────────────── */
 
 .sidebar {
   min-width: 450px;
@@ -109,33 +121,38 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #fff;
+  background: var(--rupv-cream);
+  border-right: var(--rupv-bw-1) solid var(--rupv-ink);
   z-index: 1;
-  box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+  box-shadow: var(--rupv-shadow-3);
 }
 
 .sidebar-content-info {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
+  gap: var(--rupv-s-3);
+  padding: var(--rupv-s-4);
   overflow-y: auto;
   max-height: 100vh;
 }
 
 .sidebar-entity-card {
-  background: #fff;
-  border: 1px solid #e8e8e8;
-  border-radius: 12px;
-  padding: 14px 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-  transition: box-shadow 160ms ease, transform 160ms ease;
+  background: var(--rupv-sky);
+  border: var(--rupv-bw-1) solid var(--rupv-ink);
+  border-radius: var(--rupv-r-2);
+  padding: var(--rupv-s-3) var(--rupv-s-4);
+  box-shadow: var(--rupv-shadow-3);
+  transition: background 120ms ease-out;
   cursor: pointer;
 }
 
+.sidebar-entity-card:hover {
+  background: var(--rupv-sky-deep);
+}
+
 .sidebar-stars {
-  font-size: 15px;
-  color: var(--brand-fg, #A31F33);
-  margin-bottom: 4px;
+  font-size: 14px;
+  color: var(--rupv-maroon);
+  margin-bottom: var(--rupv-s-1);
   letter-spacing: 1px;
 }

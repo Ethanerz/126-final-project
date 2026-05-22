@@ -1,191 +1,277 @@
+/* ─── Auth.css — splash / login / register ─────────────────────── */
+
 .auth-page {
   min-height: 100svh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 32px 16px;
-  background: var(--brand-bg);
-  font-family: var(--sans);
-  color: var(--text);
+  padding: var(--rupv-s-6) var(--rupv-s-4);
+  background: var(--rupv-bone);
+  font-family: var(--rupv-font-body);
+  color: var(--rupv-fg-1);
+  position: relative;
+  overflow: hidden;
 }
 
+/* X-cross hero motif — drawn behind the welcome card only.
+   Uses :has() to target the auth-page that contains a welcome card,
+   so signin/signup pages keep their plain backgrounds. */
+
+.auth-page:has(.welcome-card)::before,
+.auth-page:has(.welcome-card)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.auth-page:has(.welcome-card)::before {
+  background: linear-gradient(
+    to top right,
+    transparent calc(50% - 0.5px),
+    var(--rupv-ink) calc(50% - 0.5px),
+    var(--rupv-ink) calc(50% + 0.5px),
+    transparent calc(50% + 0.5px)
+  );
+}
+
+.auth-page:has(.welcome-card)::after {
+  background: linear-gradient(
+    to bottom right,
+    transparent calc(50% - 0.5px),
+    var(--rupv-ink) calc(50% - 0.5px),
+    var(--rupv-ink) calc(50% + 0.5px),
+    transparent calc(50% + 0.5px)
+  );
+}
+
+/* ── Card (cream brand-block on splash; standalone on login/register) ── */
+
 .auth-card {
+  position: relative;
+  z-index: 1;
   width: 100%;
-  max-width: 380px;
-  background: #ffffff;
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 36px 32px 32px;
-  box-shadow: 0 30px 60px -40px rgba(31, 20, 27, 0.35);
+  max-width: 420px;
+  background: var(--rupv-cream);
+  border: var(--rupv-bw-1) solid var(--rupv-ink);
+  border-radius: var(--rupv-r-2);
+  padding: var(--rupv-s-7) var(--rupv-s-6) var(--rupv-s-6);
+  box-shadow: var(--rupv-shadow-2);
   display: flex;
   flex-direction: column;
+  align-items: stretch;
+  gap: var(--rupv-s-4);
+}
+
+.welcome-card {
+  max-width: 460px;
   align-items: center;
-  gap: 18px;
+  text-align: center;
+  padding: var(--rupv-s-7) var(--rupv-s-6);
+  gap: var(--rupv-s-4);
 }
 
 .auth-logo {
   width: 88px;
   height: auto;
-  margin-bottom: 4px;
+  align-self: center;
   user-select: none;
 }
 
+.welcome-logo {
+  width: 132px;
+}
+
+/* ── Titles ───────────────────────────────────────────────────────── */
+
 .auth-title {
-  font-family: var(--heading);
-  font-weight: 400;
-  font-size: 32px;
-  line-height: 1.1;
-  letter-spacing: 1px;
-  color: var(--text-h);
+  font-family: var(--rupv-font-heading);
+  font-weight: 700;
+  font-size: 28px;
+  line-height: var(--rupv-lh-snug);
+  letter-spacing: 0;
+  color: var(--rupv-ink);
   text-align: center;
   margin: 0;
-  text-transform: none;
 }
 
 .auth-title .brand {
-  color: var(--brand-fg);
-  font-family: var(--heading);
-  font-size: 38px;
-  letter-spacing: 1.5px;
   display: block;
-  margin-top: 2px;
+  margin-top: 4px;
+  font-family: var(--rupv-font-display);
+  font-weight: 700;
+  font-size: 44px;
+  line-height: var(--rupv-lh-tight);
+  letter-spacing: var(--rupv-tracking-display);
+  color: var(--rupv-maroon);
+  text-transform: uppercase;
 }
+
+.welcome-title {
+  font-family: var(--rupv-font-display);
+  font-weight: 700;
+  font-size: 72px;
+  line-height: var(--rupv-lh-tight);
+  letter-spacing: var(--rupv-tracking-display);
+  color: var(--rupv-maroon);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.welcome-tagline {
+  font-family: var(--rupv-font-body);
+  font-size: var(--rupv-fs-body-sm);
+  color: var(--rupv-fg-2);
+  margin: 0 0 var(--rupv-s-2);
+  max-width: 320px;
+  line-height: var(--rupv-lh-body);
+}
+
+/* ── Options stack + form ─────────────────────────────────────────── */
 
 .auth-options {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--rupv-s-3);
   width: 100%;
-  margin-top: 4px;
 }
 
 .auth-form {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 4px;
+  gap: var(--rupv-s-3);
 }
+
+/* ── Fields (heavy ink outline, square corners — signature) ───────── */
 
 .auth-field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--rupv-s-1);
   text-align: left;
 }
 
 .auth-field label {
-  font-family: var(--sans);
-  font-size: 12px;
+  font-family: var(--rupv-font-body);
+  font-size: 14px;
   font-weight: 500;
-  color: var(--text);
-  letter-spacing: 0.2px;
+  color: var(--rupv-ink);
+  letter-spacing: 0;
 }
 
 .auth-field input {
   width: 100%;
-  box-sizing: border-box;
-  padding: 10px 12px;
-  border: 1.5px solid var(--border);
-  border-radius: 8px;
-  background: #fff;
-  font-family: var(--sans);
-  font-size: 14px;
-  color: var(--text-h);
-  transition: border-color 160ms ease, box-shadow 160ms ease;
+  padding: 10px 14px;
+  background: var(--rupv-bone);
+  border: var(--rupv-bw-3) solid var(--rupv-ink);
+  border-radius: 0;
+  font-family: var(--rupv-font-body);
+  font-size: var(--rupv-fs-body-sm);
+  color: var(--rupv-ink);
+  outline: none;
+  transition: outline-color 120ms ease-out, box-shadow 120ms ease-out;
+}
+
+.auth-field input::placeholder {
+  color: var(--rupv-fg-3);
 }
 
 .auth-field input:focus {
-  outline: none;
-  border-color: var(--brand-fg);
-  box-shadow: 0 0 0 3px var(--brand-fg-soft);
+  outline: var(--rupv-bw-2) solid var(--rupv-maroon);
+  outline-offset: 2px;
 }
 
+/* ── Buttons — design-system primary / secondary / outline / ghost ── */
+
 .auth-btn {
-  font-family: var(--sans);
-  font-weight: 600;
-  font-size: 13px;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  padding: 11px 18px;
-  border-radius: 999px;
+  font-family: var(--rupv-font-heading);
+  font-weight: 500;
+  font-size: 18px;
+  letter-spacing: 0;
+  text-transform: none;
+  padding: 10px 28px;
+  border-radius: var(--rupv-r-pill);
   cursor: pointer;
+  border: none;
   transition:
-    background 160ms ease,
-    color 160ms ease,
-    border-color 160ms ease,
-    transform 160ms ease,
-    box-shadow 160ms ease;
-  border: 1.5px solid transparent;
+    background 120ms ease-out,
+    color 120ms ease-out,
+    border-color 120ms ease-out,
+    box-shadow 120ms ease-out,
+    transform 80ms ease-out;
 }
 
 .auth-btn:disabled {
-  opacity: 0.6;
+  opacity: 0.55;
   cursor: not-allowed;
 }
 
 .auth-btn-primary {
-  background: var(--brand-fg);
-  color: var(--brand-bg);
-  border-color: var(--brand-fg);
-  box-shadow: 0 10px 22px -14px rgba(163, 31, 51, 0.75);
+  background: var(--rupv-maroon);
+  color: var(--rupv-cream);
+  box-shadow: var(--rupv-shadow-2);
 }
 
 .auth-btn-primary:hover:not(:disabled) {
-  background: var(--brand-fg-hover);
-  border-color: var(--brand-fg-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 14px 28px -14px rgba(163, 31, 51, 0.85);
+  background: var(--rupv-maroon-deep);
 }
 
 .auth-btn-primary:active:not(:disabled) {
-  transform: translateY(0);
-  box-shadow: 0 6px 14px -10px rgba(163, 31, 51, 0.75);
+  box-shadow: none;
+  transform: translateY(1px);
 }
 
 .auth-btn-outline {
+  font-family: var(--rupv-font-body);
+  font-weight: 500;
+  font-size: 16px;
   background: transparent;
-  color: var(--brand-fg);
-  border-color: var(--brand-fg);
+  color: var(--rupv-ink);
+  border: var(--rupv-bw-2) solid var(--rupv-ink);
+  border-radius: 8px;
+  padding: 10px 22px;
 }
 
 .auth-btn-outline:hover:not(:disabled) {
-  background: var(--brand-fg);
-  color: var(--brand-bg);
-  transform: translateY(-1px);
-  box-shadow: 0 10px 22px -14px rgba(163, 31, 51, 0.65);
+  background: var(--rupv-ink);
+  color: var(--rupv-cream);
 }
 
 .auth-btn-outline:active:not(:disabled) {
-  transform: translateY(0);
-  box-shadow: none;
+  transform: translateY(1px);
 }
 
 .auth-btn-ghost {
-  background: transparent;
-  color: var(--text-h);
-  border-color: var(--border);
+  font-family: var(--rupv-font-body);
+  font-weight: 500;
+  font-size: 16px;
+  background: var(--rupv-sky);
+  color: var(--rupv-slate);
+  border-radius: var(--rupv-r-pill);
+  padding: 10px 22px;
 }
 
 .auth-btn-ghost:hover:not(:disabled) {
-  background: var(--brand-fg-soft);
-  border-color: var(--brand-outline);
-  color: var(--brand-fg);
+  background: var(--rupv-sky-deep);
 }
 
+/* ── Helpers / divider / error ───────────────────────────────────── */
+
 .auth-helper {
-  font-family: var(--sans);
-  font-size: 13px;
-  color: var(--text);
-  margin-top: 8px;
+  font-family: var(--rupv-font-body);
+  font-size: 14px;
+  color: var(--rupv-fg-2);
+  margin-top: var(--rupv-s-2);
   text-align: center;
 }
 
 .auth-helper a,
 .auth-link {
-  color: var(--brand-fg);
-  text-decoration: none;
+  color: var(--rupv-maroon);
   font-weight: 600;
+  text-decoration: none;
   cursor: pointer;
   background: none;
   border: none;
@@ -202,88 +288,52 @@
 .auth-divider {
   width: 100%;
   height: 1px;
-  background: var(--border);
-  margin: 6px 0 2px;
+  background: var(--rupv-border-soft);
+  margin: var(--rupv-s-1) 0;
 }
 
 .auth-error {
   width: 100%;
-  background: var(--brand-fg-soft);
-  border: 1px solid var(--brand-outline);
-  color: var(--brand-fg);
-  font-size: 13px;
-  padding: 8px 12px;
-  border-radius: 8px;
+  background: var(--rupv-cream);
+  border: var(--rupv-bw-2) solid var(--rupv-maroon);
+  color: var(--rupv-maroon);
+  font-family: var(--rupv-font-body);
+  font-size: 14px;
+  padding: var(--rupv-s-2) var(--rupv-s-3);
+  border-radius: var(--rupv-r-1);
   text-align: left;
 }
 
+/* ── Back button (top-left of auth card) ─────────────────────────── */
+
 .auth-back {
   position: absolute;
-  top: 14px;
-  left: 14px;
+  top: var(--rupv-s-3);
+  left: var(--rupv-s-3);
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.4px;
+  gap: var(--rupv-s-1);
+  font-family: var(--rupv-font-body);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--text);
+  color: var(--rupv-ink);
   background: transparent;
-  border: 1.5px solid var(--border);
-  border-radius: 999px;
-  padding: 6px 12px 6px 10px;
+  border: var(--rupv-bw-1) solid var(--rupv-ink);
+  border-radius: var(--rupv-r-pill);
+  padding: 5px 12px 5px 10px;
   cursor: pointer;
-  transition:
-    background 160ms ease,
-    color 160ms ease,
-    border-color 160ms ease,
-    transform 160ms ease;
+  transition: background 120ms ease-out, color 120ms ease-out;
 }
 
 .auth-back::before {
-  content: '\2190';
+  content: '←';
   font-size: 14px;
   line-height: 1;
 }
 
 .auth-back:hover {
-  color: var(--brand-fg);
-  border-color: var(--brand-outline);
-  background: var(--brand-fg-soft);
-  transform: translateX(-1px);
-}
-
-.auth-card {
-  position: relative;
-}
-
-.welcome-card {
-  padding: 44px 36px 36px;
-  gap: 14px;
-}
-
-.welcome-logo {
-  width: 120px;
-  margin-bottom: 6px;
-}
-
-.welcome-title {
-  font-family: var(--heading);
-  font-weight: 400;
-  font-size: 64px;
-  line-height: 1;
-  letter-spacing: 2px;
-  color: var(--brand-fg);
-  margin: 0;
-  text-transform: uppercase;
-}
-
-.welcome-tagline {
-  font-family: var(--sans);
-  font-size: 14px;
-  color: var(--text);
-  margin: 0 0 10px;
-  max-width: 280px;
-  line-height: 1.5;
+  background: var(--rupv-ink);
+  color: var(--rupv-cream);
 }
