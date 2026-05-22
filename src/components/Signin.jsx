@@ -38,7 +38,7 @@ const Signin = () => {
     <div className="auth-page">
       <div className="auth-card">
         <img
-          src="/rmc-logo-red.png"
+          src="/rate-upv-logo.svg"
           alt="Rate UPV logo"
           className="auth-logo"
         />

@@ -264,7 +264,7 @@ const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) 
           editId ? (
             <>
               <p className="ap-hint">
-                Editing: <strong style={{ color: '#e8c547' }}>{form.name || '—'}</strong>
+                Editing: <strong>{form.name || '—'}</strong>
               </p>
               <EntityForm
                 form={form}

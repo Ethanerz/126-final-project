@@ -98,37 +98,46 @@
 }
 
 .entity-admin-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  border: 1.5px solid;
-  font-size: 0.85rem;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 1.5px solid var(--brand-fg);
+  background: #ffffff;
+  color: var(--brand-fg);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s, box-shadow 0.15s;
-  font-family: 'Courier New', monospace;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
 }
 
-.entity-admin-btn--edit {
-  background: #1a1a2e;
-  border-color: #4a7adb;
-  color: #7aaaf0;
-}
-.entity-admin-btn--edit:hover {
-  background: #4a7adb;
-  color: #fff;
-  box-shadow: 0 0 8px #4a7adb60;
+.entity-admin-btn:hover {
+  background: var(--brand-fg);
+  color: var(--brand-bg);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px -6px rgba(163, 31, 51, 0.55);
 }
 
+.entity-admin-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* Subtle differentiator: delete uses solid red as its resting state */
 .entity-admin-btn--delete {
-  background: #1a1a2e;
-  border-color: #b02020;
-  color: #e05555;
+  background: var(--brand-fg);
+  color: var(--brand-bg);
 }
+
 .entity-admin-btn--delete:hover {
-  background: #b02020;
-  color: #fff;
-  box-shadow: 0 0 8px #b0202060;
+  background: var(--brand-fg-hover);
+  border-color: var(--brand-fg-hover);
+  color: var(--brand-bg);
 }
