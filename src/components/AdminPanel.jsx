@@ -11,7 +11,7 @@ const emptyForm = {
   latitude: '',
   longitude: '',
   description: '',
-  images_text: '',
+  image_link: '',
 }
 
 // ── Defined OUTSIDE component so inputs never remount on re-render ────────────
@@ -69,13 +69,13 @@ const EntityForm = ({ form, setForm, onSubmit, submitLabel, status, loading }) =
       />
     </div>
     <div className="ap-field">
-      <label className="ap-label">Images (text / URLs)</label>
+      <label className="ap-label">Image link</label>
       <input
         className="ap-input"
-        type="text"
-        placeholder="Optional image reference"
-        value={form.images_text}
-        onChange={(e) => setForm((f) => ({ ...f, images_text: e.target.value }))}
+        type="url"
+        placeholder="https://i.imgur.com/abc123.jpg"
+        value={form.image_link}
+        onChange={(e) => setForm((f) => ({ ...f, image_link: e.target.value }))}
       />
     </div>
     {status && (
@@ -111,7 +111,7 @@ const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) 
       latitude: pendingEdit.latitude ?? '',
       longitude: pendingEdit.longitude ?? '',
       description: pendingEdit.description || '',
-      images_text: pendingEdit.images_text || '',
+      image_link: pendingEdit.image_link || '',
     })
     setEditId(pendingEdit.id)
     setDeleteId(null)
@@ -159,8 +159,8 @@ const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) 
       latitude: parseFloat(form.latitude),
       longitude: parseFloat(form.longitude),
       admin_id: session.user.id,
-      ...(form.description.trim() && { description: form.description.trim() }),
-      ...(form.images_text.trim() && { images_text: form.images_text.trim() }),
+      description: form.description.trim() || null,
+      image_link: form.image_link.trim() || null,
     }
     const { error } = await supabase.from('entities').insert([payload])
     setLoading(false)
@@ -184,7 +184,7 @@ const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) 
       latitude: parseFloat(form.latitude),
       longitude: parseFloat(form.longitude),
       description: form.description.trim() || null,
-      images_text: form.images_text.trim() || null,
+      image_link: form.image_link.trim() || null,
     }
     const { error } = await supabase.from('entities').update(payload).eq('id', editId)
     setLoading(false)

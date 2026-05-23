@@ -1,10 +1,33 @@
+/* ─── Dashboard.css ─────────────────────────────────────────────── */
+
+.dashboard-container {
+  min-height: 100svh;
+  background: var(--rupv-bone);
+  padding: var(--rupv-s-6) var(--rupv-s-5) var(--rupv-s-8);
+  font-family: var(--rupv-font-body);
+  color: var(--rupv-fg-1);
+  max-width: 1392px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.dashboard-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--rupv-s-2);
+  margin-bottom: var(--rupv-s-7);
+  padding-bottom: var(--rupv-s-5);
+  border-bottom: var(--rupv-bw-1) solid var(--rupv-border-soft);
+}
+
 .dashboard-title {
-  font-family: var(--heading);
-  font-weight: 400;
-  font-size: 88px;
-  line-height: 1;
-  letter-spacing: 2px;
-  color: var(--brand-fg);
+  font-family: var(--rupv-font-display);
+  font-weight: 700;
+  font-size: 96px;
+  line-height: var(--rupv-lh-tight);
+  letter-spacing: var(--rupv-tracking-display);
+  color: var(--rupv-maroon);
   margin: 0;
   text-transform: uppercase;
 }
@@ -15,129 +38,258 @@
   }
 }
 
-.entity-card {
-  background:rgba(from #EBF4FF r g b);
-  margin: 20px 50px 20px 50px ;
-  border-radius: 30px;
+.dashboard-header p {
+  font-family: var(--rupv-font-body);
+  font-size: var(--rupv-fs-body-sm);
+  color: var(--rupv-fg-2);
+  margin: 0 0 var(--rupv-s-2);
 }
 
-.signout-btn, .profile-btn {
-  font-family: var(--sans);
-  font-weight: 600;
-  font-size: 13px;
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
-  padding: 10px 22px;
-  border-radius: 999px;
-  border: 1.5px solid var(--brand-fg);
-  background: transparent;
-  color: var(--brand-fg);
-  cursor: pointer;
-  transition:
-    background 160ms ease,
-    color 160ms ease,
-    transform 160ms ease,
-    box-shadow 160ms ease;
-}
+/* ── Header action buttons (Sign Out / My Profile) ──────────────── */
 
-.signout-btn:hover, .profile-btn:hover {
-  background: var(--brand-fg);
-  color: var(--brand-bg);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 14px -6px rgba(163, 31, 51, 0.55);
-}
-
-.signout-btn:active, .profile-btn:active {
-  transform: translateY(0);
-  box-shadow: none;
-}
-
-.mappreview {
-  font-family: var(--sans);
-  font-weight: 600;
+.signout-btn,
+.profile-btn {
+  font-family: var(--rupv-font-body);
+  font-weight: 500;
   font-size: 14px;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-  padding: 14px 28px;
-  border-radius: 999px;
-  border: none;
-  background: var(--brand-fg);
-  color: var(--brand-bg);
+  letter-spacing: 0.02em;
+  text-transform: none;
+  padding: 8px 20px;
+  border-radius: var(--rupv-r-pill);
+  border: var(--rupv-bw-2) solid var(--rupv-ink);
+  background: transparent;
+  color: var(--rupv-ink);
   cursor: pointer;
-  box-shadow: 0 10px 22px -14px rgba(163, 31, 51, 0.75);
-  transition:
-    background 160ms ease,
-    transform 160ms ease,
-    box-shadow 160ms ease;
+  transition: background 120ms ease-out, color 120ms ease-out, box-shadow 120ms ease-out, transform 80ms ease-out;
 }
 
-.mappreview:hover {
-  background: var(--brand-fg-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 14px 28px -14px rgba(163, 31, 51, 0.85);
+.signout-btn:hover,
+.profile-btn:hover {
+  background: var(--rupv-ink);
+  color: var(--rupv-cream);
 }
 
-.mappreview:active {
-  transform: translateY(0);
-  box-shadow: 0 6px 14px -10px rgba(163, 31, 51, 0.75);
+.signout-btn:active,
+.profile-btn:active {
+  transform: translateY(1px);
 }
 
-/* ── Add to bottom of Dashboard.css ── */
+/* ── Entities grid + cards ──────────────────────────────────────── */
+
+.entities-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--rupv-s-3);
+  margin: 0 0 var(--rupv-s-6);
+}
 
 .entity-card {
   position: relative;
+  background: var(--rupv-sky);
+  border: var(--rupv-bw-1) solid var(--rupv-ink);
+  border-radius: var(--rupv-r-2);
+  padding: var(--rupv-s-4) var(--rupv-s-5);
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--rupv-s-5);
+  align-items: center;
+  box-shadow: var(--rupv-shadow-3);
+  transition: background 120ms ease-out, box-shadow 120ms ease-out;
 }
+
+.entity-card:hover {
+  background: var(--rupv-sky-deep);
+}
+
+.entity-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rupv-s-1);
+  min-width: 0;
+}
+
+.entity-info h3 {
+  margin: 0;
+  font-family: var(--rupv-font-heading);
+  font-weight: 700;
+  font-size: 22px;
+  line-height: var(--rupv-lh-snug);
+  color: var(--rupv-slate);
+}
+
+.entity-info h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.entity-info h3 a:hover {
+  color: var(--rupv-maroon);
+  text-decoration: none;
+}
+
+.entity-type {
+  font-family: var(--rupv-font-body);
+  font-size: var(--rupv-fs-caption);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--rupv-fg-2);
+  margin: 0;
+}
+
+.entity-description {
+  font-family: var(--rupv-font-body);
+  font-size: var(--rupv-fs-body-sm);
+  line-height: var(--rupv-lh-body);
+  color: var(--rupv-fg-2);
+  margin: 0;
+}
+
+.entity-location {
+  font-family: var(--rupv-font-body);
+  font-size: var(--rupv-fs-caption);
+  color: var(--rupv-fg-3);
+  margin: 0;
+}
+
+/* ── Rating badge (slate pill with big numeral) ─────────────────── */
+
+.rating-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--rupv-s-1);
+  min-width: 110px;
+}
+
+.rating-number {
+  width: 88px;
+  height: 76px;
+  background: var(--rupv-slate);
+  color: #ffffff;
+  border-radius: var(--rupv-r-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--rupv-font-heading);
+  font-weight: 700;
+  font-size: 44px;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.rating-stars {
+  font-family: var(--rupv-font-body);
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: var(--rupv-maroon);
+}
+
+.review-count {
+  font-family: var(--rupv-font-micro);
+  font-size: var(--rupv-fs-micro);
+  color: var(--rupv-fg-3);
+}
+
+/* Entity thumbnail — leftmost cell of the card */
+
+.entity-image {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--rupv-sky-deep);
+  border: var(--rupv-bw-1) solid var(--rupv-ink);
+}
+
+.entity-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.image-placeholder {
+  width: 100%;
+  height: 100%;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0 6px,
+      rgba(31, 20, 27, 0.08) 6px 7px
+    );
+}
+
+/* ── Admin action buttons (overlay top-right of card) ───────────── */
 
 .entity-admin-actions {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: var(--rupv-s-2);
+  right: var(--rupv-s-2);
   display: flex;
-  gap: 6px;
+  gap: var(--rupv-s-1);
   z-index: 1;
 }
 
 .entity-admin-btn {
-  width: 30px;
-  height: 30px;
-  border-radius: 999px;
-  border: 1.5px solid var(--brand-fg);
-  background: #ffffff;
-  color: var(--brand-fg);
-  font-family: var(--sans);
+  width: 32px;
+  height: 32px;
+  border-radius: var(--rupv-r-1);
+  border: var(--rupv-bw-2) solid var(--rupv-slate);
+  background: var(--rupv-sky);
+  color: var(--rupv-slate);
+  font-family: var(--rupv-font-body);
   font-size: 14px;
   line-height: 1;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition:
-    background 160ms ease,
-    color 160ms ease,
-    transform 160ms ease,
-    box-shadow 160ms ease;
+  transition: background 120ms ease-out, color 120ms ease-out;
 }
 
 .entity-admin-btn:hover {
-  background: var(--brand-fg);
-  color: var(--brand-bg);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 14px -6px rgba(163, 31, 51, 0.55);
+  background: var(--rupv-slate);
+  color: var(--rupv-cream);
 }
 
-.entity-admin-btn:active {
-  transform: translateY(0);
-  box-shadow: none;
-}
-
-/* Subtle differentiator: delete uses solid red as its resting state */
 .entity-admin-btn--delete {
-  background: var(--brand-fg);
-  color: var(--brand-bg);
+  background: var(--rupv-maroon);
+  border-color: var(--rupv-maroon);
+  color: var(--rupv-cream);
 }
 
 .entity-admin-btn--delete:hover {
-  background: var(--brand-fg-hover);
-  border-color: var(--brand-fg-hover);
-  color: var(--brand-bg);
+  background: var(--rupv-maroon-deep);
+  border-color: var(--rupv-maroon-deep);
+  color: var(--rupv-cream);
+}
+
+/* ── "Go to Map" CTA — slate pill, design-system secondary ──────── */
+
+.mappreview {
+  font-family: var(--rupv-font-heading);
+  font-weight: 500;
+  font-size: 18px;
+  letter-spacing: 0;
+  text-transform: none;
+  padding: 10px 28px;
+  border-radius: var(--rupv-r-pill);
+  border: none;
+  background: var(--rupv-slate);
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: var(--rupv-shadow-2);
+  transition: background 120ms ease-out, box-shadow 120ms ease-out, transform 80ms ease-out;
+}
+
+.mappreview:hover {
+  background: var(--rupv-slate-soft);
+}
+
+.mappreview:active {
+  box-shadow: none;
+  transform: translateY(1px);
 }

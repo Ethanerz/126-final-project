@@ -1,37 +1,462 @@
-textarea {
-    resize: none;  /* Prevents any resizing */
+/* ─── Ratings.css — Rating + Replies pages ──────────────────────── */
+
+.rating-container {
+  min-height: 100svh;
+  background: var(--rupv-bone);
+  padding: var(--rupv-s-6) var(--rupv-s-4) var(--rupv-s-8);
+  font-family: var(--rupv-font-body);
+  color: var(--rupv-fg-1);
+  text-align: left;
+}
+
+.rating-shell {
+  max-width: 880px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rupv-s-5);
+}
+
+/* ── Header (back + page title) ────────────────────────────────── */
+
+.rating-header {
+  display: flex;
+  align-items: center;
+  gap: var(--rupv-s-4);
+  flex-wrap: wrap;
+}
+
+.rating-title {
+  font-family: var(--rupv-font-heading);
+  font-weight: 700;
+  font-size: var(--rupv-fs-h1);
+  line-height: var(--rupv-lh-tight);
+  letter-spacing: 0;
+  color: var(--rupv-ink);
+  margin: 0;
+}
+
+@media (max-width: 1024px) {
+  .rating-title {
+    font-size: var(--rupv-fs-h2);
+  }
+}
+
+.rating-subtitle {
+  font-family: var(--rupv-font-body);
+  font-size: var(--rupv-fs-body-sm);
+  color: var(--rupv-fg-2);
+  margin: 0;
+  line-height: var(--rupv-lh-body);
+}
+
+/* ── Entity description block (sky card) ───────────────────────── */
+
+.entity-meta {
+  background: var(--rupv-sky);
+  border: var(--rupv-bw-1) solid var(--rupv-ink);
+  border-radius: var(--rupv-r-2);
+  padding: var(--rupv-s-4) var(--rupv-s-5);
+  box-shadow: var(--rupv-shadow-3);
+}
+
+.entity-meta p {
+  font-family: var(--rupv-font-body);
+  font-size: var(--rupv-fs-body-sm);
+  line-height: var(--rupv-lh-body);
+  color: var(--rupv-fg-1);
+  margin: 0;
+}
+
+/* ── Section heading ───────────────────────────────────────────── */
+
+.section-heading {
+  font-family: var(--rupv-font-heading);
+  font-weight: 500;
+  font-size: var(--rupv-fs-h4);
+  line-height: var(--rupv-lh-snug);
+  color: var(--rupv-fg-2);
+  margin: var(--rupv-s-2) 0 0;
+}
+
+/* ── Review card ───────────────────────────────────────────────── */
+
+.review-card {
+  background: var(--rupv-sky);
+  border: var(--rupv-bw-1) solid var(--rupv-ink);
+  border-radius: var(--rupv-r-2);
+  padding: var(--rupv-s-4) var(--rupv-s-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rupv-s-2);
+  box-shadow: var(--rupv-shadow-3);
+  transition: background 120ms ease-out;
+  margin: 0;
+}
+
+.review-card:hover {
+  background: var(--rupv-sky-deep);
+}
+
+.review-author {
+  font-family: var(--rupv-font-body);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--rupv-slate);
+}
+
+.review-title {
+  font-family: var(--rupv-font-heading);
+  font-weight: 700;
+  font-size: 22px;
+  line-height: var(--rupv-lh-snug);
+  color: var(--rupv-ink);
+  margin: 0;
+}
+
+.review-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rupv-s-2);
+  font-family: var(--rupv-font-body);
+  font-size: 14px;
+  color: var(--rupv-fg-2);
+}
+
+.review-rating strong {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  padding: 4px 12px;
+  background: var(--rupv-slate);
+  color: #ffffff;
+  border-radius: var(--rupv-r-3);
+  font-family: var(--rupv-font-heading);
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.review-stars {
+  color: var(--rupv-maroon);
+  letter-spacing: 1px;
+  font-size: 14px;
+}
+
+.review-text {
+  font-family: var(--rupv-font-body);
+  font-size: var(--rupv-fs-body-sm);
+  line-height: var(--rupv-lh-body);
+  color: var(--rupv-fg-1);
+  margin: var(--rupv-s-1) 0 0;
+  white-space: pre-wrap;
+}
+
+/* ── Vote stack (sky-fill, slate-stroke buttons) ───────────────── */
+
+.review-votes {
+  display: inline-flex;
+  gap: var(--rupv-s-3);
+  margin-top: var(--rupv-s-2);
 }
 
 .vote-btn {
-    cursor: pointer;
-    background: none;
-    border: 1px solid #ddd;
-    padding: 5px 10px;
-    margin: 0 5px;
-    border-radius: 5px;
-    transition: all 0.2s;
-}
-
-.review-card {
-  background:rgba(from #EBF4FF r g b);
-  margin: 20px 50px 20px 50px ;
-  border-radius: 30px;
-}
-
-.vote-btn.active {
-    background-color: #4CAF50;
-    color: white;
-    border-color: #4CAF50;
-}
-
-.vote-btn.upvote.active {
-    background-color: #4CAF50;
-}
-
-.vote-btn.downvote.active {
-    background-color: #f44336;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rupv-s-1);
+  padding: 6px 14px;
+  border-radius: var(--rupv-r-1);
+  border: var(--rupv-bw-2) solid var(--rupv-slate);
+  background: var(--rupv-sky);
+  color: var(--rupv-slate);
+  font-family: var(--rupv-font-body);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 120ms ease-out, color 120ms ease-out, transform 80ms ease-out;
 }
 
 .vote-btn:hover {
-    transform: scale(1.05);
+  background: var(--rupv-sky-deep);
+}
+
+.vote-btn:active {
+  transform: translateY(1px);
+}
+
+.vote-btn.upvote.active {
+  background: var(--rupv-slate);
+  color: #ffffff;
+}
+
+.vote-btn.downvote.active {
+  background: var(--rupv-maroon);
+  border-color: var(--rupv-maroon);
+  color: var(--rupv-cream);
+}
+
+/* ── Review actions (edit / delete on own review) ──────────────── */
+
+.review-actions {
+  display: flex;
+  gap: var(--rupv-s-2);
+  margin-top: var(--rupv-s-1);
+}
+
+.review-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rupv-s-1);
+  padding: 6px 16px;
+  border-radius: var(--rupv-r-pill);
+  border: var(--rupv-bw-2) solid var(--rupv-ink);
+  background: transparent;
+  color: var(--rupv-ink);
+  font-family: var(--rupv-font-body);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 120ms ease-out, color 120ms ease-out, transform 80ms ease-out;
+}
+
+.review-action-btn:hover {
+  background: var(--rupv-ink);
+  color: var(--rupv-cream);
+}
+
+.review-action-btn:active {
+  transform: translateY(1px);
+}
+
+.review-action-btn.danger {
+  border-color: var(--rupv-maroon);
+  color: var(--rupv-maroon);
+}
+
+.review-action-btn.danger:hover {
+  background: var(--rupv-maroon);
+  color: var(--rupv-cream);
+}
+
+/* ── Meta row (replies link + date) ────────────────────────────── */
+
+.review-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--rupv-s-3);
+  margin-top: var(--rupv-s-1);
+  padding-top: var(--rupv-s-3);
+  border-top: var(--rupv-bw-1) solid rgba(31, 20, 27, 0.15);
+}
+
+.replies-link {
+  font-family: var(--rupv-font-body);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--rupv-maroon);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rupv-s-1);
+}
+
+.replies-link:hover {
+  color: var(--rupv-maroon-deep);
+  text-decoration: underline;
+}
+
+.review-date {
+  font-family: var(--rupv-font-micro);
+  font-size: var(--rupv-fs-micro);
+  color: var(--rupv-fg-3);
+}
+
+/* ── Empty state ───────────────────────────────────────────────── */
+
+.empty-state {
+  font-family: var(--rupv-font-body);
+  font-size: var(--rupv-fs-body-sm);
+  color: var(--rupv-fg-2);
+  background: var(--rupv-bg);
+  border: var(--rupv-bw-1) dashed var(--rupv-border-soft);
+  border-radius: var(--rupv-r-2);
+  padding: var(--rupv-s-4) var(--rupv-s-5);
+  text-align: center;
+}
+
+/* ── Form card (Leave a Review / Reply) — cream surface ────────── */
+
+.form-card {
+  background: var(--rupv-cream);
+  border: var(--rupv-bw-1) solid var(--rupv-ink);
+  border-radius: var(--rupv-r-2);
+  padding: var(--rupv-s-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rupv-s-3);
+  box-shadow: var(--rupv-shadow-2);
+}
+
+.form-card-title {
+  font-family: var(--rupv-font-heading);
+  font-weight: 700;
+  font-size: var(--rupv-fs-h4);
+  color: var(--rupv-ink);
+  margin: 0;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rupv-s-1);
+}
+
+.form-field label {
+  font-family: var(--rupv-font-body);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--rupv-ink);
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--rupv-bone);
+  border: var(--rupv-bw-1) solid var(--rupv-ink);
+  border-radius: var(--rupv-r-1);
+  font-family: var(--rupv-font-body);
+  font-size: var(--rupv-fs-body-sm);
+  color: var(--rupv-ink);
+  outline: none;
+  transition: outline-color 120ms ease-out;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: var(--rupv-bw-2) solid var(--rupv-maroon);
+  outline-offset: 2px;
+}
+
+.form-field textarea {
+  resize: vertical;
+  min-height: 100px;
+  line-height: var(--rupv-lh-body);
+}
+
+.form-error {
+  background: var(--rupv-cream);
+  border: var(--rupv-bw-2) solid var(--rupv-maroon);
+  color: var(--rupv-maroon);
+  font-size: 14px;
+  padding: var(--rupv-s-2) var(--rupv-s-3);
+  border-radius: var(--rupv-r-1);
+}
+
+.form-actions {
+  display: flex;
+  gap: var(--rupv-s-2);
+  margin-top: var(--rupv-s-1);
+}
+
+/* ── Button utilities (mirrors Profile.css) ────────────────────── */
+
+.btn {
+  font-family: var(--rupv-font-heading);
+  font-weight: 500;
+  font-size: 18px;
+  letter-spacing: 0;
+  text-transform: none;
+  padding: 10px 28px;
+  border-radius: var(--rupv-r-pill);
+  border: none;
+  cursor: pointer;
+  transition: background 120ms ease-out, color 120ms ease-out, box-shadow 120ms ease-out, transform 80ms ease-out;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--rupv-maroon);
+  color: var(--rupv-cream);
+  box-shadow: var(--rupv-shadow-2);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--rupv-maroon-deep);
+}
+
+.btn-primary:active:not(:disabled) {
+  box-shadow: none;
+  transform: translateY(1px);
+}
+
+.btn-outline {
+  font-family: var(--rupv-font-body);
+  font-size: 16px;
+  background: transparent;
+  color: var(--rupv-ink);
+  border: var(--rupv-bw-2) solid var(--rupv-ink);
+  border-radius: 8px;
+  padding: 10px 22px;
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: var(--rupv-ink);
+  color: var(--rupv-cream);
+}
+
+.btn-ghost {
+  font-family: var(--rupv-font-body);
+  font-size: 16px;
+  background: var(--rupv-sky);
+  color: var(--rupv-slate);
+  border-radius: var(--rupv-r-pill);
+  padding: 10px 22px;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--rupv-sky-deep);
+}
+
+/* ── Back button (inline, same visual as map-back-btn) ─────────── */
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rupv-s-1);
+  font-family: var(--rupv-font-body);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 6px 14px 6px 12px;
+  border-radius: var(--rupv-r-pill);
+  border: var(--rupv-bw-1) solid var(--rupv-ink);
+  background: var(--rupv-bg);
+  color: var(--rupv-ink);
+  cursor: pointer;
+  transition: background 120ms ease-out, color 120ms ease-out;
+}
+
+.back-btn::before {
+  content: '←';
+  font-size: 14px;
+  line-height: 1;
+}
+
+.back-btn:hover {
+  background: var(--rupv-ink);
+  color: var(--rupv-cream);
 }

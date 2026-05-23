@@ -16,13 +16,6 @@ const Rating = () => {
     const navigate = useNavigate()
     const { entityId } = useParams()
 
-    // Protect route - redirect if not logged in
-    /*useEffect(() => {
-        if (!session) {
-            navigate('/signin')
-        }
-    }, [session, navigate])*/
-
     // Fetch specific entity data
     useEffect(() => {
         if (session && entityId) {
@@ -47,54 +40,45 @@ const Rating = () => {
         }
     }, [currentEntity?.reviews, session])
 
-    // Fetch a single entity with its reviews + reviewer names
     const fetchSingleEntityWithRatings = async () => {
-    try {
-        setLoading(true)
-        
-        // Fetch entity
-        const { data: entity, error: entityError } = await supabase
-        .from('entities')
-        .select('*')
-        .eq('id', entityId)
-        .single()
-        
-        if (entityError) throw entityError
-        
-        // Fetch reviews (no sorting here)
-        const { data: reviews, error: reviewsError } = await supabase
-        .from('reviews')
-        .select('*, user_profiles(full_name)')
-        .eq('entity_id', entityId)
-        .order('created_at', { ascending: false })  // Keep newest first? Or remove .order() entirely
-        
-        if (reviewsError) throw reviewsError
-        
-        // ✅ SORT IN REACT by net votes (upvotes - downvotes)
-        const sortedReviews = reviews?.sort((a, b) => 
-        (b.upvote_count - b.downvote_count) - (a.upvote_count - a.downvote_count)
-        ) || []
-        
-        setCurrentEntity({
-        ...entity,
-        reviews: sortedReviews
-        })
-        
-    } catch (error) {
-        console.error('Error fetching entity:', error)
-    } finally {
-        setLoading(false)
-    }
+        try {
+            setLoading(true)
+
+            const { data: entity, error: entityError } = await supabase
+                .from('entities')
+                .select('*')
+                .eq('id', entityId)
+                .single()
+
+            if (entityError) throw entityError
+
+            const { data: reviews, error: reviewsError } = await supabase
+                .from('reviews')
+                .select('*, user_profiles(full_name)')
+                .eq('entity_id', entityId)
+                .order('created_at', { ascending: false })
+
+            if (reviewsError) throw reviewsError
+
+            const sortedReviews = reviews?.sort((a, b) =>
+                (b.upvote_count - b.downvote_count) - (a.upvote_count - a.downvote_count)
+            ) || []
+
+            setCurrentEntity({ ...entity, reviews: sortedReviews })
+        } catch (error) {
+            console.error('Error fetching entity:', error)
+        } finally {
+            setLoading(false)
+        }
     }
 
-    // Fetch all entities (if needed)
     const fetchEntitiesWithRatings = async () => {
         try {
             setLoading(true)
             const { data: entities, error } = await supabase
                 .from('entities')
                 .select('*')
-            
+
             if (error) throw error
             setEntities(entities || [])
         } catch (error) {
@@ -104,7 +88,6 @@ const Rating = () => {
         }
     }
 
-    // Load all user votes in a single batch query
     const loadUserVotes = async () => {
         try {
             const reviewIds = currentEntity.reviews.map((r) => r.id)
@@ -128,11 +111,10 @@ const Rating = () => {
         }
     }
 
-    // Handle upvote/downvote
     const handleVote = async (reviewId, voteType) => {
         try {
             const existingVote = userVotes[reviewId]
-            
+
             if (existingVote === voteType) {
                 const { error: deleteError } = await supabase
                     .from('votes')
@@ -140,10 +122,9 @@ const Rating = () => {
                     .eq('target_id', reviewId)
                     .eq('user_id', session.user.id)
                     .eq('target_type', 'review')
-                
+
                 if (deleteError) throw deleteError
                 await fetchSingleEntityWithRatings()
-                
             } else {
                 if (existingVote) {
                     await supabase
@@ -153,7 +134,7 @@ const Rating = () => {
                         .eq('user_id', session.user.id)
                         .eq('target_type', 'review')
                 }
-                
+
                 const { error: insertError } = await supabase
                     .from('votes')
                     .insert([{
@@ -163,17 +144,15 @@ const Rating = () => {
                         vote_type: voteType,
                         created_at: new Date()
                     }])
-                
+
                 if (insertError) throw insertError
                 await fetchSingleEntityWithRatings()
             }
-            
         } catch (error) {
             console.error('Error handling vote:', error)
         }
     }
 
-    // Submit a new review
     const submitRating = async (ratingData) => {
         try {
             setReviewError(null)
@@ -191,7 +170,7 @@ const Rating = () => {
                     created_at: new Date(),
                     updated_at: new Date()
                 }])
-            
+
             if (error) {
                 if (error.code === '23505') {
                     setReviewError("You've already reviewed this.")
@@ -199,14 +178,13 @@ const Rating = () => {
                 }
                 throw error
             }
-            
+
             await fetchSingleEntityWithRatings()
         } catch (error) {
             console.error('Error submitting review:', error)
         }
     }
 
-    // Update existing review
     const updateRating = async (ratingData) => {
         try {
             setReviewError(null)
@@ -231,12 +209,10 @@ const Rating = () => {
         }
     }
 
-    // Delete own review
     const deleteRating = async () => {
         if (!window.confirm('Are you sure you want to delete your review?')) return
 
         try {
-            // Delete associated votes first
             const { error: votesError } = await supabase
                 .from('votes')
                 .delete()
@@ -261,8 +237,8 @@ const Rating = () => {
         }
     }
 
-    // Shared form — used for both submit and edit
-    const ReviewForm = ({ initial, onSubmit, onCancel }) => {
+    // ── Shared review form ────────────────────────────────────────────────
+    const ReviewForm = ({ initial, onSubmit, onCancel, error }) => {
         const [formState, setFormState] = useState({
             rating: initial?.rating || '',
             title: initial?.title || '',
@@ -279,60 +255,62 @@ const Rating = () => {
         }
 
         return (
-            <form onSubmit={handleSubmit}>
-                <label>
-                    Rating (1-5):
+            <form className="form-card" onSubmit={handleSubmit}>
+                <h2 className="form-card-title">
+                    {initial ? 'Edit Your Review' : 'Leave a Review'}
+                </h2>
+
+                <div className="form-field">
+                    <label htmlFor="review-rating">Rating</label>
                     <select
-                        name="rating"
+                        id="review-rating"
                         required
                         value={formState.rating}
                         onChange={(e) => setFormState({ ...formState, rating: e.target.value })}
                     >
-                        <option value="">Select rating</option>
+                        <option value="">Select a rating</option>
                         {[1, 2, 3, 4, 5].map((r) => (
                             <option key={r} value={r}>{r} ★</option>
                         ))}
                     </select>
-                </label>
+                </div>
 
-                <br />
-
-                <label>
-                    Review Title:
-                    <br />
+                <div className="form-field">
+                    <label htmlFor="review-title">Title</label>
                     <input
+                        id="review-title"
                         type="text"
-                        name="title"
                         required
                         placeholder="Summarize your experience"
                         value={formState.title}
                         onChange={(e) => setFormState({ ...formState, title: e.target.value })}
                     />
-                </label>
+                </div>
 
-                <br />
-
-                <label>
-                    Your Review:
-                    <br />
+                <div className="form-field">
+                    <label htmlFor="review-text">Your review</label>
                     <textarea
-                        name="review_text"
+                        id="review-text"
                         rows="4"
                         required
-                        placeholder="Share your experience..."
-                        style={{ resize: 'none' }}
+                        placeholder="Share your experience…"
                         value={formState.review_text}
                         onChange={(e) => setFormState({ ...formState, review_text: e.target.value })}
-                    ></textarea>
-                </label>
-                <br />
+                    />
+                </div>
 
-                <button type="submit">{initial ? 'Save Changes' : 'Submit Review'}</button>
-                {onCancel && (
-                    <button type="button" onClick={onCancel} style={{ marginLeft: '8px' }}>
-                        Cancel
+                {error && <div className="form-error">{error}</div>}
+
+                <div className="form-actions">
+                    <button type="submit" className="btn btn-primary">
+                        {initial ? 'Save changes' : 'Submit review'}
                     </button>
-                )}
+                    {onCancel && (
+                        <button type="button" className="btn btn-ghost" onClick={onCancel}>
+                            Cancel
+                        </button>
+                    )}
+                </div>
             </form>
         )
     }
@@ -340,7 +318,9 @@ const Rating = () => {
     if (loading) {
         return (
             <div className="rating-container">
-                <p>Loading...</p>
+                <div className="rating-shell">
+                    <p>Loading…</p>
+                </div>
             </div>
         )
     }
@@ -348,102 +328,115 @@ const Rating = () => {
     if (!currentEntity) {
         return (
             <div className="rating-container">
-                <p>Entity not found</p>
+                <div className="rating-shell">
+                    <p>Entity not found.</p>
+                </div>
             </div>
         )
     }
 
     return (
         <div className="rating-container">
-            <button
-                type="button"
-                className="map-back-btn"
-                onClick={() => navigate(-1)}
-                aria-label="Go back"
-            >
-                Back
-            </button>
-            <h1>{currentEntity.name}</h1>
-            <p>{currentEntity.description}</p>
-            
-            {/* Display existing reviews */}
-            <div className="reviews-list">
-                <h2>User Reviews</h2>
-                {currentEntity.reviews?.length === 0 ? (
-                    <p>No reviews yet. Be the first!</p>
-                ) : (
-                    currentEntity.reviews.map((review) => (
-                        <div key={review.id} className="review-card">
-                            <small className="review-author">
-                                {review.user_profiles?.full_name || 'User'}
-                            </small>
-                            <h3 className="review-title">{review.title}</h3>
-                            <div className="review-rating">
-                                <strong>Rating: {review.rating}/5</strong>
-                            </div>
-                            <p className="review-text">{review.review_text}</p>
-                            
-                            {/* Vote buttons */}
-                            <div className="review-votes">
-                                <button 
-                                    onClick={() => handleVote(review.id, 'upvote')}
-                                    className={`vote-btn upvote ${userVotes[review.id] === 'upvote' ? 'active' : ''}`}
-                                >
-                                    👍 {review.upvote_count || 0}
-                                </button>
-                                <button 
-                                    onClick={() => handleVote(review.id, 'downvote')}
-                                    className={`vote-btn downvote ${userVotes[review.id] === 'downvote' ? 'active' : ''}`}
-                                >
-                                    👎 {review.downvote_count || 0}
-                                </button>
-                            </div>
+            <div className="rating-shell">
 
-                            {/* Edit/Delete buttons — only show on user's own review */}
-                            {review.user_id === session?.user?.id && (
-                                <div className="review-actions">
+                <div className="rating-header">
+                    <button
+                        type="button"
+                        className="back-btn"
+                        onClick={() => navigate(-1)}
+                        aria-label="Go back"
+                    >
+                        Back
+                    </button>
+                    <h1 className="rating-title">{currentEntity.name}</h1>
+                </div>
+
+                {currentEntity.description && (
+                    <div className="entity-meta">
+                        <p>{currentEntity.description}</p>
+                    </div>
+                )}
+
+                <h2 className="section-heading">User Reviews</h2>
+
+                {currentEntity.reviews?.length === 0 ? (
+                    <div className="empty-state">No reviews yet. Be the first!</div>
+                ) : (
+                    currentEntity.reviews.map((review) => {
+                        const isOwn = review.user_id === session?.user?.id
+                        return (
+                            <div key={review.id} className="review-card">
+                                <span className="review-author">
+                                    {review.user_profiles?.full_name || 'User'}
+                                </span>
+                                <h3 className="review-title">{review.title}</h3>
+                                <div className="review-rating">
+                                    <strong>{review.rating}/5</strong>
+                                    <span className="review-stars">
+                                        {'★'.repeat(review.rating)}
+                                        {'☆'.repeat(5 - review.rating)}
+                                    </span>
+                                </div>
+                                <p className="review-text">{review.review_text}</p>
+
+                                <div className="review-votes">
                                     <button
                                         type="button"
-                                        className="edit-btn"
-                                        onClick={() => setIsEditing(true)}
+                                        onClick={() => handleVote(review.id, 'upvote')}
+                                        className={`vote-btn upvote ${userVotes[review.id] === 'upvote' ? 'active' : ''}`}
                                     >
-                                        Edit
+                                        👍 {review.upvote_count || 0}
                                     </button>
                                     <button
                                         type="button"
-                                        className="delete-btn"
-                                        onClick={deleteRating}
+                                        onClick={() => handleVote(review.id, 'downvote')}
+                                        className={`vote-btn downvote ${userVotes[review.id] === 'downvote' ? 'active' : ''}`}
                                     >
-                                        Delete
+                                        👎 {review.downvote_count || 0}
                                     </button>
                                 </div>
-                            )}
-                            
-                            <Link to={`/rating/${entityId}/${review.id}`} className="replies-link">
-                                <small>replies</small>
-                            </Link>
-                            <br />
-                            <small>Posted: {new Date(review.created_at).toLocaleDateString()}</small>
-                        </div>
-                    ))
+
+                                {isOwn && (
+                                    <div className="review-actions">
+                                        <button
+                                            type="button"
+                                            className="review-action-btn"
+                                            onClick={() => setIsEditing(true)}
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="review-action-btn danger"
+                                            onClick={deleteRating}
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                )}
+
+                                <div className="review-meta">
+                                    <Link to={`/rating/${entityId}/${review.id}`} className="replies-link">
+                                        Replies →
+                                    </Link>
+                                    <span className="review-date">
+                                        {new Date(review.created_at).toLocaleDateString()}
+                                    </span>
+                                </div>
+                            </div>
+                        )
+                    })
                 )}
-            </div>
-            
-            {/* Review form section */}
-            <div className="rating-form">
-                {reviewError && (
-                    <p className="review-error" style={{ color: 'red' }}>{reviewError}</p>
+
+                {(!userReview || isEditing) && (
+                    <ReviewForm
+                        initial={isEditing ? userReview : null}
+                        onSubmit={isEditing ? updateRating : submitRating}
+                        onCancel={isEditing ? () => setIsEditing(false) : null}
+                        error={reviewError}
+                    />
                 )}
-                {!userReview || isEditing ? (
-                    <>
-                        <h2>{isEditing ? 'Edit Your Review' : 'Leave a Review'}</h2>
-                        <ReviewForm
-                            initial={isEditing ? userReview : null}
-                            onSubmit={isEditing ? updateRating : submitRating}
-                            onCancel={isEditing ? () => setIsEditing(false) : null}
-                        />
-                    </>
-                ) : null}
+
             </div>
         </div>
     )

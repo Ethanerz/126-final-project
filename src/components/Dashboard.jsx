@@ -128,6 +128,14 @@ const Dashboard = () => {
                 </div>
               )}
 
+              <div className="entity-image">
+                {entity.image_link ? (
+                  <img src={entity.image_link} alt={entity.name} />
+                ) : (
+                  <div className="image-placeholder" aria-hidden="true" />
+                )}
+              </div>
+
               <div className="entity-info">
                 <h3><Link to={`/rating/${entity.id}`}>{entity.name}</Link></h3>
                 <p className="entity-type">
@@ -145,10 +153,6 @@ const Dashboard = () => {
                   {'☆'.repeat(5 - Math.floor(entity.avgRating))}
                 </div>
                 <div className="review-count">({entity.reviewCount} reviews)</div>
-              </div>
-
-              <div className="entity-image">
-                <div className="image-placeholder">📸</div>
               </div>
 
             </div>

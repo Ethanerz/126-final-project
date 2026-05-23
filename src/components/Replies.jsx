@@ -42,7 +42,6 @@ const Replies = () => {
             if (error) throw error
             setReview(data)
 
-            // Fetch replies for this review
             const { data: repliesData, error: repliesError } = await supabase
                 .from('review_replies')
                 .select('*, user_profiles(full_name)')
@@ -141,7 +140,9 @@ const Replies = () => {
     if (loading) {
         return (
             <div className="rating-container">
-                <p>Loading...</p>
+                <div className="rating-shell">
+                    <p>Loading…</p>
+                </div>
             </div>
         )
     }
@@ -149,92 +150,115 @@ const Replies = () => {
     if (!review) {
         return (
             <div className="rating-container">
-                <p>Review not found</p>
+                <div className="rating-shell">
+                    <p>Review not found.</p>
+                </div>
             </div>
         )
     }
 
     return (
         <div className="rating-container">
-            <button
-                type="button"
-                className="map-back-btn"
-                onClick={() => navigate(-1)}
-                aria-label="Go back"
-            >
-                Back
-            </button>
+            <div className="rating-shell">
 
-            {/* Parent review card */}
-            <div className="review-card">
-                <small className="review-author">
-                    {review.user_profiles?.full_name || 'User'}
-                </small>
-                <h3 className="review-title">{review.title}</h3>
-                <div className="review-rating">
-                    <strong>Rating: {review.rating}/5</strong>
-                </div>
-                <p className="review-text">{review.review_text}</p>
-
-                {/* Vote buttons */}
-                <div className="review-votes">
+                <div className="rating-header">
                     <button
-                        onClick={() => handleVote('upvote')}
-                        className={`vote-btn upvote ${userVote === 'upvote' ? 'active' : ''}`}
+                        type="button"
+                        className="back-btn"
+                        onClick={() => navigate(-1)}
+                        aria-label="Go back"
                     >
-                        👍 {review.upvote_count || 0}
+                        Back
                     </button>
-                    <button
-                        onClick={() => handleVote('downvote')}
-                        className={`vote-btn downvote ${userVote === 'downvote' ? 'active' : ''}`}
-                    >
-                        👎 {review.downvote_count || 0}
-                    </button>
+                    <h1 className="rating-title">Review</h1>
                 </div>
 
-                <small>Posted: {new Date(review.created_at).toLocaleDateString()}</small>
-            </div>
+                {/* Parent review */}
+                <div className="review-card">
+                    <span className="review-author">
+                        {review.user_profiles?.full_name || 'User'}
+                    </span>
+                    <h3 className="review-title">{review.title}</h3>
+                    <div className="review-rating">
+                        <strong>{review.rating}/5</strong>
+                        <span className="review-stars">
+                            {'★'.repeat(review.rating)}
+                            {'☆'.repeat(5 - review.rating)}
+                        </span>
+                    </div>
+                    <p className="review-text">{review.review_text}</p>
 
-            {/* Replies list */}
-            <div className="reviews-list">
-                <h2>Replies</h2>
+                    <div className="review-votes">
+                        <button
+                            type="button"
+                            onClick={() => handleVote('upvote')}
+                            className={`vote-btn upvote ${userVote === 'upvote' ? 'active' : ''}`}
+                        >
+                            👍 {review.upvote_count || 0}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => handleVote('downvote')}
+                            className={`vote-btn downvote ${userVote === 'downvote' ? 'active' : ''}`}
+                        >
+                            👎 {review.downvote_count || 0}
+                        </button>
+                    </div>
+
+                    <div className="review-meta">
+                        <span />
+                        <span className="review-date">
+                            Posted {new Date(review.created_at).toLocaleDateString()}
+                        </span>
+                    </div>
+                </div>
+
+                <h2 className="section-heading">Replies</h2>
+
                 {replies.length === 0 ? (
-                    <p>No replies yet. Be the first!</p>
+                    <div className="empty-state">No replies yet. Be the first!</div>
                 ) : (
                     replies.map((reply) => (
                         <div key={reply.id} className="review-card">
-                            <small className="review-author">
+                            <span className="review-author">
                                 {reply.user_profiles?.full_name || 'User'}
-                            </small>
+                            </span>
                             <p className="review-text">{reply.reply_text}</p>
-                            <small>Posted: {new Date(reply.created_at).toLocaleDateString()}</small>
+                            <div className="review-meta">
+                                <span />
+                                <span className="review-date">
+                                    {new Date(reply.created_at).toLocaleDateString()}
+                                </span>
+                            </div>
                         </div>
                     ))
                 )}
-            </div>
 
-            {/* Reply form */}
-            <div className="rating-form">
-                <h2>Leave a Reply</h2>
-                {replyError && (
-                    <p className="review-error" style={{ color: 'red' }}>{replyError}</p>
-                )}
-                <form onSubmit={submitReply}>
-                    <label>
-                        Your Reply:
-                        <br />
+                {/* Reply form */}
+                <form className="form-card" onSubmit={submitReply}>
+                    <h2 className="form-card-title">Leave a Reply</h2>
+
+                    <div className="form-field">
+                        <label htmlFor="reply-text">Your reply</label>
                         <textarea
+                            id="reply-text"
                             rows="4"
                             required
-                            placeholder="Write your reply..."
-                            style={{ resize: 'none' }}
+                            placeholder="Write your reply…"
                             value={replyText}
                             onChange={(e) => setReplyText(e.target.value)}
-                        ></textarea>
-                    </label>
-                    <br />
-                    <button type="submit">Submit Reply</button>
+                        />
+                    </div>
+
+                    {replyError && <div className="form-error">{replyError}</div>}
+
+                    <div className="form-actions">
+                        <button type="submit" className="btn btn-primary">
+                            Submit reply
+                        </button>
+                    </div>
                 </form>
+
             </div>
         </div>
     )
