@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Map from './map.jsx';
 import '../styles/map.css';
@@ -6,6 +6,29 @@ import '../styles/map.css';
 const MapPreview = () => {
   const navigate = useNavigate();
   const [entities, setEntities] = useState([]);
+  const mapRefExternal = useRef(null);
+  const markersRef = useRef({});
+
+  const flyToMarker = (entity) => {
+    const map = mapRefExternal.current;
+    if (!map) return;
+
+    // Fly to the marker
+    map.flyTo({
+      center: [entity.longitude, entity.latitude],
+      zoom: 18,
+      speed: 1.2,
+      curve: 1.2,
+    });
+
+    // Open popup after fly animation (~1.2s)
+    setTimeout(() => {
+      const marker = markersRef.current[entity.id];
+      if (marker && !marker.getPopup().isOpen()) {
+        marker.togglePopup();
+      }
+    }, 1200);
+  };
 
   return (
     <div className="map-page">
@@ -22,14 +45,23 @@ const MapPreview = () => {
             const stars = '★'.repeat(Math.floor(avgRating)) + '☆'.repeat(5 - Math.floor(avgRating));
 
             return (
-              <div key={entity.id} className="sidebar-entity-card">
+              <div
+                key={entity.id}
+                className="sidebar-entity-card"
+                onClick={() => flyToMarker(entity)}
+              >
                 <strong>{entity.name}</strong>
                 <div className="sidebar-stars">{stars}</div>
                 <div className="sidebar-rating-text">
                   {avgRating.toFixed(1)} / 5 ({reviewCount} review{reviewCount !== 1 ? 's' : ''})
                 </div>
                 <p>{entity.description || 'No description available'}</p>
-                <a href={`/rating/${entity.id}`}>View Reviews</a>
+                <a
+                  href={`/rating/${entity.id}`}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  View Reviews
+                </a>
               </div>
             );
           })}
@@ -43,7 +75,11 @@ const MapPreview = () => {
         >
           Back
         </button>
-        <Map onEntitiesLoaded={setEntities} />
+        <Map
+          onEntitiesLoaded={setEntities}
+          mapRefExternal={mapRefExternal}
+          markersRef={markersRef}
+        />
       </div>
     </div>
   );
