@@ -16,15 +16,15 @@
 .map-area {
   position: relative;
   flex: 1;
-  height: 100vh;
+  min-height: 0;
 }
 
 .map-page {
   position: relative;
   display: flex;
   flex-direction: row;
-  height: 100vh;
-  width: 100vw;
+  height: calc(100svh - var(--rupv-header-h));
+  width: 100%;
   overflow: hidden;
   background: var(--rupv-bone);
 }
@@ -54,12 +54,6 @@
   transition: background 120ms ease-out, color 120ms ease-out;
 }
 
-.map-back-btn::before {
-  content: '←';
-  font-size: 14px;
-  line-height: 1;
-}
-
 .map-back-btn:hover {
   background: var(--rupv-ink);
   color: var(--rupv-cream);
@@ -79,18 +73,33 @@
   color: var(--rupv-ink);
 }
 
-.popUpStars {
-  margin: var(--rupv-s-1) 0;
-  color: var(--rupv-maroon);
-  font-size: 16px;
-  letter-spacing: 1px;
+.popUpRating {
+  display: flex;
+  align-items: center;
+  gap: var(--rupv-s-2);
+  margin: var(--rupv-s-2) 0;
 }
 
-.popUpReviews {
+.popUpBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 34px;
+  padding: 0 8px;
+  background: var(--rupv-slate);
+  color: #ffffff;
+  border-radius: 10px;
+  font-family: var(--rupv-font-heading);
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.popUpMeta {
   font-family: var(--rupv-font-micro);
   font-size: var(--rupv-fs-micro);
   color: var(--rupv-fg-3);
-  margin-bottom: var(--rupv-s-2);
 }
 
 .popUpLink {
@@ -118,7 +127,7 @@
 .sidebar {
   min-width: 450px;
   max-width: 450px;
-  height: 100vh;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   background: var(--rupv-cream);
@@ -127,13 +136,28 @@
   box-shadow: var(--rupv-shadow-3);
 }
 
+.sidebar-header {
+  padding: var(--rupv-s-4) var(--rupv-s-4) var(--rupv-s-3);
+  border-bottom: var(--rupv-bw-1) solid var(--rupv-border-soft);
+}
+
+.sidebar-header h2 {
+  margin: 0;
+  font-family: var(--rupv-font-heading);
+  font-weight: 700;
+  font-size: var(--rupv-fs-h3);
+  line-height: var(--rupv-lh-tight);
+  color: var(--rupv-ink);
+}
+
 .sidebar-content-info {
   display: flex;
   flex-direction: column;
   gap: var(--rupv-s-3);
   padding: var(--rupv-s-4);
   overflow-y: auto;
-  max-height: 100vh;
+  flex: 1;
+  min-height: 0;
 }
 
 .sidebar-entity-card {
@@ -151,10 +175,10 @@
 .sidebar-entity-image {
   width: 100%;
   height: 140px;
-  border-radius: 8px 8px 0 0;
+  border-radius: var(--rupv-r-1);
   overflow: hidden;
-  background: #f0f0f0;
-  margin-bottom: 10px;
+  background: var(--rupv-bone);
+  margin-bottom: var(--rupv-s-3);
 }
 
 .sidebar-entity-image img {
@@ -166,22 +190,70 @@
 .sidebar-image-placeholder {
   width: 100%;
   height: 100%;
-  background: #e8e8e8;
-}
-
-.sidebar-entity-body {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  background: var(--rupv-sky-deep);
 }
 
 .sidebar-entity-card:hover {
   background: var(--rupv-sky-deep);
 }
 
-.sidebar-stars {
+.sidebar-entity-head {
+  display: flex;
+  align-items: center;
+  gap: var(--rupv-s-3);
+}
+
+.sidebar-entity-headings {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sidebar-entity-name {
+  font-family: var(--rupv-font-heading);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--rupv-ink);
+  line-height: var(--rupv-lh-snug);
+}
+
+.sidebar-entity-meta {
+  font-family: var(--rupv-font-micro);
+  font-size: var(--rupv-fs-micro);
+  color: var(--rupv-fg-3);
+}
+
+.sidebar-entity-desc {
+  margin: var(--rupv-s-3) 0 0;
+  font-family: var(--rupv-font-body);
+  font-size: var(--rupv-fs-body-sm);
+  color: var(--rupv-fg-2);
+  line-height: var(--rupv-lh-body);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.sidebar-entity-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rupv-s-1);
+  margin-top: var(--rupv-s-3);
+  align-self: flex-start;
+  font-family: var(--rupv-font-body);
   font-size: 14px;
+  font-weight: 600;
   color: var(--rupv-maroon);
-  margin-bottom: var(--rupv-s-1);
-  letter-spacing: 1px;
+  text-decoration: none;
+  transition: gap 120ms ease-out;
+}
+
+.sidebar-entity-link:hover {
+  gap: var(--rupv-s-2);
+  text-decoration: none;
 }

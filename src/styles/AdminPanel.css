@@ -24,11 +24,6 @@
   color: var(--rupv-cream);
 }
 
-.ap-fab-icon {
-  font-size: 14px;
-  line-height: 1;
-}
-
 .ap-fab-label {
   font-size: 14px;
 }
@@ -109,6 +104,10 @@
 
 .ap-tab {
   flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--rupv-s-1);
   padding: 14px 0;
   background: none;
   border: none;

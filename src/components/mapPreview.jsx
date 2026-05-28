@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Map from './map.jsx';
+import Icon from './ui/Icon';
+import RatingBadge from './ui/RatingBadge';
 import '../styles/map.css';
 
 const MapPreview = () => {
@@ -42,24 +44,43 @@ const MapPreview = () => {
             const avgRating = reviewCount > 0
               ? entity.reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
               : 0;
-            const stars = '★'.repeat(Math.floor(avgRating)) + '☆'.repeat(5 - Math.floor(avgRating));
             return (
-                <div key={entity.id} className="sidebar-entity-card" onClick={() => flyToMarker(entity)}>
-                  <strong>{entity.name}</strong>
-                  <div className="sidebar-entity-image">
-                    {entity.image_link ? (
-                      <img src={entity.image_link} alt={entity.name} />
-                    ) : (
-                      <div className="sidebar-image-placeholder" />
-                    )}
-                  </div>
-                  <div className="sidebar-stars">{stars}</div>
-                  <div className="sidebar-rating-text">
-                    {avgRating.toFixed(1)} / 5 ({reviewCount} review{reviewCount !== 1 ? 's' : ''})
-                  </div>
-                  <p>{entity.description || 'No description available'}</p>
-                  <a href={`/rating/${entity.id}`} onClick={(e) => e.stopPropagation()} >View Reviews</a>
+              <div key={entity.id} className="sidebar-entity-card" onClick={() => flyToMarker(entity)}>
+                <div className="sidebar-entity-image">
+                  {entity.image_link ? (
+                    <img src={entity.image_link} alt={entity.name} />
+                  ) : (
+                    <div className="sidebar-image-placeholder">
+                      <Icon name="building" size={32} stroke="var(--rupv-slate-soft)" />
+                    </div>
+                  )}
                 </div>
+                <div className="sidebar-entity-head">
+                  <RatingBadge
+                    value={reviewCount > 0 ? avgRating : null}
+                    count={reviewCount}
+                    size="sm"
+                  />
+                  <div className="sidebar-entity-headings">
+                    <strong className="sidebar-entity-name">{entity.name}</strong>
+                    <span className="sidebar-entity-meta">
+                      {reviewCount === 0
+                        ? 'No reviews yet'
+                        : `${reviewCount} review${reviewCount !== 1 ? 's' : ''}`}
+                    </span>
+                  </div>
+                </div>
+                {entity.description && (
+                  <p className="sidebar-entity-desc">{entity.description}</p>
+                )}
+                <Link
+                  className="sidebar-entity-link"
+                  to={`/rating/${entity.id}`}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  View reviews <Icon name="arrowUpRight" size={15} />
+                </Link>
+              </div>
             );
           })}
         </div>
@@ -70,7 +91,7 @@ const MapPreview = () => {
           className="map-back-btn"
           onClick={() => navigate(-1)}
         >
-          Back
+          <Icon name="arrowLeft" size={16} /> Back
         </button>
         <Map onEntitiesLoaded={setEntities} mapRefExternal={mapRefExternal} markersRef={markersRef} />
       </div>

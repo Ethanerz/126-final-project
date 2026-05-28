@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
 import { UserAuth } from '../context/AuthContext'
+import Icon from './ui/Icon'
 import '../styles/AdminPanel.css'
 
 const ENTITY_TYPES = ['facility', 'service']
@@ -49,7 +50,8 @@ const EntityForm = ({ form, setForm, onSubmit, submitLabel, status, loading }) =
               checked={form.entity_type === t}
               onChange={() => setForm((f) => ({ ...f, entity_type: t }))}
             />
-            {t === 'facility' ? '🏛️ Facility' : '🛎️ Service'}
+            <Icon name={t === 'facility' ? 'building' : 'bell'} size={16} />
+            {t === 'facility' ? 'Facility' : 'Service'}
           </label>
         ))}
       </div>
@@ -119,6 +121,7 @@ const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) 
     setStatus(null)
     setOpen(true)
     onConsumed()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingEdit])
 
   // When Dashboard passes a pendingDelete, load it and open panel
@@ -132,6 +135,7 @@ const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) 
     setStatus(null)
     setOpen(true)
     onConsumed()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingDelete])
 
   const reset = () => {
@@ -148,6 +152,12 @@ const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) 
   }
 
   // ── CRUD ──────────────────────────────────────────────────────────────────
+  // Every write uses .select() so we can inspect the affected rows. Without it,
+  // an RLS-blocked update/delete returns { error: null } while changing 0 rows —
+  // which previously showed a false "success" even though nothing was saved.
+
+  const PERMISSION_HINT =
+    'No rows were affected. You may not have permission to modify this entity (admins can only manage entities they own).'
 
   const handleAdd = async (e) => {
     e.preventDefault()
@@ -162,10 +172,12 @@ const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) 
       description: form.description.trim() || null,
       image_link: form.image_link.trim() || null,
     }
-    const { error } = await supabase.from('entities').insert([payload])
+    const { data, error } = await supabase.from('entities').insert([payload]).select()
     setLoading(false)
     if (error) {
       setStatus({ type: 'error', msg: error.message })
+    } else if (!data || data.length === 0) {
+      setStatus({ type: 'error', msg: PERMISSION_HINT })
     } else {
       setStatus({ type: 'success', msg: `"${payload.name}" added successfully.` })
       setForm(emptyForm)
@@ -186,10 +198,16 @@ const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) 
       description: form.description.trim() || null,
       image_link: form.image_link.trim() || null,
     }
-    const { error } = await supabase.from('entities').update(payload).eq('id', editId)
+    const { data, error } = await supabase
+      .from('entities')
+      .update(payload)
+      .eq('id', editId)
+      .select()
     setLoading(false)
     if (error) {
       setStatus({ type: 'error', msg: error.message })
+    } else if (!data || data.length === 0) {
+      setStatus({ type: 'error', msg: PERMISSION_HINT })
     } else {
       setStatus({ type: 'success', msg: `"${payload.name}" updated.` })
       onEntityChange?.()
@@ -198,16 +216,24 @@ const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) 
 
   const handleDelete = async () => {
     if (!deleteId) return
+    const name = deleteName
     setLoading(true)
     setStatus(null)
-    const { error } = await supabase.from('entities').delete().eq('id', deleteId)
+    const { data, error } = await supabase
+      .from('entities')
+      .delete()
+      .eq('id', deleteId)
+      .select()
     setLoading(false)
     if (error) {
       setStatus({ type: 'error', msg: error.message })
+    } else if (!data || data.length === 0) {
+      setStatus({ type: 'error', msg: PERMISSION_HINT })
     } else {
-      setStatus({ type: 'success', msg: `"${deleteName}" deleted.` })
+      // reset() clears status, so switch mode and reset first, then set the banner
       reset()
       setMode('add')
+      setStatus({ type: 'success', msg: `"${name}" deleted.` })
       onEntityChange?.()
     }
   }
@@ -216,8 +242,8 @@ const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) 
 
   if (!open) {
     return (
-      <button className="ap-fab" onClick={() => { setMode('add'); reset(); setOpen(true) }} title="Admin Panel">
-        <span className="ap-fab-icon">⚙</span>
+      <button className="ap-fab" onClick={() => { setMode('add'); reset(); setOpen(true) }} title="Admin panel">
+        <Icon name="building" size={16} />
         <span className="ap-fab-label">Admin</span>
       </button>
     )
@@ -229,20 +255,26 @@ const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) 
     <div className="ap-panel">
       <div className="ap-header">
         <div className="ap-header-left">
-          <span className="ap-badge">ADMIN</span>
-          <h2 className="ap-title">Manage Entities</h2>
+          <span className="ap-badge">Admin</span>
+          <h2 className="ap-title">Manage entities</h2>
         </div>
-        <button className="ap-close" onClick={() => { setOpen(false); reset() }}>✕</button>
+        <button className="ap-close" onClick={() => { setOpen(false); reset() }} aria-label="Close admin panel">
+          <Icon name="close" size={18} stroke="var(--rupv-cream)" />
+        </button>
       </div>
 
       <div className="ap-tabs">
-        {[['add', '＋ Add'], ['edit', '✎ Edit'], ['delete', '✕ Delete']].map(([m, label]) => (
+        {[
+          { m: 'add', icon: 'plus', label: 'Add' },
+          { m: 'edit', icon: 'edit', label: 'Edit' },
+          { m: 'delete', icon: 'trash', label: 'Delete' },
+        ].map(({ m, icon, label }) => (
           <button
             key={m}
             className={`ap-tab ${mode === m ? 'active' : ''}`}
             onClick={() => switchMode(m)}
           >
-            {label}
+            <Icon name={icon} size={15} /> {label}
           </button>
         ))}
       </div>
@@ -254,7 +286,7 @@ const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) 
             form={form}
             setForm={setForm}
             onSubmit={handleAdd}
-            submitLabel="Add Entity"
+            submitLabel="Add entity"
             status={status}
             loading={loading}
           />
@@ -270,20 +302,22 @@ const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) 
                 form={form}
                 setForm={setForm}
                 onSubmit={handleEditSave}
-                submitLabel="Save Changes"
+                submitLabel="Save changes"
                 status={status}
                 loading={loading}
               />
             </>
           ) : (
-            <p className="ap-hint">Click the <strong>✎</strong> button on any entity card to edit it.</p>
+            <p className="ap-hint">Select the edit button on any entity card to load it here.</p>
           )
         )}
 
         {mode === 'delete' && (
           deleteId ? (
             <div className="ap-delete-confirm">
-              <div className="ap-delete-warning">⚠️</div>
+              <div className="ap-delete-warning">
+                <Icon name="trash" size={36} stroke="var(--rupv-maroon)" />
+              </div>
               <p className="ap-delete-msg">
                 Permanently delete <strong>"{deleteName}"</strong>?<br />
                 <span className="ap-delete-sub">This will also remove all associated reviews.</span>
@@ -296,12 +330,12 @@ const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) 
                   Cancel
                 </button>
                 <button className="ap-btn-danger" onClick={handleDelete} disabled={loading}>
-                  {loading ? 'Deleting…' : 'Yes, Delete'}
+                  {loading ? 'Deleting…' : 'Yes, delete'}
                 </button>
               </div>
             </div>
           ) : (
-            <p className="ap-hint">Click the <strong>✕</strong> button on any entity card to delete it.</p>
+            <p className="ap-hint">Select the delete button on any entity card to remove it.</p>
           )
         )}
 

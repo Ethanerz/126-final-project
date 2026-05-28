@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { UserAuth } from '../context/AuthContext'
+import Avatar from './ui/Avatar'
+import Icon from './ui/Icon'
 import '../styles/Profile.css'
 
 const Profile = () => {
-    const { session } = UserAuth()
+    const { session, isGuest } = UserAuth()
     const navigate = useNavigate()
 
     const [profile, setProfile] = useState(null)
@@ -93,6 +95,7 @@ const Profile = () => {
     }
 
     const roleClass = profile.role === 'admin' ? 'role-admin' : 'role-user'
+    const displayName = profile.full_name || session.user.email?.split('@')[0] || 'Student'
 
     return (
         <div className="profile-page">
@@ -104,17 +107,25 @@ const Profile = () => {
                         onClick={() => navigate(-1)}
                         aria-label="Go back"
                     >
-                        Back
+                        <Icon name="arrowLeft" size={16} /> Back
                     </button>
-                    <h1 className="profile-title">My Profile</h1>
+                    <h1 className="profile-title">My profile</h1>
                 </div>
 
                 <div className="profile-card">
+                    <div className="profile-identity">
+                        <Avatar name={displayName} size={88} />
+                        <h2 className="profile-name">{displayName}</h2>
+                        <span className={`role-badge ${roleClass}`}>
+                            {profile.role || 'user'}
+                        </span>
+                    </div>
+
                     <div className="profile-fields">
 
-                        {/* Full Name — editable */}
+                        {/* Full name — editable */}
                         <div className="profile-field">
-                            <label htmlFor="profile-full-name">Full Name</label>
+                            <label htmlFor="profile-full-name">Full name</label>
                             {isEditing ? (
                                 <input
                                     id="profile-full-name"
@@ -134,14 +145,6 @@ const Profile = () => {
                             <p>{profile.student_id || 'Not set'}</p>
                         </div>
 
-                        {/* Role — read only, as badge */}
-                        <div className="profile-field">
-                            <label>Role</label>
-                            <span className={`role-badge ${roleClass}`}>
-                                {profile.role || 'user'}
-                            </span>
-                        </div>
-
                         {/* Email — read only */}
                         <div className="profile-field">
                             <label>Email</label>
@@ -152,6 +155,7 @@ const Profile = () => {
 
                     {saveError && <div className="profile-error">{saveError}</div>}
 
+                    {!isGuest && (
                     <div className="profile-actions">
                         {isEditing ? (
                             <>
@@ -161,7 +165,7 @@ const Profile = () => {
                                     onClick={handleSave}
                                     disabled={saving}
                                 >
-                                    {saving ? 'Saving…' : 'Save Changes'}
+                                    {saving ? 'Saving…' : 'Save changes'}
                                 </button>
                                 <button
                                     type="button"
@@ -178,10 +182,11 @@ const Profile = () => {
                                 className="btn btn-outline"
                                 onClick={() => setIsEditing(true)}
                             >
-                                Edit Profile
+                                Edit profile
                             </button>
                         )}
                     </div>
+                    )}
                 </div>
             </div>
         </div>
