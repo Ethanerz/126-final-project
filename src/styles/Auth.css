@@ -13,38 +13,6 @@
   overflow: hidden;
 }
 
-/* X-cross hero motif — drawn behind the welcome card only.
-   Uses :has() to target the auth-page that contains a welcome card,
-   so signin/signup pages keep their plain backgrounds. */
-
-.auth-page:has(.welcome-card)::before,
-.auth-page:has(.welcome-card)::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.auth-page:has(.welcome-card)::before {
-  background: linear-gradient(
-    to top right,
-    transparent calc(50% - 0.5px),
-    var(--rupv-ink) calc(50% - 0.5px),
-    var(--rupv-ink) calc(50% + 0.5px),
-    transparent calc(50% + 0.5px)
-  );
-}
-
-.auth-page:has(.welcome-card)::after {
-  background: linear-gradient(
-    to bottom right,
-    transparent calc(50% - 0.5px),
-    var(--rupv-ink) calc(50% - 0.5px),
-    var(--rupv-ink) calc(50% + 0.5px),
-    transparent calc(50% + 0.5px)
-  );
-}
 
 /* ── Card (cream brand-block on splash; standalone on login/register) ── */
 
