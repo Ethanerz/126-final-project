@@ -31,7 +31,10 @@ const Signin = () => {
     }
   }
 
-  const handleGuest = () => navigate('/dashboard')
+  const handleGuest = async () => {
+    await signInUser('guest@up.edu.ph', 'guest12345')
+    navigate('/dashboard')
+  }
   const handleResetPassword = () => navigate('/')
 
   return (
