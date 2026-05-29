@@ -4,6 +4,12 @@ import "@maptiler/sdk/dist/maptiler-sdk.css";
 import '../styles/map.css';
 import { supabase } from '../supabaseClient';
 
+// Popups are injected as raw HTML, so escape any entity-supplied text.
+const escapeHtml = (str) =>
+  String(str ?? '').replace(/[&<>"']/g, (c) => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
+
 const Map = ({ onEntitiesLoaded, mapRefExternal, markersRef }) => {
   const mapContainer = useRef(null);
   const mapRef = useRef(null);
@@ -45,22 +51,25 @@ const Map = ({ onEntitiesLoaded, mapRefExternal, markersRef }) => {
         const avgRating = reviewCount > 0
           ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
           : 0;
-        const stars = '★'.repeat(Math.floor(avgRating)) + '☆'.repeat(5 - Math.floor(avgRating));
+        const ratingNum = reviewCount > 0 ? avgRating.toFixed(1) : '—';
+        const metaText = reviewCount > 0
+          ? `${reviewCount} review${reviewCount !== 1 ? 's' : ''}`
+          : 'No reviews yet';
 
         const popupHTML = `
           <div class="popUpMarker">
-            <strong class="popUpTitle">${name}</strong>
-            <div class="popUpStars">${stars}</div>
-            <div class="popUpReviews">
-              ${avgRating.toFixed(1)} / 5 (${reviewCount} review${reviewCount !== 1 ? 's' : ''})
+            <strong class="popUpTitle">${escapeHtml(name)}</strong>
+            <div class="popUpRating">
+              <span class="popUpBadge">${ratingNum}</span>
+              <span class="popUpMeta">${metaText}</span>
             </div>
-            <a class="popUpLink" href="/rating/${id}">View Reviews</a>
+            <a class="popUpLink" href="/rating/${id}">View reviews</a>
           </div>
         `;
 
         const popup = new maptilersdk.Popup({ offset: 25 }).setHTML(popupHTML);
 
-        const marker = new maptilersdk.Marker({ color: '#FF0000' })
+        const marker = new maptilersdk.Marker({ color: '#A31F33' })
           .setLngLat([longitude, latitude])
           .setPopup(popup)
           .addTo(mapRef.current);
@@ -72,11 +81,11 @@ const Map = ({ onEntitiesLoaded, mapRefExternal, markersRef }) => {
       });
     };
 
-    if (mapRef.current.loaded?.()) {
-      addMarkers();
-    } else {
-      mapRef.current.on('load', addMarkers);
-    }
+    // The SDK's projection migration can throw inside its internal 'load'
+    // sequence, which means the 'load' event may never fire. Markers are
+    // positioned overlays that tolerate a still-loading map, so add them
+    // directly instead of gating on 'load' (same approach as EntityMiniMap).
+    addMarkers();
   }, []);
 
   return (
