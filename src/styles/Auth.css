@@ -271,37 +271,3 @@
   border-radius: var(--rupv-r-1);
   text-align: left;
 }
-
-/* ── Back button (top-left of auth card) ─────────────────────────── */
-
-.auth-back {
-  position: absolute;
-  top: var(--rupv-s-3);
-  left: var(--rupv-s-3);
-  display: inline-flex;
-  align-items: center;
-  gap: var(--rupv-s-1);
-  font-family: var(--rupv-font-body);
-  font-weight: 500;
-  font-size: 13px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--rupv-ink);
-  background: transparent;
-  border: var(--rupv-bw-1) solid var(--rupv-ink);
-  border-radius: var(--rupv-r-pill);
-  padding: 5px 12px 5px 10px;
-  cursor: pointer;
-  transition: background 120ms ease-out, color 120ms ease-out;
-}
-
-.auth-back::before {
-  content: '←';
-  font-size: 14px;
-  line-height: 1;
-}
-
-.auth-back:hover {
-  background: var(--rupv-ink);
-  color: var(--rupv-cream);
-}

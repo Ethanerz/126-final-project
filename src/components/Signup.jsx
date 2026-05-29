@@ -26,7 +26,7 @@ const Signup = () => {
     try {
       const result = await signUpNewUser(email, password)
       if (result.success) {
-        navigate('/dashboard')
+        navigate('/')
       } else {
         setError(result.error?.message || 'Unable to register')
       }
@@ -47,7 +47,7 @@ const Signup = () => {
         />
 
         <h2 className="auth-title">
-          Register to
+          Sign up for
           <span className="brand">Rate UPV</span>
         </h2>
 
@@ -92,12 +92,12 @@ const Signup = () => {
             className="auth-btn auth-btn-primary"
             disabled={loading}
           >
-            {loading ? 'Registering…' : 'Register'}
+            {loading ? 'Signing up…' : 'Sign up'}
           </button>
         </form>
 
         <p className="auth-helper">
-          Already have an account? <Link to="/signin">Sign in</Link>
+          Already have an account? <Link to="/signin">Log in</Link>
         </p>
       </div>
     </div>

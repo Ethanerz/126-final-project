@@ -3,9 +3,15 @@ import { supabase } from "../supabaseClient";
 
 const AuthContext = createContext();
 
+// The shared read-only demo account. Guests can browse but never write.
+export const GUEST_EMAIL = 'guest@up.edu.ph';
+const GUEST_PASSWORD = 'guest12345';
+
 export const AuthContextProvider = ({ children }) => {
   const [session, setSession] = useState(undefined);
-  const [userRole, setUserRole] = useState(null);  // ← ADD THIS
+  const [userRole, setUserRole] = useState(null);
+
+  const isGuest = session?.user?.email === GUEST_EMAIL;
 
   const signUpNewUser = async (email, password) => {
     const { data, error } = await supabase.auth.signUp({
@@ -36,6 +42,8 @@ export const AuthContextProvider = ({ children }) => {
       return { success: false, error: error.message };
     }
   };
+
+  const signInAsGuest = () => signInUser(GUEST_EMAIL, GUEST_PASSWORD);
 
   // Get session on mount
   useEffect(() => {
@@ -83,7 +91,7 @@ export const AuthContextProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ session, userRole, signUpNewUser, signOut, signInUser }}>
+    <AuthContext.Provider value={{ session, userRole, isGuest, signUpNewUser, signOut, signInUser, signInAsGuest }}>
       {children}
     </AuthContext.Provider>
   );

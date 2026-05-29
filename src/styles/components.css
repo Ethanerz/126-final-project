@@ -1,0 +1,331 @@
+/* ─────────────────────────────────────────────────────────────────
+   Rate UPV — shared component classes
+   Buttons · RatingBadge · Pill · Avatar · Header · Footer · layout
+   All values reference the --rupv-* tokens declared in index.css.
+   ───────────────────────────────────────────────────────────────── */
+
+/* ── Layout scaffolding ─────────────────────────────────────────── */
+.rupv-main {
+  flex: 1 1 auto;
+  width: 100%;
+}
+
+.rupv-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--rupv-s-7) var(--rupv-s-5);
+}
+
+/* ── Button ─────────────────────────────────────────────────────── */
+.rupv-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--rupv-s-2);
+  font-family: var(--rupv-font-body);
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  border: var(--rupv-bw-2) solid var(--rupv-border);
+  border-radius: var(--rupv-r-pill);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.05s ease,
+    box-shadow 0.15s ease;
+  user-select: none;
+}
+.rupv-btn:hover { text-decoration: none; }
+.rupv-btn:active { transform: translateY(1px); }
+.rupv-btn:focus-visible {
+  outline: var(--rupv-bw-2) solid var(--rupv-slate);
+  outline-offset: 2px;
+}
+.rupv-btn:disabled,
+.rupv-btn[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* sizes */
+.rupv-btn--sm { padding: 8px 16px;  font-size: 14px; }
+.rupv-btn--md { padding: 12px 22px; font-size: 16px; }
+.rupv-btn--lg { padding: 16px 30px; font-size: 20px; }
+.rupv-btn--block { display: flex; width: 100%; }
+
+/* variants */
+.rupv-btn--primary {
+  background: var(--rupv-maroon);
+  color: var(--rupv-cream);
+  border-color: var(--rupv-ink);
+  box-shadow: var(--rupv-shadow-1);
+}
+.rupv-btn--primary:hover { background: var(--rupv-maroon-deep); color: var(--rupv-cream); }
+
+.rupv-btn--slate {
+  background: var(--rupv-slate);
+  color: var(--rupv-cream);
+  border-color: var(--rupv-ink);
+  box-shadow: var(--rupv-shadow-1);
+}
+.rupv-btn--slate:hover { background: #2c3242; color: var(--rupv-cream); }
+
+.rupv-btn--ghost {
+  background: transparent;
+  color: var(--rupv-ink);
+  border-color: var(--rupv-ink);
+}
+.rupv-btn--ghost:hover { background: var(--rupv-ink); color: var(--rupv-cream); }
+
+.rupv-btn--onDark {
+  background: transparent;
+  color: var(--rupv-cream);
+  border-color: var(--rupv-cream);
+}
+.rupv-btn--onDark:hover { background: var(--rupv-cream); color: var(--rupv-ink); }
+
+.rupv-btn--chip {
+  background: var(--rupv-sky);
+  color: var(--rupv-slate);
+  border-color: var(--rupv-slate);
+  font-weight: 500;
+}
+.rupv-btn--chip:hover { background: var(--rupv-sky-deep); color: var(--rupv-slate); }
+.rupv-btn--chip[data-active='true'] {
+  background: var(--rupv-slate);
+  color: var(--rupv-cream);
+}
+
+.rupv-btn--danger {
+  background: var(--rupv-bg);
+  color: var(--rupv-maroon);
+  border-color: var(--rupv-maroon);
+}
+.rupv-btn--danger:hover { background: var(--rupv-maroon); color: var(--rupv-cream); }
+
+/* ── RatingBadge ────────────────────────────────────────────────── */
+.rupv-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--rupv-font-heading);
+  font-weight: 700;
+  line-height: 1;
+  border: var(--rupv-bw-2) solid var(--rupv-ink);
+  flex: none;
+}
+.rupv-badge--filled {
+  background: var(--rupv-slate);
+  color: var(--rupv-cream);
+}
+.rupv-badge--ghost {
+  background: transparent;
+  color: var(--rupv-slate);
+  border-color: var(--rupv-slate);
+}
+
+.rupv-badge-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--rupv-s-2);
+}
+.rupv-badge-block-num {
+  font-family: var(--rupv-font-display);
+  font-weight: 700;
+  font-size: 110px;
+  line-height: 0.9;
+  letter-spacing: var(--rupv-tracking-display);
+  color: var(--rupv-slate);
+}
+.rupv-badge-block-label {
+  font-family: var(--rupv-font-micro);
+  font-size: var(--rupv-fs-caption);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--rupv-fg-3);
+}
+
+/* ── Pill ───────────────────────────────────────────────────────── */
+.rupv-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  background: var(--rupv-sky);
+  color: var(--rupv-slate);
+  border-radius: var(--rupv-r-pill);
+  font-family: var(--rupv-font-heading);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.rupv-pill--italic { font-style: italic; }
+
+/* ── Avatar ─────────────────────────────────────────────────────── */
+.rupv-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--rupv-ink);
+  color: var(--rupv-cream);
+  border-radius: var(--rupv-r-pill);
+  font-family: var(--rupv-font-heading);
+  font-weight: 700;
+  line-height: 1;
+  overflow: hidden;
+  flex: none;
+  user-select: none;
+}
+
+/* ── Header ─────────────────────────────────────────────────────── */
+.rupv-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rupv-s-4);
+  height: var(--rupv-header-h);
+  padding: 0 var(--rupv-s-7);
+  background: var(--rupv-ink);
+  color: var(--rupv-cream);
+  box-shadow: var(--rupv-shadow-2);
+}
+
+.rupv-header-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rupv-s-3);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+}
+.rupv-header-logo { height: 46px; width: auto; display: block; }
+.rupv-header-wordmark {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1;
+}
+.rupv-header-name {
+  font-family: var(--rupv-font-heading);
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--rupv-cream);
+}
+.rupv-header-tagline {
+  font-family: var(--rupv-font-micro);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--rupv-fg-inv-2);
+  margin-top: 3px;
+}
+
+.rupv-header-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--rupv-s-3);
+}
+.rupv-header-role {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  background: var(--rupv-maroon);
+  color: var(--rupv-cream);
+  border-radius: var(--rupv-r-pill);
+  font-family: var(--rupv-font-micro);
+  font-size: var(--rupv-fs-caption);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.rupv-header-greeting {
+  font-family: var(--rupv-font-body);
+  font-size: 15px;
+  color: var(--rupv-fg-inv-2);
+}
+.rupv-header-account {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rupv-s-2);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: var(--rupv-r-pill);
+}
+.rupv-header-account:hover .rupv-header-greeting {
+  text-decoration: underline;
+}
+.rupv-header-account:focus-visible {
+  outline: var(--rupv-bw-2) solid var(--rupv-cream);
+  outline-offset: 2px;
+}
+
+/* ── Footer ─────────────────────────────────────────────────────── */
+.rupv-footer {
+  background: var(--rupv-bone);
+  border-top: var(--rupv-bw-3) solid var(--rupv-ink);
+  margin-top: auto;
+}
+.rupv-footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--rupv-s-6) var(--rupv-s-7);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rupv-s-5);
+  flex-wrap: wrap;
+}
+.rupv-footer-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--rupv-s-3);
+}
+.rupv-footer-logo { height: 44px; width: auto; display: block; }
+.rupv-footer-name {
+  font-family: var(--rupv-font-heading);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--rupv-ink);
+}
+.rupv-footer-copy {
+  font-family: var(--rupv-font-micro);
+  font-size: var(--rupv-fs-caption);
+  color: var(--rupv-fg-3);
+  margin-top: 2px;
+}
+.rupv-footer-links {
+  display: flex;
+  align-items: center;
+  gap: var(--rupv-s-5);
+  flex-wrap: wrap;
+}
+.rupv-footer-link {
+  font-family: var(--rupv-font-body);
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--rupv-slate);
+}
+.rupv-footer-link:hover { color: var(--rupv-maroon); text-decoration: underline; }
+
+/* ── Responsive chrome ──────────────────────────────────────────── */
+@media (max-width: 640px) {
+  :root { --rupv-header-h: 68px; }
+  .rupv-header { padding: 0 var(--rupv-s-4); }
+  .rupv-header-logo { height: 38px; }
+  .rupv-header-name { font-size: 18px; }
+  .rupv-header-tagline { display: none; }
+  .rupv-header-greeting { display: none; }
+  .rupv-header-nav { gap: var(--rupv-s-2); }
+  .rupv-container { padding: var(--rupv-s-5) var(--rupv-s-4); }
+  .rupv-footer-inner { padding: var(--rupv-s-5) var(--rupv-s-4); }
+}

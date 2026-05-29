@@ -1,295 +1,221 @@
-/* ─── Dashboard.css ─────────────────────────────────────────────── */
+/* ─── Dashboard / Browse ────────────────────────────────────────── */
 
-.dashboard-container {
-  min-height: 100svh;
-  background: var(--rupv-bone);
-  padding: var(--rupv-s-6) var(--rupv-s-5) var(--rupv-s-8);
+.rupv-browse-loading {
   font-family: var(--rupv-font-body);
-  color: var(--rupv-fg-1);
-  max-width: 1392px;
-  margin: 0 auto;
-  text-align: left;
+  font-size: var(--rupv-fs-body);
+  color: var(--rupv-fg-3);
+  padding: var(--rupv-s-8) 0;
+  text-align: center;
 }
 
-.dashboard-header {
+/* ── Page head ──────────────────────────────────────────────────── */
+.rupv-browse-head {
   display: flex;
-  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--rupv-s-5);
+  flex-wrap: wrap;
+  margin-bottom: var(--rupv-s-6);
+}
+.rupv-browse-sub {
+  font-family: var(--rupv-font-body);
+  font-size: var(--rupv-fs-body);
+  color: var(--rupv-fg-2);
+  margin-top: var(--rupv-s-2);
+  max-width: 52ch;
+}
+
+/* ── Toolbar ────────────────────────────────────────────────────── */
+.rupv-browse-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--rupv-s-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--rupv-s-6);
+}
+.rupv-search {
+  display: inline-flex;
   align-items: center;
   gap: var(--rupv-s-2);
-  margin-bottom: var(--rupv-s-7);
-  padding-bottom: var(--rupv-s-5);
-  border-bottom: var(--rupv-bw-1) solid var(--rupv-border-soft);
+  flex: 1 1 280px;
+  min-width: 0;
+  padding: 10px 18px;
+  background: var(--rupv-bg);
+  border: var(--rupv-bw-2) solid var(--rupv-ink);
+  border-radius: var(--rupv-r-pill);
 }
-
-.dashboard-title {
-  font-family: var(--rupv-font-display);
-  font-weight: 700;
-  font-size: 96px;
-  line-height: var(--rupv-lh-tight);
-  letter-spacing: var(--rupv-tracking-display);
-  color: var(--rupv-maroon);
-  margin: 0;
-  text-transform: uppercase;
-}
-
-@media (max-width: 1024px) {
-  .dashboard-title {
-    font-size: 64px;
-  }
-}
-
-.dashboard-header p {
+.rupv-search input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
   font-family: var(--rupv-font-body);
   font-size: var(--rupv-fs-body-sm);
-  color: var(--rupv-fg-2);
-  margin: 0 0 var(--rupv-s-2);
+  color: var(--rupv-fg-1);
 }
-
-/* ── Header action buttons (Sign Out / My Profile) ──────────────── */
-
-.signout-btn,
-.profile-btn {
-  font-family: var(--rupv-font-body);
-  font-weight: 500;
-  font-size: 14px;
-  letter-spacing: 0.02em;
-  text-transform: none;
-  padding: 8px 20px;
-  border-radius: var(--rupv-r-pill);
-  border: var(--rupv-bw-2) solid var(--rupv-ink);
-  background: transparent;
-  color: var(--rupv-ink);
-  cursor: pointer;
-  transition: background 120ms ease-out, color 120ms ease-out, box-shadow 120ms ease-out, transform 80ms ease-out;
-}
-
-.signout-btn:hover,
-.profile-btn:hover {
-  background: var(--rupv-ink);
-  color: var(--rupv-cream);
-}
-
-.signout-btn:active,
-.profile-btn:active {
-  transform: translateY(1px);
-}
-
-/* ── Entities grid + cards ──────────────────────────────────────── */
-
-.entities-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--rupv-s-3);
-  margin: 0 0 var(--rupv-s-6);
-}
-
-.entity-card {
-  position: relative;
-  background: var(--rupv-sky);
-  border: var(--rupv-bw-1) solid var(--rupv-ink);
-  border-radius: var(--rupv-r-2);
-  padding: var(--rupv-s-4) var(--rupv-s-5);
-  margin: 0;
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: var(--rupv-s-5);
+.rupv-search input::placeholder { color: var(--rupv-fg-3); }
+.rupv-filters {
+  display: flex;
   align-items: center;
-  box-shadow: var(--rupv-shadow-3);
-  transition: background 120ms ease-out, box-shadow 120ms ease-out;
+  gap: var(--rupv-s-2);
+  flex-wrap: wrap;
 }
 
-.entity-card:hover {
-  background: var(--rupv-sky-deep);
+/* ── Grid ───────────────────────────────────────────────────────── */
+.rupv-browse-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--rupv-s-5);
 }
 
-.entity-info {
+/* ── Facility card ──────────────────────────────────────────────── */
+.rupv-fcard {
+  position: relative;
+  background: var(--rupv-bg);
+  border: var(--rupv-bw-2) solid var(--rupv-ink);
+  border-radius: var(--rupv-r-3);
+  overflow: hidden;
+  box-shadow: var(--rupv-shadow-1);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.rupv-fcard:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--rupv-shadow-4);
+}
+.rupv-fcard-link {
   display: flex;
   flex-direction: column;
-  gap: var(--rupv-s-1);
-  min-width: 0;
-}
-
-.entity-info h3 {
-  margin: 0;
-  font-family: var(--rupv-font-heading);
-  font-weight: 700;
-  font-size: 22px;
-  line-height: var(--rupv-lh-snug);
-  color: var(--rupv-slate);
-}
-
-.entity-info h3 a {
+  height: 100%;
   color: inherit;
   text-decoration: none;
 }
+.rupv-fcard-link:hover { text-decoration: none; color: inherit; }
 
-.entity-info h3 a:hover {
-  color: var(--rupv-maroon);
-  text-decoration: none;
+.rupv-fcard-media {
+  position: relative;
+  height: 160px;
+  background: var(--rupv-sky);
+  border-bottom: var(--rupv-bw-2) solid var(--rupv-ink);
 }
-
-.entity-type {
-  font-family: var(--rupv-font-body);
-  font-size: var(--rupv-fs-caption);
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--rupv-fg-2);
-  margin: 0;
-}
-
-.entity-description {
-  font-family: var(--rupv-font-body);
-  font-size: var(--rupv-fs-body-sm);
-  line-height: var(--rupv-lh-body);
-  color: var(--rupv-fg-2);
-  margin: 0;
-}
-
-.entity-location {
-  font-family: var(--rupv-font-body);
-  font-size: var(--rupv-fs-caption);
-  color: var(--rupv-fg-3);
-  margin: 0;
-}
-
-/* ── Rating badge (slate pill with big numeral) ─────────────────── */
-
-.rating-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--rupv-s-1);
-  min-width: 110px;
-}
-
-.rating-number {
-  width: 88px;
-  height: 76px;
-  background: var(--rupv-slate);
-  color: #ffffff;
-  border-radius: var(--rupv-r-3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--rupv-font-heading);
-  font-weight: 700;
-  font-size: 44px;
-  line-height: 1;
-  letter-spacing: 0;
-}
-
-.rating-stars {
-  font-family: var(--rupv-font-body);
-  font-size: 14px;
-  letter-spacing: 1px;
-  color: var(--rupv-maroon);
-}
-
-.review-count {
-  font-family: var(--rupv-font-micro);
-  font-size: var(--rupv-fs-micro);
-  color: var(--rupv-fg-3);
-}
-
-/* Entity thumbnail — leftmost cell of the card */
-
-.entity-image {
-  width: 64px;
-  height: 64px;
-  border-radius: 8px;
-  overflow: hidden;
-  flex-shrink: 0;
-  background: var(--rupv-sky-deep);
-  border: var(--rupv-bw-1) solid var(--rupv-ink);
-}
-
-.entity-image img {
+.rupv-fcard-media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
-
-.image-placeholder {
+.rupv-fcard-media-empty {
   width: 100%;
   height: 100%;
-  background:
-    repeating-linear-gradient(
-      45deg,
-      transparent 0 6px,
-      rgba(31, 20, 27, 0.08) 6px 7px
-    );
-}
-
-/* ── Admin action buttons (overlay top-right of card) ───────────── */
-
-.entity-admin-actions {
-  position: absolute;
-  top: var(--rupv-s-2);
-  right: var(--rupv-s-2);
   display: flex;
-  gap: var(--rupv-s-1);
-  z-index: 1;
-}
-
-.entity-admin-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--rupv-r-1);
-  border: var(--rupv-bw-2) solid var(--rupv-slate);
-  background: var(--rupv-sky);
-  color: var(--rupv-slate);
-  font-family: var(--rupv-font-body);
-  font-size: 14px;
-  line-height: 1;
-  cursor: pointer;
-  display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background 120ms ease-out, color 120ms ease-out;
+  background:
+    repeating-linear-gradient(45deg, var(--rupv-sky) 0 12px, var(--rupv-sky-deep) 12px 24px);
 }
-
-.entity-admin-btn:hover {
-  background: var(--rupv-slate);
-  color: var(--rupv-cream);
-}
-
-.entity-admin-btn--delete {
-  background: var(--rupv-maroon);
-  border-color: var(--rupv-maroon);
-  color: var(--rupv-cream);
-}
-
-.entity-admin-btn--delete:hover {
-  background: var(--rupv-maroon-deep);
-  border-color: var(--rupv-maroon-deep);
-  color: var(--rupv-cream);
-}
-
-/* ── "Go to Map" CTA — slate pill, design-system secondary ──────── */
-
-.mappreview {
-  font-family: var(--rupv-font-heading);
-  font-weight: 500;
-  font-size: 18px;
-  letter-spacing: 0;
-  text-transform: none;
-  padding: 10px 28px;
+.rupv-fcard-go {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--rupv-ink);
   border-radius: var(--rupv-r-pill);
-  border: none;
-  background: var(--rupv-slate);
-  color: #ffffff;
-  cursor: pointer;
   box-shadow: var(--rupv-shadow-2);
-  transition: background 120ms ease-out, box-shadow 120ms ease-out, transform 80ms ease-out;
 }
 
-.mappreview:hover {
-  background: var(--rupv-slate-soft);
+.rupv-fcard-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rupv-s-3);
+  padding: var(--rupv-s-4);
+  flex: 1 1 auto;
+}
+.rupv-fcard-head {
+  display: flex;
+  align-items: center;
+  gap: var(--rupv-s-3);
+}
+.rupv-fcard-headings { min-width: 0; }
+.rupv-fcard-name {
+  font-family: var(--rupv-font-heading);
+  font-weight: 700;
+  font-size: 21px;
+  line-height: 1.15;
+  color: var(--rupv-slate);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.rupv-fcard-meta {
+  font-family: var(--rupv-font-micro);
+  font-size: var(--rupv-fs-caption);
+  color: var(--rupv-fg-3);
+  margin-top: 2px;
+}
+.rupv-fcard-desc {
+  font-family: var(--rupv-font-body);
+  font-size: var(--rupv-fs-body-sm);
+  color: var(--rupv-fg-2);
+  line-height: var(--rupv-lh-body);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.rupv-fcard-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rupv-s-2);
+  margin-top: auto;
 }
 
-.mappreview:active {
-  box-shadow: none;
-  transform: translateY(1px);
+/* ── Admin affordances on card ──────────────────────────────────── */
+.rupv-fcard-admin {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  display: flex;
+  gap: var(--rupv-s-2);
+}
+.rupv-fcard-iconbtn {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--rupv-cream);
+  color: var(--rupv-ink);
+  border: var(--rupv-bw-2) solid var(--rupv-ink);
+  border-radius: var(--rupv-r-pill);
+  cursor: pointer;
+  box-shadow: var(--rupv-shadow-1);
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.rupv-fcard-iconbtn:hover { background: var(--rupv-ink); color: var(--rupv-cream); }
+.rupv-fcard-iconbtn--danger:hover { background: var(--rupv-maroon); border-color: var(--rupv-maroon); color: var(--rupv-cream); }
+
+/* ── Empty state ────────────────────────────────────────────────── */
+.rupv-browse-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--rupv-s-3);
+  text-align: center;
+  padding: var(--rupv-s-9) var(--rupv-s-5);
+  background: var(--rupv-bg);
+  border: var(--rupv-bw-2) dashed var(--rupv-border-soft);
+  border-radius: var(--rupv-r-3);
+}
+.rupv-browse-empty .rupv-body-sm { max-width: 40ch; }
+
+@media (max-width: 640px) {
+  .rupv-browse-grid { grid-template-columns: 1fr; }
+  .rupv-browse-head { gap: var(--rupv-s-3); }
 }
