@@ -16,7 +16,12 @@ export const AuthContextProvider = ({ children }) => {
   const signUpNewUser = async (email, password) => {
     const { data, error } = await supabase.auth.signUp({
       email: email,
-      password: password
+      password: password,
+      options: {
+        // Where the confirmation link sends the user back to. Must be listed
+        // under Authentication → URL Configuration → Redirect URLs in Supabase.
+        emailRedirectTo: `${window.location.origin}/`
+      }
     });
     if (error) {
       console.error("there was a problem signing up: ", error);
