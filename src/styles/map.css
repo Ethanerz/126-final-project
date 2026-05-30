@@ -257,3 +257,52 @@
   gap: var(--rupv-s-2);
   text-decoration: none;
 }
+
+/* ── Mobile: stack the map over the places list ─────────────────── */
+@media (max-width: 768px) {
+  .map-page {
+    flex-direction: column;
+  }
+
+  /* Map pinned on top with a fixed share of the height; it stays put
+     while the list below scrolls, so tapping a card still flies it. */
+  .map-area {
+    order: 1;
+    flex: 0 0 45%;
+    min-height: 220px;
+  }
+
+  /* Sidebar becomes a full-width panel below the map. */
+  .sidebar {
+    order: 2;
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+    min-height: 0;
+    border-right: none;
+    border-top: var(--rupv-bw-2) solid var(--rupv-ink);
+  }
+
+  .sidebar-header {
+    padding: var(--rupv-s-3) var(--rupv-s-4) var(--rupv-s-2);
+  }
+
+  .sidebar-content-info {
+    padding: var(--rupv-s-3) var(--rupv-s-4) var(--rupv-s-4);
+  }
+
+  .sidebar-entity-image {
+    height: 120px;
+  }
+}
+
+/* ── Narrow phones: trim the back button so it doesn't crowd the map ── */
+@media (max-width: 400px) {
+  .map-back-btn {
+    top: var(--rupv-s-3);
+    left: var(--rupv-s-3);
+    font-size: 12px;
+    padding: 6px 12px 6px 10px;
+  }
+}
