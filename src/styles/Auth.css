@@ -271,3 +271,11 @@
   border-radius: var(--rupv-r-1);
   text-align: left;
 }
+
+.auth-hint {
+  display: block;
+  font-family: var(--rupv-font-micro);
+  font-size: var(--rupv-fs-caption);
+  color: var(--rupv-fg-3);
+  margin-top: var(--rupv-s-1);
+}
