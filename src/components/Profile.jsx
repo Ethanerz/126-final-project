@@ -14,6 +14,7 @@ const Profile = () => {
     const [loading, setLoading] = useState(true)
     const [isEditing, setIsEditing] = useState(false)
     const [fullName, setFullName] = useState('')
+    const [studentId, setStudentId] = useState('')
     const [saveError, setSaveError] = useState(null)
     const [saving, setSaving] = useState(false)
 
@@ -26,16 +27,24 @@ const Profile = () => {
     const fetchProfile = async () => {
         try {
             setLoading(true)
+            // student_id is intentionally not selectable via the table (it is
+            // private to its owner). The owner reads their own value through the
+            // get_my_student_id() RPC instead.
             const { data, error } = await supabase
                 .from('user_profiles')
-                .select('*')
+                .select('id, full_name, role, created_at, updated_at')
                 .eq('id', session.user.id)
                 .single()
 
             if (error) throw error
 
-            setProfile(data)
+            // Non-fatal: if this fails we just show a blank student ID rather
+            // than breaking the whole profile page.
+            const { data: myStudentId } = await supabase.rpc('get_my_student_id')
+
+            setProfile({ ...data, student_id: myStudentId ?? null })
             setFullName(data.full_name || '')
+            setStudentId(myStudentId || '')
         } catch (error) {
             console.error('Error fetching profile:', error)
         } finally {
@@ -52,11 +61,21 @@ const Profile = () => {
                 .from('user_profiles')
                 .update({
                     full_name: fullName,
+                    // Store null (not '') when blank so the UNIQUE constraint
+                    // doesn't trip on multiple empty student IDs.
+                    student_id: studentId.trim() || null,
                     updated_at: new Date()
                 })
                 .eq('id', session.user.id)
 
-            if (error) throw error
+            if (error) {
+                // 23505 = unique_violation: that student ID is already taken.
+                if (error.code === '23505') {
+                    setSaveError('That student ID is already in use.')
+                    return
+                }
+                throw error
+            }
 
             await fetchProfile()
             setIsEditing(false)
@@ -70,6 +89,7 @@ const Profile = () => {
 
     const handleCancel = () => {
         setFullName(profile.full_name || '')
+        setStudentId(profile.student_id || '')
         setSaveError(null)
         setIsEditing(false)
     }
@@ -139,10 +159,20 @@ const Profile = () => {
                             )}
                         </div>
 
-                        {/* Student ID — read only */}
+                        {/* Student ID — editable by the owner, private to them */}
                         <div className="profile-field">
-                            <label>Student ID</label>
-                            <p>{profile.student_id || 'Not set'}</p>
+                            <label htmlFor="profile-student-id">Student ID</label>
+                            {isEditing ? (
+                                <input
+                                    id="profile-student-id"
+                                    type="text"
+                                    value={studentId}
+                                    onChange={(e) => setStudentId(e.target.value)}
+                                    placeholder="Enter your student ID"
+                                />
+                            ) : (
+                                <p>{profile.student_id || 'Not set'}</p>
+                            )}
                         </div>
 
                         {/* Email — read only */}
