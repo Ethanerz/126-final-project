@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { UserAuth } from '../context/AuthContext'
 import Avatar from './ui/Avatar'
@@ -19,10 +19,11 @@ const Profile = () => {
     const [saving, setSaving] = useState(false)
 
     useEffect(() => {
-        if (session) {
+        // Guests have no profile to load — they get redirected below.
+        if (session && !isGuest) {
             fetchProfile()
         }
-    }, [session])
+    }, [session, isGuest])
 
     const fetchProfile = async () => {
         try {
@@ -92,6 +93,12 @@ const Profile = () => {
         setStudentId(profile.student_id || '')
         setSaveError(null)
         setIsEditing(false)
+    }
+
+    // Guests (and logged-out visitors) have no profile page — bounce them home.
+    // session === undefined means auth is still resolving, so wait before redirecting.
+    if (session !== undefined && (!session || isGuest)) {
+        return <Navigate to="/" replace />
     }
 
     if (loading) {
