@@ -295,3 +295,51 @@
   color: var(--rupv-fg-3);
   margin-top: var(--rupv-s-1);
 }
+
+/* ── Auth modal (blurred overlay on the home page) ──────────────── */
+.rupv-modal-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--rupv-s-5);
+  background: rgba(31, 20, 27, 0.45);
+  backdrop-filter: blur(7px) saturate(115%);
+  -webkit-backdrop-filter: blur(7px) saturate(115%);
+  animation: rupv-fade-in var(--rupv-dur-2) var(--rupv-ease) both;
+}
+.rupv-modal {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  max-height: calc(100svh - var(--rupv-s-7));
+  overflow-y: auto;
+}
+/* the auth-card reused as the modal panel: pop-in entrance + deeper shadow */
+.rupv-modal.auth-card {
+  animation: rupv-pop-in var(--rupv-dur-3) var(--rupv-ease-spring) both;
+  box-shadow: var(--rupv-shadow-4);
+}
+.rupv-modal-close {
+  position: absolute;
+  top: var(--rupv-s-3);
+  right: var(--rupv-s-3);
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: var(--rupv-bw-1) solid var(--rupv-border-soft);
+  border-radius: var(--rupv-r-pill);
+  color: var(--rupv-ink);
+  cursor: pointer;
+  transition: background var(--rupv-dur-1) var(--rupv-ease),
+    color var(--rupv-dur-1) var(--rupv-ease);
+}
+.rupv-modal-close:hover {
+  background: var(--rupv-ink);
+  color: var(--rupv-cream);
+}

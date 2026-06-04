@@ -11,7 +11,7 @@ function displayName(session, isGuest) {
 }
 
 export default function Header() {
-  const { session, userRole, signOut, isGuest } = UserAuth()
+  const { session, userRole, signOut, isGuest, openAuth } = UserAuth()
   const navigate = useNavigate()
 
   const name = displayName(session, isGuest)
@@ -52,13 +52,13 @@ export default function Header() {
         ) : isGuest ? (
           <>
             <span className="rupv-header-greeting">Browsing as guest</span>
-            <Button variant="onDark" size="sm" onClick={() => navigate('/signin')}>Log in</Button>
-            <Button variant="primary" size="sm" onClick={() => navigate('/signup')}>Sign up</Button>
+            <Button variant="onDark" size="sm" onClick={() => openAuth('signin')}>Log in</Button>
+            <Button variant="primary" size="sm" onClick={() => openAuth('signup')}>Sign up</Button>
           </>
         ) : (
           <>
-            <Button variant="onDark" size="sm" onClick={() => navigate('/signin')}>Log in</Button>
-            <Button variant="primary" size="sm" onClick={() => navigate('/signup')}>Sign up</Button>
+            <Button variant="onDark" size="sm" onClick={() => openAuth('signin')}>Log in</Button>
+            <Button variant="primary" size="sm" onClick={() => openAuth('signup')}>Sign up</Button>
           </>
         )}
       </nav>

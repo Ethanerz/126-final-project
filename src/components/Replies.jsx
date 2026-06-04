@@ -24,7 +24,7 @@ const Replies = () => {
   const [replyText, setReplyText] = useState('')
   const [replyError, setReplyError] = useState(null)
   const [busy, setBusy] = useState(false)
-  const { session, isGuest } = UserAuth()
+  const { session, isGuest, openAuth } = UserAuth()
   const { entityId, reviewId } = useParams()
 
   useEffect(() => {
@@ -237,7 +237,7 @@ const Replies = () => {
             <div className="rupv-rform rupv-rform-guest">
               <p className="rupv-h4">Join the conversation</p>
               <p className="rupv-body-sm">Log in with your UP account to leave a reply.</p>
-              <Button variant="primary" size="md" to="/signin">Log in</Button>
+              <Button variant="primary" size="md" onClick={() => openAuth('signin')}>Log in</Button>
             </div>
           ) : (
             <form className="rupv-rform" onSubmit={submitReply}>

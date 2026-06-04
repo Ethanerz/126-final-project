@@ -99,7 +99,7 @@ const Rating = () => {
   const [isEditing, setIsEditing] = useState(false)
   const [reviewError, setReviewError] = useState(null)
   const [busy, setBusy] = useState(false)
-  const { session, isGuest } = UserAuth()
+  const { session, isGuest, openAuth } = UserAuth()
   const { entityId } = useParams()
   const formRef = useRef(null)
 
@@ -487,7 +487,7 @@ const Rating = () => {
             <div className="rupv-rform rupv-rform-guest">
               <p className="rupv-h4">Want to share your experience?</p>
               <p className="rupv-body-sm">Log in with your UP account to write a review.</p>
-              <Button variant="primary" size="md" to="/signin">Log in</Button>
+              <Button variant="primary" size="md" onClick={() => openAuth('signin')}>Log in</Button>
             </div>
           ) : (
             <>

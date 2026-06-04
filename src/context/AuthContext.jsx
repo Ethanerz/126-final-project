@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState, useContext } from "react";
+import { createContext, useEffect, useState, useContext, useCallback } from "react";
 import { supabase } from "../supabaseClient";
 
 const AuthContext = createContext();
@@ -12,6 +12,11 @@ export const AuthContextProvider = ({ children }) => {
   const [userRole, setUserRole] = useState(null);
 
   const isGuest = session?.user?.email === GUEST_EMAIL;
+
+  // Auth modal (login/signup overlay) state + controls.
+  const [authModal, setAuthModal] = useState({ open: false, mode: 'signin' });
+  const openAuth = useCallback((mode = 'signin') => setAuthModal({ open: true, mode }), []);
+  const closeAuth = useCallback(() => setAuthModal((m) => ({ ...m, open: false })), []);
 
   const signUpNewUser = async (email, password) => {
     const { data, error } = await supabase.auth.signUp({
@@ -96,7 +101,7 @@ export const AuthContextProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ session, userRole, isGuest, signUpNewUser, signOut, signInUser, signInAsGuest }}>
+    <AuthContext.Provider value={{ session, userRole, isGuest, signUpNewUser, signOut, signInUser, signInAsGuest, authModal, openAuth, closeAuth }}>
       {children}
     </AuthContext.Provider>
   );

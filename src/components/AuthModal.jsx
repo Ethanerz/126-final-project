@@ -1,0 +1,229 @@
+import { useEffect, useState } from 'react'
+import { UserAuth } from '../context/AuthContext'
+import Icon from './ui/Icon'
+import '../styles/Auth.css'
+
+// Mirror of the DB trigger (restrict_up_email_signups) for a clean client-side
+// message before the request is sent.
+const UP_EMAIL_PATTERN = /@up\.edu\.ph$/i
+
+// Login / signup as a blurred overlay on whatever page you're on. Hosts the
+// same flows the old full-page routes did (login, signup, guest, email
+// confirmation) and closes on success instead of navigating.
+export default function AuthModal() {
+  const { authModal, closeAuth, signInUser, signUpNewUser, signInAsGuest } = UserAuth()
+  const open = authModal?.open
+
+  const [mode, setMode] = useState('signin')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [awaitingConfirmation, setAwaitingConfirmation] = useState(false)
+
+  // Sync mode from the trigger and reset the form each time it opens.
+  useEffect(() => {
+    if (open) {
+      setMode(authModal.mode || 'signin')
+      setEmail('')
+      setPassword('')
+      setConfirmPassword('')
+      setError('')
+      setLoading(false)
+      setAwaitingConfirmation(false)
+    }
+  }, [open, authModal?.mode])
+
+  // Escape to close + lock body scroll while open.
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e) => { if (e.key === 'Escape') closeAuth() }
+    window.addEventListener('keydown', onKey)
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prevOverflow
+    }
+  }, [open, closeAuth])
+
+  if (!open) return null
+
+  const switchMode = (m) => {
+    setMode(m)
+    setError('')
+    setAwaitingConfirmation(false)
+  }
+
+  const handleSignIn = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+    try {
+      const result = await signInUser(email, password)
+      if (result.success) closeAuth()
+      else setError(result.error?.message || result.error || 'Unable to sign in')
+    } catch (err) {
+      setError(err.message || 'An error occurred during sign-in')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleGuest = async () => {
+    await signInAsGuest()
+    closeAuth()
+  }
+
+  const handleSignUp = async (e) => {
+    e.preventDefault()
+    setError('')
+    const cleanEmail = email.trim()
+    if (!UP_EMAIL_PATTERN.test(cleanEmail)) {
+      setError('Please use your UP email address (must end in @up.edu.ph).')
+      return
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match')
+      return
+    }
+    setLoading(true)
+    try {
+      const result = await signUpNewUser(cleanEmail, password)
+      if (!result.success) {
+        setError(result.error?.message || 'Unable to register')
+        return
+      }
+      // Email-confirmation on → user but no session; off → logged in immediately.
+      if (result.data?.session) closeAuth()
+      else setAwaitingConfirmation(true)
+    } catch (err) {
+      setError(err.message || 'An error occurred during sign-up')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div
+      className="rupv-modal-scrim"
+      role="dialog"
+      aria-modal="true"
+      onMouseDown={(e) => { if (e.target === e.currentTarget) closeAuth() }}
+    >
+      <div className="rupv-modal auth-card">
+        <button className="rupv-modal-close" onClick={closeAuth} aria-label="Close">
+          <Icon name="close" size={18} />
+        </button>
+
+        <img src="/rate-upv-logo.svg" alt="Rate UPV logo" className="auth-logo" />
+
+        {awaitingConfirmation ? (
+          <>
+            <h2 className="auth-title">Check your email</h2>
+            <p className="auth-helper">
+              We sent a confirmation link to <strong>{email.trim()}</strong>. Open it to
+              finish creating your Rate UPV account — you can't log in until you confirm.
+            </p>
+            <button type="button" className="auth-link" onClick={() => switchMode('signin')}>
+              Back to log in
+            </button>
+          </>
+        ) : mode === 'signin' ? (
+          <>
+            <h2 className="auth-title">
+              Log in to<span className="brand">Rate UPV</span>
+            </h2>
+            <form className="auth-form" onSubmit={handleSignIn}>
+              <div className="auth-field">
+                <label htmlFor="m-signin-email">Email</label>
+                <input
+                  id="m-signin-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
+                />
+              </div>
+              <div className="auth-field">
+                <label htmlFor="m-signin-password">Password</label>
+                <input
+                  id="m-signin-password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                />
+              </div>
+              {error && <div className="auth-error">{error}</div>}
+              <button type="submit" className="auth-btn auth-btn-primary" disabled={loading}>
+                {loading ? 'Signing in…' : 'Log in'}
+              </button>
+            </form>
+            <button type="button" className="auth-btn auth-btn-ghost" onClick={handleGuest}>
+              Continue as guest
+            </button>
+            <div className="auth-divider" />
+            <p className="auth-helper">
+              Don't have an account yet?{' '}
+              <button type="button" className="auth-link" onClick={() => switchMode('signup')}>
+                Sign up
+              </button>
+            </p>
+          </>
+        ) : (
+          <>
+            <h2 className="auth-title">
+              Sign up for<span className="brand">Rate UPV</span>
+            </h2>
+            <form className="auth-form" onSubmit={handleSignUp}>
+              <div className="auth-field">
+                <label htmlFor="m-signup-email">Email</label>
+                <input
+                  id="m-signup-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
+                  placeholder="juan.delacruz@up.edu.ph"
+                />
+                <small className="auth-hint">Use your UP email (@up.edu.ph).</small>
+              </div>
+              <div className="auth-field">
+                <label htmlFor="m-signup-password">Password</label>
+                <input
+                  id="m-signup-password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="new-password"
+                />
+              </div>
+              <div className="auth-field">
+                <label htmlFor="m-signup-confirm">Confirm Password</label>
+                <input
+                  id="m-signup-confirm"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  autoComplete="new-password"
+                />
+              </div>
+              {error && <div className="auth-error">{error}</div>}
+              <button type="submit" className="auth-btn auth-btn-primary" disabled={loading}>
+                {loading ? 'Signing up…' : 'Sign up'}
+              </button>
+            </form>
+            <p className="auth-helper">
+              Already have an account?{' '}
+              <button type="button" className="auth-link" onClick={() => switchMode('signin')}>
+                Log in
+              </button>
+            </p>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
