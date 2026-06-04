@@ -5,6 +5,7 @@ export default function Button({
   variant = 'primary',
   size = 'md',
   block = false,
+  loading = false,
   to,
   href,
   type = 'button',
@@ -22,6 +23,15 @@ export default function Button({
     .filter(Boolean)
     .join(' ')
 
+  const content = loading ? (
+    <>
+      <span className="rupv-spinner" aria-hidden="true" />
+      {children}
+    </>
+  ) : (
+    children
+  )
+
   if (to) {
     return (
       <Link to={to} className={cls} {...rest}>
@@ -37,8 +47,8 @@ export default function Button({
     )
   }
   return (
-    <button type={type} className={cls} {...rest}>
-      {children}
+    <button type={type} className={cls} {...rest} disabled={loading || rest.disabled}>
+      {content}
     </button>
   )
 }

@@ -214,9 +214,9 @@ const Replies = () => {
             <p className="rupv-body-sm">Be the first to reply.</p>
           </div>
         ) : (
-          <div className="rupv-review-list">
-            {replies.map((reply) => (
-              <article key={reply.id} className="rupv-review">
+          <div className="rupv-review-list rupv-stagger">
+            {replies.map((reply, i) => (
+              <article key={reply.id} className="rupv-review" style={{ '--i': i }}>
                 <header className="rupv-review-head">
                   <Avatar name={reply.user_profiles?.full_name} size={40} />
                   <div className="rupv-review-author">
@@ -254,7 +254,7 @@ const Replies = () => {
               </label>
               {replyError && <p className="rupv-rform-error">{replyError}</p>}
               <div className="rupv-rform-actions">
-                <Button type="submit" variant="primary" size="md" disabled={busy}>
+                <Button type="submit" variant="primary" size="md" loading={busy}>
                   Submit reply
                 </Button>
               </div>

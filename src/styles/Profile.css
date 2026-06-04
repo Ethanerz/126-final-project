@@ -33,11 +33,12 @@
 }
 
 .profile-card {
-  background: var(--rupv-cream);
+  background: var(--rupv-grad-cream);
   border: var(--rupv-bw-1) solid var(--rupv-ink);
   border-radius: var(--rupv-r-2);
   padding: var(--rupv-s-6) var(--rupv-s-6) var(--rupv-s-5);
   box-shadow: var(--rupv-shadow-2);
+  animation: rupv-fade-up var(--rupv-dur-3) var(--rupv-ease-out) both;
 }
 
 .profile-identity {
@@ -102,12 +103,12 @@
   font-size: var(--rupv-fs-body-sm);
   color: var(--rupv-ink);
   outline: none;
-  transition: outline-color 120ms ease-out;
+  transition: border-color 120ms ease-out, box-shadow 120ms ease-out;
 }
 
 .profile-field input:focus {
-  outline: var(--rupv-bw-2) solid var(--rupv-maroon);
-  outline-offset: 2px;
+  border-color: var(--rupv-maroon);
+  box-shadow: 0 0 0 3px var(--brand-fg-soft);
 }
 
 .role-badge {
@@ -118,14 +119,14 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   color: #ffffff;
-  background: var(--rupv-slate);
+  background: var(--rupv-grad-slate);
   padding: 4px 14px;
   border-radius: var(--rupv-r-pill);
   text-transform: uppercase;
 }
 
 .role-badge.role-admin {
-  background: var(--rupv-maroon);
+  background: var(--rupv-grad-maroon);
   color: var(--rupv-cream);
 }
 
@@ -168,13 +169,14 @@
 }
 
 .btn-primary {
-  background: var(--rupv-maroon);
+  background: var(--rupv-grad-maroon);
   color: var(--rupv-cream);
   box-shadow: var(--rupv-shadow-2);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--rupv-maroon-deep);
+  box-shadow: var(--rupv-glow-maroon), var(--rupv-shadow-2);
+  transform: translateY(-1px);
 }
 
 .btn-primary:active:not(:disabled) {

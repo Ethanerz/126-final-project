@@ -45,7 +45,9 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform var(--rupv-dur-3) var(--rupv-ease-out);
 }
+.rupv-detail-media:hover img { transform: scale(1.04); }
 .rupv-detail-media-empty {
   width: 100%;
   height: 100%;
@@ -270,13 +272,22 @@
   font-weight: 600;
   font-size: var(--rupv-fs-body-sm);
   cursor: pointer;
-  transition: background 0.12s ease, color 0.12s ease, transform 0.05s ease;
+  transition: background var(--rupv-dur-1) var(--rupv-ease),
+    color var(--rupv-dur-1) var(--rupv-ease),
+    border-color var(--rupv-dur-1) var(--rupv-ease),
+    transform var(--rupv-dur-1) var(--rupv-ease-spring),
+    box-shadow var(--rupv-dur-1) var(--rupv-ease);
 }
-.rupv-vote:hover { background: var(--rupv-sky-deep); }
-.rupv-vote:active { transform: translateY(1px); }
-.rupv-vote.is-active { background: var(--rupv-slate); color: var(--rupv-cream); }
+.rupv-vote:hover { background: var(--rupv-sky-deep); transform: translateY(-1px); }
+.rupv-vote:active { transform: scale(0.94); }
+.rupv-vote.is-active {
+  background: var(--rupv-grad-slate);
+  color: var(--rupv-cream);
+  border-color: var(--rupv-ink);
+  box-shadow: var(--rupv-shadow-1);
+}
 .rupv-vote--down.is-active {
-  background: var(--rupv-maroon);
+  background: var(--rupv-grad-maroon);
   border-color: var(--rupv-maroon);
   color: var(--rupv-cream);
 }
@@ -285,7 +296,7 @@
 /* ── Review / reply form ────────────────────────────────────────── */
 .rupv-rform-slot { margin-top: var(--rupv-s-5); }
 .rupv-rform {
-  background: var(--rupv-cream);
+  background: var(--rupv-grad-cream);
   border: var(--rupv-bw-2) solid var(--rupv-ink);
   border-radius: var(--rupv-r-3);
   padding: var(--rupv-s-5);
@@ -326,11 +337,13 @@
   font-size: var(--rupv-fs-body-sm);
   color: var(--rupv-ink);
   outline: none;
+  transition: border-color var(--rupv-dur-1) var(--rupv-ease),
+    box-shadow var(--rupv-dur-1) var(--rupv-ease);
 }
 .rupv-field input:focus,
 .rupv-field textarea:focus {
-  outline: var(--rupv-bw-2) solid var(--rupv-maroon);
-  outline-offset: 2px;
+  border-color: var(--rupv-maroon);
+  box-shadow: 0 0 0 3px var(--brand-fg-soft);
 }
 .rupv-field textarea { resize: vertical; min-height: 110px; line-height: var(--rupv-lh-body); }
 
@@ -354,9 +367,10 @@
 .rupv-rate-chip:hover { background: var(--rupv-sky); }
 .rupv-rate-chip:active { transform: translateY(1px); }
 .rupv-rate-chip[data-active='true'] {
-  background: var(--rupv-slate);
+  background: var(--rupv-grad-slate);
   color: var(--rupv-cream);
   border-color: var(--rupv-ink);
+  animation: rupv-pop-in var(--rupv-dur-2) var(--rupv-ease-spring);
 }
 
 .rupv-rform-error {

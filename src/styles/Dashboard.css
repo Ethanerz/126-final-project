@@ -43,6 +43,12 @@
   background: var(--rupv-bg);
   border: var(--rupv-bw-2) solid var(--rupv-ink);
   border-radius: var(--rupv-r-pill);
+  transition: border-color var(--rupv-dur-1) var(--rupv-ease),
+    box-shadow var(--rupv-dur-1) var(--rupv-ease);
+}
+.rupv-search:focus-within {
+  border-color: var(--rupv-maroon);
+  box-shadow: 0 0 0 3px var(--brand-fg-soft);
 }
 .rupv-search input {
   flex: 1 1 auto;
@@ -77,11 +83,14 @@
   border-radius: var(--rupv-r-3);
   overflow: hidden;
   box-shadow: var(--rupv-shadow-1);
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  transition: transform var(--rupv-dur-2) var(--rupv-ease-out),
+    box-shadow var(--rupv-dur-2) var(--rupv-ease),
+    border-color var(--rupv-dur-2) var(--rupv-ease);
 }
 .rupv-fcard:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px);
   box-shadow: var(--rupv-shadow-4);
+  border-color: var(--rupv-maroon);
 }
 .rupv-fcard-link {
   display: flex;
@@ -103,7 +112,9 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform var(--rupv-dur-3) var(--rupv-ease-out);
 }
+.rupv-fcard:hover .rupv-fcard-media img { transform: scale(1.05); }
 .rupv-fcard-media-empty {
   width: 100%;
   height: 100%;
@@ -122,10 +133,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--rupv-ink);
+  background: var(--rupv-grad-maroon);
   border-radius: var(--rupv-r-pill);
   box-shadow: var(--rupv-shadow-2);
+  transition: transform var(--rupv-dur-2) var(--rupv-ease-spring);
 }
+.rupv-fcard:hover .rupv-fcard-go { transform: scale(1.12); }
 
 .rupv-fcard-body {
   display: flex;
@@ -219,3 +232,117 @@
   .rupv-browse-grid { grid-template-columns: 1fr; }
   .rupv-browse-head { gap: var(--rupv-s-3); }
 }
+
+/* ── Loading skeletons ──────────────────────────────────────────── */
+.rupv-fcard--skeleton { pointer-events: none; }
+.rupv-skel-media { height: 160px; border-radius: 0; }
+.rupv-skel-badge { width: 56px; height: 56px; border-radius: var(--rupv-r-2); flex: none; }
+.rupv-skel-line { height: 16px; width: 100%; }
+.rupv-skel-line--sm { width: 45%; }
+
+/* ── Hero band ──────────────────────────────────────────────────── */
+.rupv-hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rupv-s-6);
+  flex-wrap: wrap;
+  padding: var(--rupv-s-7) var(--rupv-s-6);
+  margin-bottom: var(--rupv-s-6);
+  border: var(--rupv-bw-2) solid var(--rupv-ink);
+  border-radius: var(--rupv-r-3);
+  background: var(--rupv-grad-ink);
+  color: var(--rupv-cream);
+  box-shadow: var(--rupv-shadow-3);
+  animation: rupv-fade-up var(--rupv-dur-3) var(--rupv-ease-out) both;
+}
+/* dot-grid texture */
+.rupv-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 247, 240, 0.10) 1.5px, transparent 1.6px);
+  background-size: 22px 22px;
+  pointer-events: none;
+}
+/* maroon glow accent */
+.rupv-hero::after {
+  content: "";
+  position: absolute;
+  right: -120px;
+  top: -120px;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(163, 31, 51, 0.55), transparent 65%);
+  pointer-events: none;
+}
+.rupv-hero-content { position: relative; z-index: 1; }
+.rupv-hero-eyebrow {
+  font-family: var(--rupv-font-micro);
+  font-size: var(--rupv-fs-caption);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--rupv-fg-inv-2);
+  margin: 0 0 var(--rupv-s-2);
+}
+.rupv-hero-title {
+  font-family: var(--rupv-font-display);
+  font-weight: 700;
+  font-size: clamp(48px, 7vw, 84px);
+  line-height: var(--rupv-lh-tight);
+  letter-spacing: var(--rupv-tracking-display);
+  text-transform: uppercase;
+  color: var(--rupv-cream);
+  margin: 0;
+}
+.rupv-hero-sub {
+  font-family: var(--rupv-font-body);
+  font-size: var(--rupv-fs-body);
+  color: var(--rupv-fg-inv-2);
+  margin: var(--rupv-s-3) 0 0;
+  max-width: 50ch;
+}
+.rupv-hero-actions { margin-top: var(--rupv-s-5); }
+.rupv-hero-stats {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: var(--rupv-s-6);
+  flex-wrap: wrap;
+}
+.rupv-hero-stat { display: flex; flex-direction: column; }
+.rupv-hero-stat-num {
+  font-family: var(--rupv-font-display);
+  font-size: 56px;
+  line-height: 1;
+  color: var(--rupv-cream);
+}
+.rupv-hero-stat-label {
+  font-family: var(--rupv-font-micro);
+  font-size: var(--rupv-fs-caption);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rupv-fg-inv-2);
+  margin-top: var(--rupv-s-1);
+}
+@media (max-width: 720px) {
+  .rupv-hero { padding: var(--rupv-s-6) var(--rupv-s-5); }
+  .rupv-hero-stats { gap: var(--rupv-s-5); }
+  .rupv-hero-stat-num { font-size: 40px; }
+}
+
+/* ── Card type accent bar ───────────────────────────────────────── */
+.rupv-fcard::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  z-index: 3;
+  background: var(--rupv-grad-slate);
+}
+.rupv-fcard[data-type="service"]::before { background: var(--rupv-grad-maroon); }

@@ -82,6 +82,22 @@
   --rupv-shadow-3: 0 4px 10px rgba(59, 66, 86, 0.35);
   --rupv-shadow-4: 0 12px 28px rgba(31, 20, 27, 0.20);
 
+  /* ── Motion ────────────────────────────────────────────────────── */
+  --rupv-dur-1: 120ms;   /* micro — taps, hovers */
+  --rupv-dur-2: 200ms;   /* standard — state changes */
+  --rupv-dur-3: 340ms;   /* entrance — reveals */
+  --rupv-ease:        cubic-bezier(0.4, 0, 0.2, 1);    /* standard */
+  --rupv-ease-out:    cubic-bezier(0.16, 1, 0.3, 1);   /* decelerate / entrance */
+  --rupv-ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1); /* gentle overshoot */
+
+  /* ── Gradients (on-brand) ──────────────────────────────────────── */
+  --rupv-grad-maroon: linear-gradient(135deg, #BE3247 0%, var(--rupv-maroon) 48%, var(--rupv-maroon-deep) 100%);
+  --rupv-grad-slate:  linear-gradient(135deg, #4C5572 0%, var(--rupv-slate) 100%);
+  --rupv-grad-ink:    linear-gradient(160deg, #2C1E27 0%, var(--rupv-ink) 100%);
+  --rupv-grad-sky:    linear-gradient(135deg, var(--rupv-sky) 0%, var(--rupv-sky-deep) 100%);
+  --rupv-grad-cream:  linear-gradient(160deg, #FFFFFF 0%, var(--rupv-cream) 100%);
+  --rupv-glow-maroon: 0 6px 20px rgba(163, 31, 51, 0.32);
+
   /* ── Type families ─────────────────────────────────────────────── */
   --rupv-font-display:  "Agency FB", "Oswald", "Impact", sans-serif;
   --rupv-font-heading:  "Raleway", "Helvetica Neue", system-ui, sans-serif;
@@ -144,10 +160,28 @@ body {
   min-height: 100svh;
 }
 
+/* Ambient textured backdrop — faint dot grid + soft brand glows, fixed behind
+   all content. Sits below #root (z-index 1); content surfaces paint over it. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(rgba(31, 20, 27, 0.05) 1px, transparent 1.3px),
+    radial-gradient(48% 38% at 10% 0%, rgba(163, 31, 51, 0.08), transparent 70%),
+    radial-gradient(45% 45% at 100% 100%, rgba(59, 66, 86, 0.07), transparent 72%);
+  background-size: 22px 22px, 100% 100%, 100% 100%;
+  background-repeat: repeat, no-repeat, no-repeat;
+}
+
 #root {
+  position: relative;
+  z-index: 1;
   width: 100%;
   min-height: 100svh;
-  background: var(--rupv-bone);
+  background: transparent;
   display: flex;
   flex-direction: column;
 }
@@ -276,3 +310,81 @@ a:hover {
 }
 .rupv-card--warm  { background: var(--rupv-surface-warm); }
 .rupv-card--ink   { background: var(--rupv-surface-dark); color: var(--rupv-fg-inv); }
+
+/* ─────────────────────────────────────────────────────────────────
+   Motion — keyframes, entrance utilities, skeletons, spinner
+   ───────────────────────────────────────────────────────────────── */
+
+@keyframes rupv-fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes rupv-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes rupv-pop-in {
+  0%   { opacity: 0; transform: scale(0.92); }
+  60%  { opacity: 1; transform: scale(1.02); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes rupv-shimmer {
+  from { background-position: 180% 0; }
+  to   { background-position: -180% 0; }
+}
+@keyframes rupv-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Entrance: fade-up on mount */
+.rupv-animate-in {
+  animation: rupv-fade-up var(--rupv-dur-3) var(--rupv-ease-out) both;
+}
+
+/* Staggered children — set inline style="--i:N" on each child */
+.rupv-stagger > * {
+  animation: rupv-fade-up var(--rupv-dur-3) var(--rupv-ease-out) both;
+  animation-delay: calc(var(--i, 0) * 55ms);
+}
+
+/* Skeleton shimmer block */
+.rupv-skeleton {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--rupv-sky);
+  background-image: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0) 28%,
+    rgba(255, 255, 255, 0.70) 50%,
+    rgba(255, 255, 255, 0) 72%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: rupv-shimmer 1.3s var(--rupv-ease) infinite;
+  border-radius: var(--rupv-r-2);
+}
+
+/* Inline spinner (inherits text color) */
+.rupv-spinner {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: rupv-spin 0.6s linear infinite;
+  vertical-align: -0.15em;
+}
+
+/* Smooth in-page scrolling */
+html { scroll-behavior: smooth; }
+
+/* Respect user motion preference — disable all motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

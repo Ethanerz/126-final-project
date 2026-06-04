@@ -78,7 +78,7 @@ function ReviewForm({ initial, onSubmit, onCancel, error, busy }) {
       {error && <p className="rupv-rform-error">{error}</p>}
 
       <div className="rupv-rform-actions">
-        <Button type="submit" variant="primary" size="md" disabled={busy || !rating}>
+        <Button type="submit" variant="primary" size="md" loading={busy} disabled={!rating}>
           {initial ? 'Save changes' : 'Submit review'}
         </Button>
         {onCancel && (
@@ -418,11 +418,11 @@ const Rating = () => {
             <p className="rupv-body-sm">Be the first to share your experience.</p>
           </div>
         ) : (
-          <div className="rupv-review-list">
-            {reviews.map((review) => {
+          <div className="rupv-review-list rupv-stagger">
+            {reviews.map((review, i) => {
               const isOwn = review.user_id === session?.user?.id
               return (
-                <article key={review.id} className="rupv-review">
+                <article key={review.id} className="rupv-review" style={{ '--i': i }}>
                   <header className="rupv-review-head">
                     <Avatar name={review.user_profiles?.full_name} size={44} />
                     <div className="rupv-review-author">

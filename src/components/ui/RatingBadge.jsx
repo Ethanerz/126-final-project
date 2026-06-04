@@ -9,10 +9,11 @@ export default function RatingBadge({ value, count, size = 'md', tone = 'filled'
   const s = SIZES[size]
   const hasValue = value != null && count !== 0
   const shown = hasValue ? Number(value).toFixed(1) : '—'
+  const score = !hasValue ? 'none' : value >= 4 ? 'good' : value >= 2.5 ? 'ok' : 'bad'
 
   if (s.block) {
     return (
-      <div className="rupv-badge-block">
+      <div className={`rupv-badge-block rupv-badge-block--${score}`}>
         <div className="rupv-badge-block-num">{shown}</div>
         <div className="rupv-badge-block-label">overall user ratings</div>
       </div>
@@ -21,7 +22,7 @@ export default function RatingBadge({ value, count, size = 'md', tone = 'filled'
 
   return (
     <div
-      className={`rupv-badge rupv-badge--${tone}`}
+      className={`rupv-badge rupv-badge--${tone} rupv-badge--score-${score}`}
       style={{ width: s.w, height: s.h, borderRadius: s.radius, fontSize: s.font }}
     >
       {shown}

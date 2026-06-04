@@ -82,10 +82,33 @@ const Dashboard = () => {
     })
   }, [entities, typeFilter, query])
 
+  const stats = useMemo(() => {
+    const places = entities.length
+    const totalReviews = entities.reduce((sum, e) => sum + (e.reviewCount || 0), 0)
+    const rated = entities.filter((e) => e.reviewCount > 0)
+    const avg = rated.length
+      ? rated.reduce((sum, e) => sum + e.avgRating, 0) / rated.length
+      : 0
+    return { places, totalReviews, avg }
+  }, [entities])
+
   if (session === undefined || loading) {
     return (
       <div className="rupv-container rupv-browse">
-        <div className="rupv-browse-loading">Loading facilities and services…</div>
+        <div className="rupv-browse-grid" aria-hidden="true">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <article key={i} className="rupv-fcard rupv-fcard--skeleton">
+              <div className="rupv-skeleton rupv-skel-media" />
+              <div className="rupv-fcard-body">
+                <div className="rupv-fcard-head">
+                  <div className="rupv-skeleton rupv-skel-badge" />
+                  <div className="rupv-skeleton rupv-skel-line" />
+                </div>
+                <div className="rupv-skeleton rupv-skel-line rupv-skel-line--sm" />
+              </div>
+            </article>
+          ))}
+        </div>
       </div>
     )
   }
@@ -101,17 +124,35 @@ const Dashboard = () => {
         />
       )}
 
-      <header className="rupv-browse-head">
-        <div>
-          <h1 className="rupv-h1">Browse campus</h1>
-          <p className="rupv-browse-sub">
-            Real student reviews of the facilities and services at UP Visayas.
+      <section className="rupv-hero">
+        <div className="rupv-hero-content">
+          <p className="rupv-hero-eyebrow">UP Visayas · Student Reviews</p>
+          <h1 className="rupv-hero-title">Browse campus</h1>
+          <p className="rupv-hero-sub">
+            Real student reviews of the facilities and services at UP Visayas —
+            find the best spots, dodge the worst.
           </p>
+          <div className="rupv-hero-actions">
+            <Button variant="onDark" size="md" to="/mappreview">
+              <Icon name="map" size={18} /> Campus map
+            </Button>
+          </div>
         </div>
-        <Button variant="ghost" size="md" to="/mappreview">
-          <Icon name="map" size={18} /> Campus map
-        </Button>
-      </header>
+        <div className="rupv-hero-stats">
+          <div className="rupv-hero-stat">
+            <span className="rupv-hero-stat-num">{stats.places}</span>
+            <span className="rupv-hero-stat-label">Places</span>
+          </div>
+          <div className="rupv-hero-stat">
+            <span className="rupv-hero-stat-num">{stats.totalReviews}</span>
+            <span className="rupv-hero-stat-label">Reviews</span>
+          </div>
+          <div className="rupv-hero-stat">
+            <span className="rupv-hero-stat-num">{stats.avg ? stats.avg.toFixed(1) : '—'}</span>
+            <span className="rupv-hero-stat-label">Avg rating</span>
+          </div>
+        </div>
+      </section>
 
       <div className="rupv-browse-toolbar">
         <label className="rupv-search">
@@ -151,9 +192,9 @@ const Dashboard = () => {
           </p>
         </div>
       ) : (
-        <div className="rupv-browse-grid">
-          {filtered.map((entity) => (
-            <article key={entity.id} className="rupv-fcard">
+        <div className="rupv-browse-grid rupv-stagger">
+          {filtered.map((entity, i) => (
+            <article key={entity.id} className="rupv-fcard" data-type={entity.entity_type} style={{ '--i': i }}>
               {isAdmin && (
                 <div className="rupv-fcard-admin">
                   <button

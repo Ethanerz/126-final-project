@@ -31,12 +31,15 @@
   border-radius: var(--rupv-r-pill);
   cursor: pointer;
   text-decoration: none;
-  transition: background 0.15s ease, color 0.15s ease, transform 0.05s ease,
-    box-shadow 0.15s ease;
+  transition: background var(--rupv-dur-1) var(--rupv-ease),
+    color var(--rupv-dur-1) var(--rupv-ease),
+    border-color var(--rupv-dur-1) var(--rupv-ease),
+    transform var(--rupv-dur-1) var(--rupv-ease-spring),
+    box-shadow var(--rupv-dur-2) var(--rupv-ease);
   user-select: none;
 }
-.rupv-btn:hover { text-decoration: none; }
-.rupv-btn:active { transform: translateY(1px); }
+.rupv-btn:hover { text-decoration: none; transform: translateY(-1px); }
+.rupv-btn:active { transform: translateY(1px) scale(0.99); }
 .rupv-btn:focus-visible {
   outline: var(--rupv-bw-2) solid var(--rupv-slate);
   outline-offset: 2px;
@@ -56,20 +59,23 @@
 
 /* variants */
 .rupv-btn--primary {
-  background: var(--rupv-maroon);
+  background: var(--rupv-grad-maroon);
   color: var(--rupv-cream);
   border-color: var(--rupv-ink);
   box-shadow: var(--rupv-shadow-1);
 }
-.rupv-btn--primary:hover { background: var(--rupv-maroon-deep); color: var(--rupv-cream); }
+.rupv-btn--primary:hover {
+  color: var(--rupv-cream);
+  box-shadow: var(--rupv-glow-maroon), var(--rupv-shadow-2);
+}
 
 .rupv-btn--slate {
-  background: var(--rupv-slate);
+  background: var(--rupv-grad-slate);
   color: var(--rupv-cream);
   border-color: var(--rupv-ink);
   box-shadow: var(--rupv-shadow-1);
 }
-.rupv-btn--slate:hover { background: #2c3242; color: var(--rupv-cream); }
+.rupv-btn--slate:hover { color: var(--rupv-cream); box-shadow: var(--rupv-shadow-3); }
 
 .rupv-btn--ghost {
   background: transparent;
@@ -116,7 +122,7 @@
   flex: none;
 }
 .rupv-badge--filled {
-  background: var(--rupv-slate);
+  background: var(--rupv-grad-slate);
   color: var(--rupv-cream);
 }
 .rupv-badge--ghost {
@@ -124,6 +130,15 @@
   color: var(--rupv-slate);
   border-color: var(--rupv-slate);
 }
+
+/* Score-driven colours (filled tone only — ghost stays neutral) */
+.rupv-badge--filled.rupv-badge--score-good { background: linear-gradient(135deg, #44A455, var(--rupv-rate-good)); }
+.rupv-badge--filled.rupv-badge--score-ok   { background: linear-gradient(135deg, #E3A92A, var(--rupv-rate-ok)); color: var(--rupv-ink); }
+.rupv-badge--filled.rupv-badge--score-bad  { background: var(--rupv-grad-maroon); }
+.rupv-badge--filled.rupv-badge--score-none { background: var(--rupv-grad-slate); }
+.rupv-badge-block--good .rupv-badge-block-num { color: var(--rupv-rate-good); }
+.rupv-badge-block--ok   .rupv-badge-block-num { color: var(--rupv-rate-ok); }
+.rupv-badge-block--bad  .rupv-badge-block-num { color: var(--rupv-maroon); }
 
 .rupv-badge-block {
   display: flex;
@@ -170,7 +185,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--rupv-ink);
+  background: var(--rupv-grad-ink);
   color: var(--rupv-cream);
   border-radius: var(--rupv-r-pill);
   font-family: var(--rupv-font-heading);
@@ -192,7 +207,7 @@
   gap: var(--rupv-s-4);
   height: var(--rupv-header-h);
   padding: 0 var(--rupv-s-7);
-  background: var(--rupv-ink);
+  background: var(--rupv-grad-ink);
   color: var(--rupv-cream);
   box-shadow: var(--rupv-shadow-2);
 }
@@ -237,7 +252,7 @@
   display: inline-flex;
   align-items: center;
   padding: 4px 12px;
-  background: var(--rupv-maroon);
+  background: var(--rupv-grad-maroon);
   color: var(--rupv-cream);
   border-radius: var(--rupv-r-pill);
   font-family: var(--rupv-font-micro);
