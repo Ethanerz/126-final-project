@@ -356,12 +356,12 @@ const Rating = () => {
           )}
         </div>
 
-        <div className="rupv-detail-info">
-          <div className="rupv-detail-badge">
+        <div className="rupv-detail-info rupv-stagger">
+          <div className="rupv-detail-badge" style={{ '--i': 0 }}>
             <RatingBadge value={avgRating} count={reviewCount} size="lg" />
           </div>
 
-          <div className="rupv-detail-headings">
+          <div className="rupv-detail-headings" style={{ '--i': 1 }}>
             <h1 className="rupv-h1">{currentEntity.name}</h1>
             <p className="rupv-detail-meta">
               {isService ? 'Service' : 'Facility'} ·{' '}
@@ -372,20 +372,20 @@ const Rating = () => {
           </div>
 
           {currentEntity.description && (
-            <p className="rupv-detail-desc">{currentEntity.description}</p>
+            <p className="rupv-detail-desc" style={{ '--i': 2 }}>{currentEntity.description}</p>
           )}
 
-          <div className="rupv-detail-tags">
+          <div className="rupv-detail-tags" style={{ '--i': 3 }}>
             <Pill>{isService ? 'Service' : 'Facility'}</Pill>
             {currentEntity.address && <Pill>{currentEntity.address}</Pill>}
           </div>
 
           {!isGuest && ((!userReview || isEditing) ? (
-            <Button variant="slate" size="md" onClick={focusForm}>
+            <Button variant="slate" size="md" onClick={focusForm} style={{ '--i': 4 }}>
               <Icon name="edit" size={18} stroke="var(--rupv-cream)" /> Write a review
             </Button>
           ) : (
-            <Button variant="slate" size="md" onClick={focusForm}>
+            <Button variant="slate" size="md" onClick={focusForm} style={{ '--i': 4 }}>
               <Icon name="edit" size={18} stroke="var(--rupv-cream)" /> Edit your review
             </Button>
           ))}

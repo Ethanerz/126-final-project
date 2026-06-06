@@ -140,6 +140,19 @@
 }
 .rupv-fcard:hover .rupv-fcard-go { transform: scale(1.12); }
 
+/* Press feedback — a tactile "push" when tapping a card through to its page.
+   Placed after the :hover rules so the pressed transform wins while held. */
+.rupv-fcard:active {
+  transform: translateY(-1px) scale(0.985);
+  box-shadow: var(--rupv-shadow-2);
+  border-color: var(--rupv-maroon);
+  transition-duration: var(--rupv-dur-1);
+}
+.rupv-fcard:active .rupv-fcard-go {
+  transform: scale(1.06) translate(2px, -2px);
+  transition-duration: var(--rupv-dur-1);
+}
+
 .rupv-fcard-body {
   display: flex;
   flex-direction: column;
