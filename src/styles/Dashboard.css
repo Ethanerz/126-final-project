@@ -140,6 +140,19 @@
 }
 .rupv-fcard:hover .rupv-fcard-go { transform: scale(1.12); }
 
+/* Press feedback — a tactile "push" when tapping a card through to its page.
+   Placed after the :hover rules so the pressed transform wins while held. */
+.rupv-fcard:active {
+  transform: translateY(-1px) scale(0.985);
+  box-shadow: var(--rupv-shadow-2);
+  border-color: var(--rupv-maroon);
+  transition-duration: var(--rupv-dur-1);
+}
+.rupv-fcard:active .rupv-fcard-go {
+  transform: scale(1.06) translate(2px, -2px);
+  transition-duration: var(--rupv-dur-1);
+}
+
 .rupv-fcard-body {
   display: flex;
   flex-direction: column;
@@ -234,11 +247,46 @@
 }
 
 /* ── Loading skeletons ──────────────────────────────────────────── */
-.rupv-fcard--skeleton { pointer-events: none; }
+/* Skeleton surfaces drop the hard outline and lean on a soft shadow instead.
+   Borders are kept transparent (not removed) so the layout doesn't shift when
+   the real, outlined content swaps in. */
+.rupv-fcard--skeleton {
+  pointer-events: none;
+  border-color: transparent;
+  box-shadow: 0 6px 20px rgba(31, 20, 27, 0.12);
+}
+.rupv-fcard--skeleton::before { display: none; }   /* hide the type accent bar */
+
+/* Match the card skeletons: a light, soft-shadowed surface — not the dark
+   hero band — so the whole loading state reads as one consistent skeleton.
+   Compound selector (two classes) so these win over the base `.rupv-hero`
+   rules, which are defined later in this file at equal single-class weight. */
+.rupv-hero.rupv-hero--skeleton {
+  background: var(--rupv-bg);
+  border-color: transparent;
+  box-shadow: 0 6px 20px rgba(31, 20, 27, 0.12);
+}
+.rupv-hero.rupv-hero--skeleton::before,
+.rupv-hero.rupv-hero--skeleton::after { content: none; }   /* drop the dot texture + maroon glow */
+
+/* Card placeholders */
 .rupv-skel-media { height: 160px; border-radius: 0; }
 .rupv-skel-badge { width: 56px; height: 56px; border-radius: var(--rupv-r-2); flex: none; }
 .rupv-skel-line { height: 16px; width: 100%; }
 .rupv-skel-line--sm { width: 45%; }
+
+/* Hero placeholders */
+.rupv-skel-eyebrow    { width: 150px; height: 12px; margin-bottom: var(--rupv-s-4); }
+.rupv-skel-title      { width: min(60%, 360px); height: 56px; margin-bottom: var(--rupv-s-4); }
+.rupv-skel-sub        { width: min(85%, 460px); height: 14px; margin-top: var(--rupv-s-3); }
+.rupv-skel-sub--short { width: min(60%, 320px); margin-top: var(--rupv-s-2); }
+.rupv-skel-btn        { width: 168px; height: 44px; border-radius: var(--rupv-r-pill); margin-top: var(--rupv-s-5); }
+.rupv-skel-stat-num   { width: 64px; height: 48px; }
+.rupv-skel-stat-label { width: 72px; height: 12px; margin-top: var(--rupv-s-1); }
+
+/* Toolbar placeholders */
+.rupv-skel-search { flex: 1 1 280px; height: 44px; border-radius: var(--rupv-r-pill); }
+.rupv-skel-chip   { width: 84px; height: 38px; border-radius: var(--rupv-r-pill); }
 
 /* ── Hero band ──────────────────────────────────────────────────── */
 .rupv-hero {
