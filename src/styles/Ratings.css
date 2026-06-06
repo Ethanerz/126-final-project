@@ -394,3 +394,34 @@
   .rupv-detail-media { aspect-ratio: 16 / 9; }
   .rupv-detail-badge .rupv-badge-block-num { font-size: 76px; }
 }
+
+/* ── Loading skeleton ───────────────────────────────────────────── */
+/* Reuses the real layout classes (so it lands in place and inherits the
+   hero-media fade-up + review stagger). Surfaces drop the hard outline
+   for a soft shadow; borders kept transparent to avoid layout shift. */
+.rupv-detail-media--skeleton {
+  border-color: transparent;
+  box-shadow: 0 6px 20px rgba(31, 20, 27, 0.12);
+}
+.rupv-detail-skel-fill { width: 100%; height: 100%; border-radius: 0; }
+
+.rupv-detail-skel-back     { width: 96px; height: 18px; margin-bottom: var(--rupv-s-5); }
+.rupv-detail-skel-badge    { width: 120px; height: 96px; border-radius: var(--rupv-r-2); }
+.rupv-detail-skel-title    { width: min(70%, 360px); height: 48px; }
+.rupv-detail-skel-meta     { width: 180px; height: 13px; }
+.rupv-detail-skel-line     { width: 100%; max-width: 520px; height: 14px; }
+.rupv-detail-skel-line--sm { width: 60%; }
+.rupv-detail-skel-tags     { display: flex; gap: var(--rupv-s-2); }
+.rupv-detail-skel-pill     { width: 96px; height: 30px; border-radius: var(--rupv-r-pill); }
+.rupv-detail-skel-btn      { width: 170px; height: 44px; border-radius: var(--rupv-r-pill); }
+.rupv-detail-skel-h2       { width: 200px; height: 32px; margin-bottom: var(--rupv-s-5); }
+
+.rupv-review--skeleton {
+  border-color: transparent;
+  box-shadow: 0 6px 20px rgba(31, 20, 27, 0.12);
+}
+.rupv-review-skel-avatar { width: 44px; height: 44px; border-radius: 50%; flex: none; }
+.rupv-review-skel-author { display: flex; flex-direction: column; gap: 6px; margin-right: auto; }
+.rupv-review-skel-name   { width: 120px; height: 16px; }
+.rupv-review-skel-date   { width: 80px; height: 12px; }
+.rupv-review-skel-badge  { width: 52px; height: 30px; border-radius: var(--rupv-r-2); }

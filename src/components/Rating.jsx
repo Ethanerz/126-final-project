@@ -317,8 +317,46 @@ const Rating = () => {
 
   if (loading) {
     return (
-      <div className="rupv-container rupv-detail">
-        <p className="rupv-detail-status">Loading…</p>
+      <div className="rupv-container rupv-detail" aria-busy="true">
+        <div className="rupv-skeleton rupv-detail-skel-back" aria-hidden="true" />
+
+        <section className="rupv-detail-hero" aria-hidden="true">
+          <div className="rupv-detail-media rupv-detail-media--skeleton">
+            <div className="rupv-skeleton rupv-detail-skel-fill" />
+          </div>
+          <div className="rupv-detail-info">
+            <div className="rupv-skeleton rupv-detail-skel-badge" />
+            <div className="rupv-skeleton rupv-detail-skel-title" />
+            <div className="rupv-skeleton rupv-detail-skel-meta" />
+            <div className="rupv-skeleton rupv-detail-skel-line" />
+            <div className="rupv-skeleton rupv-detail-skel-line rupv-detail-skel-line--sm" />
+            <div className="rupv-detail-skel-tags">
+              <div className="rupv-skeleton rupv-detail-skel-pill" />
+              <div className="rupv-skeleton rupv-detail-skel-pill" />
+            </div>
+            <div className="rupv-skeleton rupv-detail-skel-btn" />
+          </div>
+        </section>
+
+        <section className="rupv-detail-reviews" aria-hidden="true">
+          <div className="rupv-skeleton rupv-detail-skel-h2" />
+          <div className="rupv-review-list rupv-stagger">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <article key={i} className="rupv-review rupv-review--skeleton" style={{ '--i': i }}>
+                <header className="rupv-review-head">
+                  <div className="rupv-skeleton rupv-review-skel-avatar" />
+                  <div className="rupv-review-skel-author">
+                    <div className="rupv-skeleton rupv-review-skel-name" />
+                    <div className="rupv-skeleton rupv-review-skel-date" />
+                  </div>
+                  <div className="rupv-skeleton rupv-review-skel-badge" />
+                </header>
+                <div className="rupv-skeleton rupv-detail-skel-line" />
+                <div className="rupv-skeleton rupv-detail-skel-line rupv-detail-skel-line--sm" />
+              </article>
+            ))}
+          </div>
+        </section>
       </div>
     )
   }
