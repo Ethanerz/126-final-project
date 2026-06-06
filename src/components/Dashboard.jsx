@@ -94,7 +94,37 @@ const Dashboard = () => {
 
   if (session === undefined || loading) {
     return (
-      <div className="rupv-container rupv-browse">
+      <div className="rupv-container rupv-browse" aria-busy="true">
+        {/* Hero band — mirrors the real hero so content loads in place */}
+        <section className="rupv-hero rupv-hero--skeleton" aria-hidden="true">
+          <div className="rupv-hero-content">
+            <div className="rupv-skeleton rupv-skel-eyebrow" />
+            <div className="rupv-skeleton rupv-skel-title" />
+            <div className="rupv-skeleton rupv-skel-sub" />
+            <div className="rupv-skeleton rupv-skel-sub rupv-skel-sub--short" />
+            <div className="rupv-skeleton rupv-skel-btn" />
+          </div>
+          <div className="rupv-hero-stats">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="rupv-hero-stat">
+                <div className="rupv-skeleton rupv-skel-stat-num" />
+                <div className="rupv-skeleton rupv-skel-stat-label" />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Toolbar — search field + filter chips */}
+        <div className="rupv-browse-toolbar" aria-hidden="true">
+          <div className="rupv-skeleton rupv-skel-search" />
+          <div className="rupv-filters">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="rupv-skeleton rupv-skel-chip" />
+            ))}
+          </div>
+        </div>
+
+        {/* Card grid */}
         <div className="rupv-browse-grid" aria-hidden="true">
           {Array.from({ length: 6 }).map((_, i) => (
             <article key={i} className="rupv-fcard rupv-fcard--skeleton">

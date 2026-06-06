@@ -8,6 +8,7 @@ import '../styles/map.css';
 const MapPreview = () => {
   const navigate = useNavigate();
   const [entities, setEntities] = useState([]);
+  const [loaded, setLoaded] = useState(false);
   const mapRefExternal = useRef(null);
   const markersRef = useRef({});
 
@@ -38,14 +39,34 @@ const MapPreview = () => {
         <div className="sidebar-header">
           <h2>Places</h2>
         </div>
-        <div className="sidebar-content-info">
-          {entities.map((entity) => {
+        <div className="sidebar-content-info rupv-stagger">
+          {!loaded
+            ? Array.from({ length: 5 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="sidebar-entity-card sidebar-entity-card--skeleton"
+                  style={{ '--i': i }}
+                  aria-hidden="true"
+                >
+                  <div className="rupv-skeleton sidebar-skel-image" />
+                  <div className="sidebar-entity-head">
+                    <div className="rupv-skeleton sidebar-skel-badge" />
+                    <div className="sidebar-entity-headings">
+                      <div className="rupv-skeleton sidebar-skel-name" />
+                      <div className="rupv-skeleton sidebar-skel-meta" />
+                    </div>
+                  </div>
+                  <div className="rupv-skeleton sidebar-skel-line" />
+                  <div className="rupv-skeleton sidebar-skel-line sidebar-skel-line--sm" />
+                </div>
+              ))
+            : entities.map((entity, i) => {
             const reviewCount = entity.reviews?.length ?? 0;
             const avgRating = reviewCount > 0
               ? entity.reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
               : 0;
             return (
-              <div key={entity.id} className="sidebar-entity-card" onClick={() => flyToMarker(entity)}>
+              <div key={entity.id} className="sidebar-entity-card" style={{ '--i': Math.min(i, 8) }} onClick={() => flyToMarker(entity)}>
                 <div className="sidebar-entity-image">
                   {entity.image_link ? (
                     <img src={entity.image_link} alt={entity.name} />
@@ -93,7 +114,15 @@ const MapPreview = () => {
         >
           <Icon name="arrowLeft" size={16} /> Back
         </button>
-        <Map onEntitiesLoaded={setEntities} mapRefExternal={mapRefExternal} markersRef={markersRef} />
+        <Map
+          onEntitiesLoaded={(data) => { setEntities(data); setLoaded(true); }}
+          mapRefExternal={mapRefExternal}
+          markersRef={markersRef}
+        />
+        <div
+          className={`map-skeleton rupv-skeleton ${loaded ? 'map-skeleton--done' : ''}`}
+          aria-hidden="true"
+        />
       </div>
     </div>
   );
