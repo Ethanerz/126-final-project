@@ -43,6 +43,21 @@
   gap: var(--rupv-s-4);
 }
 
+/* Login ⇄ signup swap. The keyed .auth-view remounts on mode change and
+   replays this fade-scale. Scale stays ≤ 1 (transform only) so it never
+   introduces a scrollbar inside the modal. */
+@keyframes rupv-auth-swap {
+  from { opacity: 0; transform: scale(0.98); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.auth-view {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--rupv-s-4);
+  animation: rupv-auth-swap var(--rupv-dur-2) var(--rupv-ease-out) both;
+}
+
 .welcome-card {
   max-width: 460px;
   align-items: center;
@@ -146,15 +161,16 @@
 
 .auth-field input {
   width: 100%;
-  padding: 10px 14px;
-  background: var(--rupv-bone);
-  border: var(--rupv-bw-3) solid var(--rupv-ink);
-  border-radius: 0;
+  padding: 12px 14px;
+  background: var(--rupv-bg);
+  border: var(--rupv-bw-2) solid var(--rupv-ink);
+  border-radius: var(--rupv-r-1);
   font-family: var(--rupv-font-body);
   font-size: var(--rupv-fs-body-sm);
   color: var(--rupv-ink);
   outline: none;
-  transition: border-color 120ms ease-out, box-shadow 120ms ease-out;
+  transition: border-color var(--rupv-dur-1) var(--rupv-ease),
+    box-shadow var(--rupv-dur-1) var(--rupv-ease);
 }
 
 .auth-field input::placeholder {
@@ -269,13 +285,6 @@
   text-decoration: underline;
 }
 
-.auth-divider {
-  width: 100%;
-  height: 1px;
-  background: var(--rupv-border-soft);
-  margin: var(--rupv-s-1) 0;
-}
-
 .auth-error {
   width: 100%;
   background: var(--rupv-cream);
@@ -321,6 +330,23 @@
 .rupv-modal.auth-card {
   animation: rupv-pop-in var(--rupv-dur-3) var(--rupv-ease-spring) both;
   box-shadow: var(--rupv-shadow-4);
+}
+
+/* Exit — reverse of the entrance; .is-closing is set just before unmount, and
+   the scrim's animationend triggers the actual close. */
+@keyframes rupv-modal-scrim-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+@keyframes rupv-modal-card-out {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.96) translateY(4px); }
+}
+.rupv-modal-scrim.is-closing {
+  animation: rupv-modal-scrim-out var(--rupv-dur-2) var(--rupv-ease) forwards;
+}
+.rupv-modal.auth-card.is-closing {
+  animation: rupv-modal-card-out var(--rupv-dur-2) var(--rupv-ease) forwards;
 }
 .rupv-modal-close {
   position: absolute;

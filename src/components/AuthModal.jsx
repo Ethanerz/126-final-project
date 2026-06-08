@@ -11,7 +11,7 @@ const UP_EMAIL_PATTERN = /@up\.edu\.ph$/i
 // same flows the old full-page routes did (login, signup, guest, email
 // confirmation) and closes on success instead of navigating.
 export default function AuthModal() {
-  const { authModal, closeAuth, signInUser, signUpNewUser, signInAsGuest } = UserAuth()
+  const { authModal, closeAuth, signInUser, signUpNewUser } = UserAuth()
   const open = authModal?.open
 
   const [mode, setMode] = useState('signin')
@@ -21,6 +21,7 @@ export default function AuthModal() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [awaitingConfirmation, setAwaitingConfirmation] = useState(false)
+  const [closing, setClosing] = useState(false)
 
   // Sync mode from the trigger and reset the form each time it opens.
   useEffect(() => {
@@ -32,13 +33,14 @@ export default function AuthModal() {
       setError('')
       setLoading(false)
       setAwaitingConfirmation(false)
+      setClosing(false)
     }
   }, [open, authModal?.mode])
 
   // Escape to close + lock body scroll while open.
   useEffect(() => {
     if (!open) return
-    const onKey = (e) => { if (e.key === 'Escape') closeAuth() }
+    const onKey = (e) => { if (e.key === 'Escape') setClosing(true) }
     window.addEventListener('keydown', onKey)
     const prevOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
@@ -46,9 +48,20 @@ export default function AuthModal() {
       window.removeEventListener('keydown', onKey)
       document.body.style.overflow = prevOverflow
     }
-  }, [open, closeAuth])
+  }, [open])
 
   if (!open) return null
+
+  // Play the exit animation first, then actually close once it finishes.
+  const requestClose = () => setClosing(true)
+  const handleScrimAnimEnd = (e) => {
+    // Only react to the scrim's own fade-out — ignore the card's bubbled
+    // animation and the entrance animations (closing is false then).
+    if (e.target === e.currentTarget && closing) {
+      setClosing(false)
+      closeAuth()
+    }
+  }
 
   const switchMode = (m) => {
     setMode(m)
@@ -62,18 +75,13 @@ export default function AuthModal() {
     setError('')
     try {
       const result = await signInUser(email, password)
-      if (result.success) closeAuth()
+      if (result.success) requestClose()
       else setError(result.error?.message || result.error || 'Unable to sign in')
     } catch (err) {
       setError(err.message || 'An error occurred during sign-in')
     } finally {
       setLoading(false)
     }
-  }
-
-  const handleGuest = async () => {
-    await signInAsGuest()
-    closeAuth()
   }
 
   const handleSignUp = async (e) => {
@@ -96,7 +104,7 @@ export default function AuthModal() {
         return
       }
       // Email-confirmation on → user but no session; off → logged in immediately.
-      if (result.data?.session) closeAuth()
+      if (result.data?.session) requestClose()
       else setAwaitingConfirmation(true)
     } catch (err) {
       setError(err.message || 'An error occurred during sign-up')
@@ -107,19 +115,21 @@ export default function AuthModal() {
 
   return (
     <div
-      className="rupv-modal-scrim"
+      className={`rupv-modal-scrim${closing ? ' is-closing' : ''}`}
       role="dialog"
       aria-modal="true"
-      onMouseDown={(e) => { if (e.target === e.currentTarget) closeAuth() }}
+      onMouseDown={(e) => { if (e.target === e.currentTarget) requestClose() }}
+      onAnimationEnd={handleScrimAnimEnd}
     >
-      <div className="rupv-modal auth-card">
-        <button className="rupv-modal-close" onClick={closeAuth} aria-label="Close">
+      <div className={`rupv-modal auth-card${closing ? ' is-closing' : ''}`}>
+        <button className="rupv-modal-close" onClick={requestClose} aria-label="Close">
           <Icon name="close" size={18} />
         </button>
 
         <img src="/rate-upv-logo.svg" alt="Rate UPV logo" className="auth-logo" />
 
-        {awaitingConfirmation ? (
+        <div className="auth-view" key={awaitingConfirmation ? 'confirm' : mode}>
+          {awaitingConfirmation ? (
           <>
             <h2 className="auth-title">Check your email</h2>
             <p className="auth-helper">
@@ -161,10 +171,6 @@ export default function AuthModal() {
                 {loading ? 'Signing in…' : 'Log in'}
               </button>
             </form>
-            <button type="button" className="auth-btn auth-btn-ghost" onClick={handleGuest}>
-              Continue as guest
-            </button>
-            <div className="auth-divider" />
             <p className="auth-helper">
               Don't have an account yet?{' '}
               <button type="button" className="auth-link" onClick={() => switchMode('signup')}>
@@ -222,7 +228,8 @@ export default function AuthModal() {
               </button>
             </p>
           </>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )

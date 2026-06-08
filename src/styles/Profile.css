@@ -95,15 +95,16 @@
 
 .profile-field input {
   width: 100%;
-  padding: 10px 14px;
-  background: var(--rupv-bone);
-  border: var(--rupv-bw-3) solid var(--rupv-ink);
-  border-radius: 0;
+  padding: 12px 14px;
+  background: var(--rupv-bg);
+  border: var(--rupv-bw-2) solid var(--rupv-ink);
+  border-radius: var(--rupv-r-1);
   font-family: var(--rupv-font-body);
   font-size: var(--rupv-fs-body-sm);
   color: var(--rupv-ink);
   outline: none;
-  transition: border-color 120ms ease-out, box-shadow 120ms ease-out;
+  transition: border-color var(--rupv-dur-1) var(--rupv-ease),
+    box-shadow var(--rupv-dur-1) var(--rupv-ease);
 }
 
 .profile-field input:focus {
