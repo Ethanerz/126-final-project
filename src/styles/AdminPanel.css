@@ -2,12 +2,20 @@
 
 /* ── Collapsed FAB ──────────────────────────────────────────────── */
 
+/* Floating trigger — fixed to the viewport so it follows the page like the
+   sticky header, on the front layer instead of sitting in the flow above the
+   hero. `left` keeps its original x: pinned to the centered container's left
+   content edge (max-width 1200 / 2 = 600px, + the --rupv-s-5 side padding). */
 .ap-fab {
+  position: fixed;
+  z-index: 40;
+  top: calc(var(--rupv-header-h) + var(--rupv-s-3));
+  left: max(var(--rupv-s-5), calc(50vw - 600px + var(--rupv-s-5)));
   display: inline-flex;
   align-items: center;
   gap: var(--rupv-s-2);
   padding: 8px 20px;
-  background: transparent;
+  background: var(--rupv-cream);
   color: var(--rupv-ink);
   border: var(--rupv-bw-2) solid var(--rupv-ink);
   border-radius: var(--rupv-r-pill);
@@ -16,6 +24,7 @@
   font-weight: 500;
   letter-spacing: 0.02em;
   cursor: pointer;
+  box-shadow: var(--rupv-shadow-2);
   transition: background 120ms ease-out, color 120ms ease-out;
 }
 
@@ -30,16 +39,22 @@
 
 /* ── Expanded panel ─────────────────────────────────────────────── */
 
-.ap-panel {
+/* ── Modal panel — opens centered over a blurred scrim, like the auth modal.
+   Reuses the shared .rupv-modal-scrim / .rupv-modal shell (defined in Auth.css,
+   always loaded via the AuthModal mounted in Layout). The shell handles the
+   scrim fade + scroll; this adds the admin width, surface, and pop-in/out. ── */
+.rupv-modal.ap-modal {
+  max-width: 460px;
   background: var(--rupv-cream);
   border: var(--rupv-bw-1) solid var(--rupv-ink);
   border-radius: var(--rupv-r-2);
-  overflow: hidden;
   font-family: var(--rupv-font-body);
-  box-shadow: var(--rupv-shadow-3);
-  margin-bottom: var(--rupv-s-6);
   text-align: left;
-  animation: rupv-fade-up var(--rupv-dur-3) var(--rupv-ease-out) both;
+  box-shadow: var(--rupv-shadow-4);
+  animation: rupv-pop-in var(--rupv-dur-3) var(--rupv-ease-spring) both;
+}
+.rupv-modal.ap-modal.is-closing {
+  animation: rupv-modal-card-out var(--rupv-dur-2) var(--rupv-ease) forwards;
 }
 
 .ap-header {

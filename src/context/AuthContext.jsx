@@ -61,8 +61,14 @@ export const AuthContextProvider = ({ children }) => {
       setSession(session);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+    // Supabase re-checks and refreshes the token whenever the tab regains focus,
+    // firing an event here. Replacing the session object on every such event would
+    // re-run every [session] effect (refetch + loading skeleton). Keep the same
+    // object while it's the same logged-in user; only update on real sign-in/out.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      setSession((prev) =>
+        prev?.user?.id && prev.user.id === newSession?.user?.id ? prev : newSession
+      );
     });
 
     return () => subscription.unsubscribe();

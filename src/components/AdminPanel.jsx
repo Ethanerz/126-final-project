@@ -103,6 +103,7 @@ const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) 
   const [deleteName, setDeleteName] = useState('')
   const [status, setStatus] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [closing, setClosing] = useState(false)
 
   // When Dashboard passes a pendingEdit, load it and open panel
   useEffect(() => {
@@ -138,6 +139,19 @@ const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingDelete])
 
+  // Escape to close + lock body scroll while the modal is open (like AuthModal).
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e) => { if (e.key === 'Escape') setClosing(true) }
+    window.addEventListener('keydown', onKey)
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prevOverflow
+    }
+  }, [open])
+
   const reset = () => {
     setForm(emptyForm)
     setEditId(null)
@@ -149,6 +163,16 @@ const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) 
   const switchMode = (m) => {
     reset()
     setMode(m)
+  }
+
+  // Play the exit animation, then actually close (mirrors AuthModal).
+  const requestClose = () => setClosing(true)
+  const handleScrimAnimEnd = (e) => {
+    if (e.target === e.currentTarget && closing) {
+      setClosing(false)
+      setOpen(false)
+      reset()
+    }
   }
 
   // ── CRUD ──────────────────────────────────────────────────────────────────
@@ -252,16 +276,24 @@ const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) 
   // ── Expanded panel ────────────────────────────────────────────────────────
 
   return (
-    <div className="ap-panel">
-      <div className="ap-header">
-        <div className="ap-header-left">
-          <span className="ap-badge">Admin</span>
-          <h2 className="ap-title">Manage entities</h2>
+    <div
+      className={`rupv-modal-scrim${closing ? ' is-closing' : ''}`}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Manage entities"
+      onMouseDown={(e) => { if (e.target === e.currentTarget) requestClose() }}
+      onAnimationEnd={handleScrimAnimEnd}
+    >
+      <div className={`rupv-modal ap-modal${closing ? ' is-closing' : ''}`}>
+        <div className="ap-header">
+          <div className="ap-header-left">
+            <span className="ap-badge">Admin</span>
+            <h2 className="ap-title">Manage entities</h2>
+          </div>
+          <button className="ap-close" onClick={requestClose} aria-label="Close admin panel">
+            <Icon name="close" size={18} stroke="var(--rupv-cream)" />
+          </button>
         </div>
-        <button className="ap-close" onClick={() => { setOpen(false); reset() }} aria-label="Close admin panel">
-          <Icon name="close" size={18} stroke="var(--rupv-cream)" />
-        </button>
-      </div>
 
       <div className="ap-tabs">
         {[
@@ -339,6 +371,7 @@ const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) 
           )
         )}
 
+      </div>
       </div>
     </div>
   )
