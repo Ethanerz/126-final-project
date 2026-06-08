@@ -128,7 +128,8 @@ export default function AuthModal() {
 
         <img src="/rate-upv-logo.svg" alt="Rate UPV logo" className="auth-logo" />
 
-        {awaitingConfirmation ? (
+        <div className="auth-view" key={awaitingConfirmation ? 'confirm' : mode}>
+          {awaitingConfirmation ? (
           <>
             <h2 className="auth-title">Check your email</h2>
             <p className="auth-helper">
@@ -227,7 +228,8 @@ export default function AuthModal() {
               </button>
             </p>
           </>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )

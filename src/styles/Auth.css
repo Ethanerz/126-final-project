@@ -43,6 +43,21 @@
   gap: var(--rupv-s-4);
 }
 
+/* Login ⇄ signup swap. The keyed .auth-view remounts on mode change and
+   replays this fade-scale. Scale stays ≤ 1 (transform only) so it never
+   introduces a scrollbar inside the modal. */
+@keyframes rupv-auth-swap {
+  from { opacity: 0; transform: scale(0.98); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.auth-view {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--rupv-s-4);
+  animation: rupv-auth-swap var(--rupv-dur-2) var(--rupv-ease-out) both;
+}
+
 .welcome-card {
   max-width: 460px;
   align-items: center;
