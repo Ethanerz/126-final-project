@@ -167,15 +167,16 @@
 }
 
 .ap-input {
-  background: var(--rupv-bone);
-  border: var(--rupv-bw-1) solid var(--rupv-ink);
+  background: var(--rupv-bg);
+  border: var(--rupv-bw-2) solid var(--rupv-ink);
   border-radius: var(--rupv-r-1);
   color: var(--rupv-ink);
   font-family: var(--rupv-font-body);
-  font-size: 14px;
-  padding: 10px 12px;
+  font-size: var(--rupv-fs-body-sm);
+  padding: 12px 14px;
   outline: none;
-  transition: outline-color 120ms ease-out;
+  transition: border-color var(--rupv-dur-1) var(--rupv-ease),
+    box-shadow var(--rupv-dur-1) var(--rupv-ease);
   width: 100%;
 }
 
@@ -184,8 +185,8 @@
 }
 
 .ap-input:focus {
-  outline: var(--rupv-bw-2) solid var(--rupv-maroon);
-  outline-offset: 2px;
+  border-color: var(--rupv-maroon);
+  box-shadow: 0 0 0 3px var(--brand-fg-soft);
 }
 
 .ap-textarea {
