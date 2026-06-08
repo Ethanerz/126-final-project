@@ -237,3 +237,20 @@
   background: var(--rupv-ink);
   color: var(--rupv-cream);
 }
+
+/* ── Loading skeleton ───────────────────────────────────────────── */
+/* Reuses the real layout classes so it lands in place and inherits the card's
+   fade-up entrance. The card drops its outline for a soft shadow, matching the
+   other page skeletons; the shimmer placeholders sit on the cream surface. */
+.profile-card--skeleton {
+  border-color: transparent;
+  box-shadow: 0 6px 20px rgba(31, 20, 27, 0.12);
+}
+.profile-skel-back   { width: 84px;  height: 30px; border-radius: var(--rupv-r-pill); }
+.profile-skel-title  { width: 190px; height: 36px; }
+.profile-skel-avatar { width: 88px;  height: 88px; border-radius: 50%; }
+.profile-skel-name   { width: 160px; height: 26px; }
+.profile-skel-badge  { width: 80px;  height: 22px; border-radius: var(--rupv-r-pill); }
+.profile-skel-label  { width: 90px;  height: 11px; }
+.profile-skel-value  { width: min(70%, 240px); height: 16px; }
+.profile-skel-btn    { width: 132px; height: 42px; border-radius: 8px; }

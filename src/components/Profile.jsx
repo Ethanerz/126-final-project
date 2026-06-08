@@ -103,9 +103,33 @@ const Profile = () => {
 
     if (loading) {
         return (
-            <div className="profile-page">
+            <div className="profile-page" aria-busy="true">
                 <div className="profile-shell">
-                    <p>Loading your profile…</p>
+                    <div className="profile-header" aria-hidden="true">
+                        <div className="rupv-skeleton profile-skel-back" />
+                        <div className="rupv-skeleton profile-skel-title" />
+                    </div>
+
+                    <div className="profile-card profile-card--skeleton" aria-hidden="true">
+                        <div className="profile-identity">
+                            <div className="rupv-skeleton profile-skel-avatar" />
+                            <div className="rupv-skeleton profile-skel-name" />
+                            <div className="rupv-skeleton profile-skel-badge" />
+                        </div>
+
+                        <div className="profile-fields">
+                            {Array.from({ length: 3 }).map((_, i) => (
+                                <div key={i} className="profile-field">
+                                    <div className="rupv-skeleton profile-skel-label" />
+                                    <div className="rupv-skeleton profile-skel-value" />
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="profile-actions">
+                            <div className="rupv-skeleton profile-skel-btn" />
+                        </div>
+                    </div>
                 </div>
             </div>
         )
