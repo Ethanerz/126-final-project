@@ -316,6 +316,23 @@
   animation: rupv-pop-in var(--rupv-dur-3) var(--rupv-ease-spring) both;
   box-shadow: var(--rupv-shadow-4);
 }
+
+/* Exit — reverse of the entrance; .is-closing is set just before unmount, and
+   the scrim's animationend triggers the actual close. */
+@keyframes rupv-modal-scrim-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+@keyframes rupv-modal-card-out {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.96) translateY(4px); }
+}
+.rupv-modal-scrim.is-closing {
+  animation: rupv-modal-scrim-out var(--rupv-dur-2) var(--rupv-ease) forwards;
+}
+.rupv-modal.auth-card.is-closing {
+  animation: rupv-modal-card-out var(--rupv-dur-2) var(--rupv-ease) forwards;
+}
 .rupv-modal-close {
   position: absolute;
   top: var(--rupv-s-3);
