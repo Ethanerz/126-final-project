@@ -109,18 +109,28 @@ const Rating = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session, entityId])
 
+  // Reload the user's votes only when the *set* of reviews changes (initial
+  // load, a new/removed review) — not when vote counts change — so optimistic
+  // vote updates don't get clobbered by a stale refetch.
+  const reviewIdsKey = (currentEntity?.reviews ?? []).map((r) => r.id).join(',')
   useEffect(() => {
     if (session && currentEntity?.reviews?.length > 0) loadUserVotes()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reviewIdsKey, session])
+
+  useEffect(() => {
     if (session && currentEntity?.reviews) {
       const existing = currentEntity.reviews.find((r) => r.user_id === session.user.id)
       setUserReview(existing || null)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentEntity?.reviews, session])
 
-  async function fetchSingleEntityWithRatings() {
+  // `silent` refreshes (after a vote / review change) update the data without
+  // flipping on the full-page loading skeleton — otherwise every vote looks
+  // like a page refresh. Only the initial load shows the skeleton.
+  async function fetchSingleEntityWithRatings({ silent = false } = {}) {
     try {
-      setLoading(true)
+      if (!silent) setLoading(true)
 
       const { data: entity, error: entityError } = await supabase
         .from('entities')
@@ -148,7 +158,7 @@ const Rating = () => {
     } catch (error) {
       console.error('Error fetching entity:', error)
     } finally {
-      setLoading(false)
+      if (!silent) setLoading(false)
     }
   }
 
@@ -173,9 +183,54 @@ const Rating = () => {
   }
 
   async function handleVote(reviewId, voteType) {
-    try {
-      const existingVote = userVotes[reviewId]
+    const existingVote = userVotes[reviewId]
 
+    // Figure out the new vote and how the counts shift, then apply it to the UI
+    // immediately so it feels instant. The DB write runs in the background; the
+    // count columns are kept correct server-side by a trigger, so no refetch.
+    let newVote
+    let upDelta = 0
+    let downDelta = 0
+    if (existingVote === voteType) {
+      newVote = undefined // toggling the same vote off
+      if (voteType === 'upvote') upDelta = -1
+      else downDelta = -1
+    } else {
+      newVote = voteType
+      if (existingVote === 'upvote') upDelta -= 1
+      else if (existingVote === 'downvote') downDelta -= 1
+      if (voteType === 'upvote') upDelta += 1
+      else downDelta += 1
+    }
+
+    // Snapshots for rollback if the write fails.
+    const prevVotes = userVotes
+    const prevEntity = currentEntity
+
+    setUserVotes((prev) => {
+      const next = { ...prev }
+      if (newVote) next[reviewId] = newVote
+      else delete next[reviewId]
+      return next
+    })
+    setCurrentEntity((prev) =>
+      prev
+        ? {
+            ...prev,
+            reviews: prev.reviews.map((r) =>
+              r.id === reviewId
+                ? {
+                    ...r,
+                    upvote_count: (r.upvote_count || 0) + upDelta,
+                    downvote_count: (r.downvote_count || 0) + downDelta,
+                  }
+                : r
+            ),
+          }
+        : prev
+    )
+
+    try {
       if (existingVote === voteType) {
         const { error } = await supabase
           .from('votes')
@@ -186,12 +241,13 @@ const Rating = () => {
         if (error) throw error
       } else {
         if (existingVote) {
-          await supabase
+          const { error: delError } = await supabase
             .from('votes')
             .delete()
             .eq('target_id', reviewId)
             .eq('user_id', session.user.id)
             .eq('target_type', 'review')
+          if (delError) throw delError
         }
         const { error } = await supabase.from('votes').insert([
           {
@@ -204,9 +260,11 @@ const Rating = () => {
         ])
         if (error) throw error
       }
-      await fetchSingleEntityWithRatings()
     } catch (error) {
       console.error('Error handling vote:', error)
+      // Write failed — undo the optimistic update.
+      setUserVotes(prevVotes)
+      setCurrentEntity(prevEntity)
     }
   }
 
@@ -236,7 +294,7 @@ const Rating = () => {
         }
         throw error
       }
-      await fetchSingleEntityWithRatings()
+      await fetchSingleEntityWithRatings({ silent: true })
     } catch (error) {
       console.error('Error submitting review:', error)
       setReviewError('Something went wrong. Please try again.')
@@ -264,7 +322,7 @@ const Rating = () => {
       if (error) throw error
 
       setIsEditing(false)
-      await fetchSingleEntityWithRatings()
+      await fetchSingleEntityWithRatings({ silent: true })
     } catch (error) {
       console.error('Error updating review:', error)
       setReviewError('Something went wrong. Please try again.')
@@ -292,7 +350,7 @@ const Rating = () => {
 
       setUserReview(null)
       setIsEditing(false)
-      await fetchSingleEntityWithRatings()
+      await fetchSingleEntityWithRatings({ silent: true })
     } catch (error) {
       console.error('Error deleting review:', error)
     }
