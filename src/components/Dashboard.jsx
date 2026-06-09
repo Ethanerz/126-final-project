@@ -216,9 +216,6 @@ const Dashboard = () => {
                       <Icon name="building" size={36} stroke="var(--rupv-slate-soft)" />
                     </div>
                   )}
-                  <span className="rupv-fcard-go" aria-hidden="true">
-                    <Icon name="arrowUpRight" size={18} stroke="var(--rupv-cream)" />
-                  </span>
                 </div>
 
                 <div className="rupv-fcard-body">
