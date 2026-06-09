@@ -27,10 +27,6 @@
 
 /* ── Toolbar ────────────────────────────────────────────────────── */
 .rupv-browse-toolbar {
-  display: flex;
-  align-items: center;
-  gap: var(--rupv-s-4);
-  flex-wrap: wrap;
   margin-bottom: var(--rupv-s-6);
 }
 .rupv-search {

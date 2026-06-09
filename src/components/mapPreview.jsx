@@ -1,25 +1,21 @@
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Map from './map.jsx';
 import Icon from './ui/Icon';
 import RatingBadge from './ui/RatingBadge';
+import EntityFilters from './ui/EntityFilters';
+import { useEntityFilters } from '../hooks/useEntityFilters';
 import '../styles/map.css';
-
-const TYPE_FILTERS = [
-  { key: 'all', label: 'All' },
-  { key: 'facility', label: 'Facilities' },
-  { key: 'service', label: 'Services' },
-];
 
 const MapPreview = () => {
   const navigate = useNavigate();
   const [entities, setEntities] = useState([]);
   const [loaded, setLoaded] = useState(false);
   const [listOpen, setListOpen] = useState(true);
-  const [query, setQuery] = useState('');
-  const [typeFilter, setTypeFilter] = useState('all');
   const mapRefExternal = useRef(null);
   const markersRef = useRef({});
+
+  const { filtered, filterProps } = useEntityFilters(entities);
 
   const flyToMarker = (entity) => {
     const map = mapRefExternal.current;
@@ -42,18 +38,14 @@ const MapPreview = () => {
     }, 1200);
   };
 
-  // Filter the list the same way the Browse page does (search + type).
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return entities.filter((e) => {
-      if (typeFilter !== 'all' && e.entity_type !== typeFilter) return false;
-      if (!q) return true;
-      return (
-        e.name?.toLowerCase().includes(q) ||
-        e.description?.toLowerCase().includes(q)
-      );
+  // Keep the map pins in sync with the filtered list — hide the ones filtered out.
+  useEffect(() => {
+    const visible = new Set(filtered.map((e) => String(e.id)));
+    Object.entries(markersRef.current).forEach(([id, marker]) => {
+      const el = marker?.getElement?.();
+      if (el) el.style.display = visible.has(String(id)) ? '' : 'none';
     });
-  }, [entities, query, typeFilter]);
+  }, [filtered]);
 
   return (
     <div className="map-page">
@@ -89,30 +81,7 @@ const MapPreview = () => {
       {/* Floating places panel, overlaid on the map */}
       <aside className={`sidebar ${listOpen ? '' : 'sidebar--collapsed'}`} aria-hidden={!listOpen} inert={!listOpen}>
         <div className="sidebar-toolbar">
-          <label className="rupv-search">
-            <Icon name="search" size={20} stroke="var(--rupv-fg-3)" />
-            <input
-              type="search"
-              placeholder="Search places"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              aria-label="Search places"
-            />
-          </label>
-          <div className="rupv-filters" role="tablist" aria-label="Filter by type">
-            {TYPE_FILTERS.map((f) => (
-              <button
-                key={f.key}
-                type="button"
-                className="rupv-btn rupv-btn--chip rupv-btn--sm"
-                data-active={typeFilter === f.key}
-                aria-pressed={typeFilter === f.key}
-                onClick={() => setTypeFilter(f.key)}
-              >
-                {f.label}
-              </button>
-            ))}
-          </div>
+          <EntityFilters {...filterProps} searchPlaceholder="Search places" />
         </div>
 
         <div className="sidebar-content-info rupv-stagger">
