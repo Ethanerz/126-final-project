@@ -253,7 +253,7 @@
 .ap-radio.active {
   background: var(--rupv-grad-slate);
   border-color: var(--rupv-slate);
-  color: #ffffff;
+  color: var(--rupv-cream);
 }
 
 /* ── Submit button (primary maroon pill) ────────────────────────── */

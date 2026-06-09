@@ -34,7 +34,7 @@ const Map = ({ onEntitiesLoaded, mapRefExternal, markersRef }) => {
     const addMarkers = async () => {
       const { data: entities, error } = await supabase
         .from('entities')
-        .select('id, name, description, image_link, latitude, longitude, reviews(rating)');
+        .select('id, name, entity_type, description, image_link, latitude, longitude, reviews(rating)');
 
       if (error) {
         console.error('Error fetching entities:', error.message);

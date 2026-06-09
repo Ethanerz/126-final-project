@@ -170,7 +170,7 @@
   align-items: center;
   padding: 4px 12px;
   background: var(--rupv-sky);
-  color: var(--rupv-slate);
+  color: var(--rupv-ink);
   border-radius: var(--rupv-r-pill);
   font-family: var(--rupv-font-heading);
   font-weight: 500;
@@ -328,7 +328,7 @@
   font-family: var(--rupv-font-body);
   font-weight: 500;
   font-size: 15px;
-  color: var(--rupv-slate);
+  color: var(--rupv-ink);
 }
 .rupv-footer-link:hover { color: var(--rupv-maroon); text-decoration: underline; }
 
@@ -343,4 +343,84 @@
   .rupv-header-nav { gap: var(--rupv-s-2); }
   .rupv-container { padding: var(--rupv-s-5) var(--rupv-s-4); }
   .rupv-footer-inner { padding: var(--rupv-s-5) var(--rupv-s-4); }
+}
+
+/* ── Filter bar (shared by Browse + Map) ────────────────────────── */
+.rupv-filterbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rupv-s-3);
+  width: 100%;
+}
+.rupv-filterbar-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--rupv-s-3);
+  flex-wrap: wrap;
+}
+.rupv-filterbar-more {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--rupv-s-4) var(--rupv-s-5);
+  padding-top: var(--rupv-s-1);
+  animation: rupv-fade-up var(--rupv-dur-2) var(--rupv-ease-out) both;
+}
+
+/* Min-rating group inside "More" */
+.rupv-filter-group {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rupv-s-2);
+  flex-wrap: wrap;
+}
+.rupv-filter-group-label {
+  font-family: var(--rupv-font-micro);
+  font-size: var(--rupv-fs-caption);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--rupv-fg-3);
+}
+
+/* Dropdown control (sort + min-rating) — a styled native select */
+.rupv-select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 7px 34px 7px 14px;
+  border: var(--rupv-bw-2) solid var(--rupv-ink);
+  border-radius: var(--rupv-r-pill);
+  background-color: var(--rupv-bg);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231F141B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  font-family: var(--rupv-font-body);
+  font-size: var(--rupv-fs-body-sm);
+  font-weight: 500;
+  color: var(--rupv-ink);
+  cursor: pointer;
+  transition: border-color var(--rupv-dur-1) var(--rupv-ease),
+    box-shadow var(--rupv-dur-1) var(--rupv-ease);
+}
+.rupv-select:focus-visible {
+  outline: none;
+  border-color: var(--rupv-maroon);
+  box-shadow: 0 0 0 3px var(--brand-fg-soft);
+}
+
+/* Reviewed-only checkbox toggle */
+.rupv-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rupv-s-2);
+  cursor: pointer;
+  font-family: var(--rupv-font-body);
+  font-size: var(--rupv-fs-body-sm);
+  color: var(--rupv-fg-1);
+  user-select: none;
+}
+.rupv-toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--rupv-maroon);
+  cursor: pointer;
 }

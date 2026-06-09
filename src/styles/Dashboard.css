@@ -27,10 +27,6 @@
 
 /* ── Toolbar ────────────────────────────────────────────────────── */
 .rupv-browse-toolbar {
-  display: flex;
-  align-items: center;
-  gap: var(--rupv-s-4);
-  flex-wrap: wrap;
   margin-bottom: var(--rupv-s-6);
 }
 .rupv-search {
@@ -124,22 +120,6 @@
   background:
     repeating-linear-gradient(45deg, var(--rupv-sky) 0 12px, var(--rupv-sky-deep) 12px 24px);
 }
-.rupv-fcard-go {
-  position: absolute;
-  right: 12px;
-  bottom: 12px;
-  width: 34px;
-  height: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--rupv-grad-maroon);
-  border-radius: var(--rupv-r-pill);
-  box-shadow: var(--rupv-shadow-2);
-  transition: transform var(--rupv-dur-2) var(--rupv-ease-spring);
-}
-.rupv-fcard:hover .rupv-fcard-go { transform: scale(1.12); }
-
 /* Press feedback — a tactile "push" when tapping a card through to its page.
    Placed after the :hover rules so the pressed transform wins while held. */
 .rupv-fcard:active {
@@ -148,11 +128,6 @@
   border-color: var(--rupv-maroon);
   transition-duration: var(--rupv-dur-1);
 }
-.rupv-fcard:active .rupv-fcard-go {
-  transform: scale(1.06) translate(2px, -2px);
-  transition-duration: var(--rupv-dur-1);
-}
-
 .rupv-fcard-body {
   display: flex;
   flex-direction: column;
@@ -171,7 +146,7 @@
   font-weight: 700;
   font-size: 21px;
   line-height: 1.15;
-  color: var(--rupv-slate);
+  color: var(--rupv-ink);
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;

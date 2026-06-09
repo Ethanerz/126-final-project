@@ -1,5 +1,20 @@
 /* ─── map.css ───────────────────────────────────────────────────── */
 
+.map-page {
+  position: relative;
+  height: calc(100svh - var(--rupv-header-h));
+  width: 100%;
+  overflow: hidden;
+  background: var(--rupv-bone);
+  animation: rupv-fade-in var(--rupv-dur-3) var(--rupv-ease-out) both;
+}
+
+/* The map fills the whole page; the places list floats over it. */
+.map-area {
+  position: absolute;
+  inset: 0;
+}
+
 .map-wrap {
   position: relative;
   width: 100%;
@@ -13,29 +28,19 @@
   height: 100%;
 }
 
-.map-area {
-  position: relative;
-  flex: 1;
-  min-height: 0;
-}
-
-.map-page {
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  height: calc(100svh - var(--rupv-header-h));
-  width: 100%;
-  overflow: hidden;
-  background: var(--rupv-bone);
-}
-
-/* Back button — pinned top-left of the map */
-
-.map-back-btn {
+/* ── Floating top-left controls (back + list toggle) ────────────── */
+.map-controls {
   position: absolute;
   top: var(--rupv-s-4);
   left: var(--rupv-s-4);
-  z-index: 10;
+  z-index: 12;
+  display: flex;
+  gap: var(--rupv-s-2);
+  flex-wrap: wrap;
+}
+
+.map-back-btn,
+.map-toggle-btn {
   display: inline-flex;
   align-items: center;
   gap: var(--rupv-s-1);
@@ -44,9 +49,9 @@
   font-size: 13px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  padding: 6px 14px 6px 12px;
+  padding: 8px 14px;
   border-radius: var(--rupv-r-pill);
-  border: var(--rupv-bw-1) solid var(--rupv-ink);
+  border: var(--rupv-bw-2) solid var(--rupv-ink);
   background: var(--rupv-cream);
   color: var(--rupv-ink);
   cursor: pointer;
@@ -54,7 +59,8 @@
   transition: background 120ms ease-out, color 120ms ease-out;
 }
 
-.map-back-btn:hover {
+.map-back-btn:hover,
+.map-toggle-btn:hover {
   background: var(--rupv-ink);
   color: var(--rupv-cream);
 }
@@ -88,7 +94,7 @@
   height: 34px;
   padding: 0 8px;
   background: var(--rupv-slate);
-  color: #ffffff;
+  color: var(--rupv-cream);
   border-radius: 10px;
   font-family: var(--rupv-font-heading);
   font-weight: 700;
@@ -122,32 +128,47 @@
   text-decoration: none;
 }
 
-/* ── Sidebar (entity list on map page) ──────────────────────────── */
+/* ── Floating places panel — overlays the map; toggle to hide/show ── */
 
 .sidebar {
-  min-width: 450px;
-  max-width: 450px;
-  min-height: 0;
+  position: absolute;
+  top: calc(var(--rupv-s-4) + var(--rupv-s-7));
+  left: var(--rupv-s-4);
+  bottom: var(--rupv-s-4);
+  width: 360px;
+  max-width: calc(100vw - var(--rupv-s-6));
+  z-index: 10;
   display: flex;
   flex-direction: column;
   background: var(--rupv-cream);
-  border-right: var(--rupv-bw-1) solid var(--rupv-ink);
-  z-index: 1;
-  box-shadow: var(--rupv-shadow-3);
+  border: var(--rupv-bw-2) solid var(--rupv-ink);
+  border-radius: var(--rupv-r-3);
+  box-shadow: var(--rupv-shadow-4);
+  overflow: hidden;
+  transition: transform var(--rupv-dur-3) var(--rupv-ease-out),
+    opacity var(--rupv-dur-2) var(--rupv-ease);
 }
 
-.sidebar-header {
-  padding: var(--rupv-s-4) var(--rupv-s-4) var(--rupv-s-3);
+/* Collapsed: slide off-screen to the left and fade out. */
+.sidebar--collapsed {
+  transform: translateX(calc(-100% - var(--rupv-s-5)));
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Toolbar: search + type filters (mirrors the Browse page) ───── */
+.sidebar-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rupv-s-3);
+  padding: var(--rupv-s-4);
   border-bottom: var(--rupv-bw-1) solid var(--rupv-border-soft);
 }
 
-.sidebar-header h2 {
-  margin: 0;
-  font-family: var(--rupv-font-heading);
-  font-weight: 700;
-  font-size: var(--rupv-fs-h3);
-  line-height: var(--rupv-lh-tight);
-  color: var(--rupv-ink);
+/* The Browse search pill is built for a row; let it fill the column here. */
+.sidebar-toolbar .rupv-search {
+  flex: 0 0 auto;
+  width: 100%;
 }
 
 .sidebar-content-info {
@@ -159,6 +180,16 @@
   flex: 1;
   min-height: 0;
 }
+
+.sidebar-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--rupv-s-2);
+  text-align: center;
+  padding: var(--rupv-s-7) var(--rupv-s-4);
+}
+.sidebar-empty .rupv-body-sm { color: var(--rupv-fg-2); }
 
 .sidebar-entity-card {
   background: var(--rupv-sky);
@@ -258,57 +289,24 @@
   text-decoration: none;
 }
 
-/* ── Mobile: stack the map over the places list ─────────────────── */
+/* ── Mobile: the panel spans most of the width, still toggleable ── */
 @media (max-width: 768px) {
-  .map-page {
-    flex-direction: column;
+  .map-controls {
+    top: var(--rupv-s-3);
+    left: var(--rupv-s-3);
   }
-
-  /* Map pinned on top with a fixed share of the height; it stays put
-     while the list below scrolls, so tapping a card still flies it. */
-  .map-area {
-    order: 1;
-    flex: 0 0 45%;
-    min-height: 220px;
-  }
-
-  /* Sidebar becomes a full-width panel below the map. */
   .sidebar {
-    order: 2;
-    flex: 1 1 0;
-    min-width: 0;
+    top: calc(var(--rupv-s-3) + var(--rupv-s-7));
+    left: var(--rupv-s-3);
+    right: var(--rupv-s-3);
+    bottom: var(--rupv-s-3);
+    width: auto;
     max-width: none;
-    width: 100%;
-    min-height: 0;
-    border-right: none;
-    border-top: var(--rupv-bw-2) solid var(--rupv-ink);
   }
-
-  .sidebar-header {
-    padding: var(--rupv-s-3) var(--rupv-s-4) var(--rupv-s-2);
-  }
-
-  .sidebar-content-info {
-    padding: var(--rupv-s-3) var(--rupv-s-4) var(--rupv-s-4);
-  }
-
   .sidebar-entity-image {
     height: 120px;
   }
 }
-
-/* ── Narrow phones: trim the back button so it doesn't crowd the map ── */
-@media (max-width: 400px) {
-  .map-back-btn {
-    top: var(--rupv-s-3);
-    left: var(--rupv-s-3);
-    font-size: 12px;
-    padding: 6px 12px 6px 10px;
-  }
-}
-
-/* ── Page entrance — header lifts in, the list staggers (matches Browse) ── */
-.sidebar-header { animation: rupv-fade-up var(--rupv-dur-3) var(--rupv-ease-out) both; }
 
 /* ── Loading skeletons ──────────────────────────────────────────── */
 /* Skeleton card drops the hard outline for a soft shadow; its surface is

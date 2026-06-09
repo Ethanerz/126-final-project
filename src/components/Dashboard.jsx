@@ -7,19 +7,13 @@ import Button from './ui/Button'
 import Icon from './ui/Icon'
 import Pill from './ui/Pill'
 import RatingBadge from './ui/RatingBadge'
+import EntityFilters from './ui/EntityFilters'
+import { useEntityFilters } from '../hooks/useEntityFilters'
 import '../styles/Dashboard.css'
-
-const TYPE_FILTERS = [
-  { key: 'all', label: 'All' },
-  { key: 'facility', label: 'Facilities' },
-  { key: 'service', label: 'Services' },
-]
 
 const Dashboard = () => {
   const [entities, setEntities] = useState([])
   const [loading, setLoading] = useState(true)
-  const [query, setQuery] = useState('')
-  const [typeFilter, setTypeFilter] = useState('all')
   const [pendingEdit, setPendingEdit] = useState(null)
   const [pendingDelete, setPendingDelete] = useState(null)
   const { session, userRole, signInAsGuest } = UserAuth()
@@ -70,17 +64,7 @@ const Dashboard = () => {
     if (session) fetchEntitiesWithRatings()
   }, [session])
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    return entities.filter((e) => {
-      if (typeFilter !== 'all' && e.entity_type !== typeFilter) return false
-      if (!q) return true
-      return (
-        e.name?.toLowerCase().includes(q) ||
-        e.description?.toLowerCase().includes(q)
-      )
-    })
-  }, [entities, typeFilter, query])
+  const { filtered, filterProps } = useEntityFilters(entities)
 
   const stats = useMemo(() => {
     const places = entities.length
@@ -185,30 +169,7 @@ const Dashboard = () => {
       </section>
 
       <div className="rupv-browse-toolbar">
-        <label className="rupv-search">
-          <Icon name="search" size={20} stroke="var(--rupv-fg-3)" />
-          <input
-            type="search"
-            placeholder="Search facilities and services"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            aria-label="Search"
-          />
-        </label>
-        <div className="rupv-filters" role="tablist" aria-label="Filter by type">
-          {TYPE_FILTERS.map((f) => (
-            <button
-              key={f.key}
-              type="button"
-              className="rupv-btn rupv-btn--chip rupv-btn--sm"
-              data-active={typeFilter === f.key}
-              aria-pressed={typeFilter === f.key}
-              onClick={() => setTypeFilter(f.key)}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
+        <EntityFilters {...filterProps} searchPlaceholder="Search facilities and services" />
       </div>
 
       {filtered.length === 0 ? (
@@ -255,9 +216,6 @@ const Dashboard = () => {
                       <Icon name="building" size={36} stroke="var(--rupv-slate-soft)" />
                     </div>
                   )}
-                  <span className="rupv-fcard-go" aria-hidden="true">
-                    <Icon name="arrowUpRight" size={18} stroke="var(--rupv-cream)" />
-                  </span>
                 </div>
 
                 <div className="rupv-fcard-body">

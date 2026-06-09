@@ -16,7 +16,7 @@
   font-family: var(--rupv-font-body);
   font-weight: 600;
   font-size: var(--rupv-fs-body-sm);
-  color: var(--rupv-slate);
+  color: var(--rupv-ink);
   text-decoration: none;
   margin-bottom: var(--rupv-s-5);
   animation: rupv-fade-up var(--rupv-dur-3) var(--rupv-ease-out) both;
@@ -189,7 +189,7 @@
   font-family: var(--rupv-font-heading);
   font-weight: 700;
   font-size: var(--rupv-fs-body);
-  color: var(--rupv-slate);
+  color: var(--rupv-ink);
 }
 .rupv-review-date {
   font-family: var(--rupv-font-micro);
@@ -229,7 +229,7 @@
   font-family: var(--rupv-font-body);
   font-weight: 600;
   font-size: var(--rupv-fs-body-sm);
-  color: var(--rupv-slate);
+  color: var(--rupv-ink);
   text-decoration: none;
 }
 .rupv-review-replies:hover { color: var(--rupv-maroon); }
