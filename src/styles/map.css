@@ -94,7 +94,7 @@
   height: 34px;
   padding: 0 8px;
   background: var(--rupv-slate);
-  color: #ffffff;
+  color: var(--rupv-cream);
   border-radius: 10px;
   font-family: var(--rupv-font-heading);
   font-weight: 700;

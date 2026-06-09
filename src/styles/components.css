@@ -170,7 +170,7 @@
   align-items: center;
   padding: 4px 12px;
   background: var(--rupv-sky);
-  color: var(--rupv-slate);
+  color: var(--rupv-ink);
   border-radius: var(--rupv-r-pill);
   font-family: var(--rupv-font-heading);
   font-weight: 500;
@@ -328,7 +328,7 @@
   font-family: var(--rupv-font-body);
   font-weight: 500;
   font-size: 15px;
-  color: var(--rupv-slate);
+  color: var(--rupv-ink);
 }
 .rupv-footer-link:hover { color: var(--rupv-maroon); text-decoration: underline; }
 

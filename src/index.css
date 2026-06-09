@@ -21,11 +21,16 @@
   --rupv-ink:           #1F141B;
   --rupv-bone:          #F5F5F5;
 
-  /* ── Secondary ─────────────────────────────────────────────────── */
-  --rupv-slate:         #3B4256;
-  --rupv-slate-soft:    #5A6480;
-  --rupv-sky:           #EBF4FF;
-  --rupv-sky-deep:      #D8E6F7;
+  /* ── Secondary — deep red + blush, extending the maroon "anthem" ─── */
+  --rupv-wine:          #7A1228;
+  --rupv-wine-soft:     #A85C66;
+  --rupv-blush:         #F6E8E6;
+  --rupv-blush-deep:    #EFD3D2;
+  /* Legacy names kept as aliases so existing component CSS keeps working. */
+  --rupv-slate:         var(--rupv-wine);
+  --rupv-slate-soft:    var(--rupv-wine-soft);
+  --rupv-sky:           var(--rupv-blush);
+  --rupv-sky-deep:      var(--rupv-blush-deep);
 
   /* ── Semantic ──────────────────────────────────────────────────── */
   --rupv-fg-1:          var(--rupv-ink);
@@ -34,7 +39,7 @@
   --rupv-fg-inv:        var(--rupv-cream);
   --rupv-fg-inv-2:      #C9C0C5;
 
-  --rupv-bg:            #FFFFFF;
+  --rupv-bg:            var(--rupv-cream);
   --rupv-bg-alt:        var(--rupv-bone);
   --rupv-surface:       var(--rupv-sky);
   --rupv-surface-warm:  var(--rupv-cream);
@@ -80,7 +85,7 @@
   /* ── Shadows ───────────────────────────────────────────────────── */
   --rupv-shadow-1: 0 1px 3px rgba(0, 0, 0, 0.12);
   --rupv-shadow-2: 0 4px 4px rgba(0, 0, 0, 0.25);
-  --rupv-shadow-3: 0 4px 10px rgba(59, 66, 86, 0.35);
+  --rupv-shadow-3: 0 4px 12px rgba(31, 20, 27, 0.22);
   --rupv-shadow-4: 0 12px 28px rgba(31, 20, 27, 0.20);
 
   /* ── Motion ────────────────────────────────────────────────────── */
@@ -93,10 +98,10 @@
 
   /* ── Gradients (on-brand) ──────────────────────────────────────── */
   --rupv-grad-maroon: linear-gradient(135deg, #BE3247 0%, var(--rupv-maroon) 48%, var(--rupv-maroon-deep) 100%);
-  --rupv-grad-slate:  linear-gradient(135deg, #4C5572 0%, var(--rupv-slate) 100%);
-  --rupv-grad-ink:    linear-gradient(160deg, #2C1E27 0%, var(--rupv-ink) 100%);
+  --rupv-grad-slate:  linear-gradient(135deg, #A3293A 0%, var(--rupv-wine) 100%);
+  --rupv-grad-ink:    linear-gradient(160deg, #36202B 0%, var(--rupv-ink) 100%);
   --rupv-grad-sky:    linear-gradient(135deg, var(--rupv-sky) 0%, var(--rupv-sky-deep) 100%);
-  --rupv-grad-cream:  linear-gradient(160deg, #FFFFFF 0%, var(--rupv-cream) 100%);
+  --rupv-grad-cream:  linear-gradient(160deg, var(--rupv-cream) 0%, #FBEEE3 100%);
   --rupv-glow-maroon: 0 6px 20px rgba(163, 31, 51, 0.32);
 
   /* ── Type families ─────────────────────────────────────────────── */
@@ -171,8 +176,8 @@ body::before {
   pointer-events: none;
   background-image:
     radial-gradient(rgba(31, 20, 27, 0.05) 1px, transparent 1.3px),
-    radial-gradient(48% 38% at 10% 0%, rgba(163, 31, 51, 0.08), transparent 70%),
-    radial-gradient(45% 45% at 100% 100%, rgba(59, 66, 86, 0.07), transparent 72%);
+    radial-gradient(48% 38% at 10% 0%, rgba(163, 31, 51, 0.10), transparent 70%),
+    radial-gradient(45% 45% at 100% 100%, rgba(122, 21, 37, 0.08), transparent 72%);
   background-size: 22px 22px, 100% 100%, 100% 100%;
   background-repeat: repeat, no-repeat, no-repeat;
 }
