@@ -22,13 +22,15 @@ const Map = ({ onEntitiesLoaded, onError, externalMapRef, markersRef }) => {
   useEffect(() => {
     if (mapRef.current) return;
 
-    // No explicit style: the SDK default (Streets) applies. Passing
-    // MapStyle.STREETS triggers a deprecation + invalid-style fallback and an
-    // internal projection-migration TypeError in the current SDK.
+    // No explicit style: the SDK default (Streets) applies — the old
+    // MapStyle.STREETS reference is deprecated/invalid in this SDK version.
+    // The explicit projection skips the SDK's projection-migration step,
+    // which throws an internal TypeError when left to auto-migrate.
     const map = new maptilersdk.Map({
       container: mapContainer.current,
       center: [UPV_CENTER.lng, UPV_CENTER.lat],
       zoom: DEFAULT_ZOOM,
+      projection: 'mercator',
     });
     mapRef.current = map;
 
