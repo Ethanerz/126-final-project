@@ -20,12 +20,13 @@
   border: var(--rupv-bw-2) solid var(--rupv-ink);
   border-radius: var(--rupv-r-pill);
   font-family: var(--rupv-font-body);
-  font-size: 14px;
+  font-size: var(--rupv-fs-sm);
   font-weight: 500;
   letter-spacing: 0.02em;
   cursor: pointer;
   box-shadow: var(--rupv-shadow-2);
-  transition: background 120ms ease-out, color 120ms ease-out;
+  transition: background var(--rupv-dur-1) var(--rupv-ease),
+    color var(--rupv-dur-1) var(--rupv-ease);
 }
 
 .ap-fab:hover {
@@ -34,7 +35,7 @@
 }
 
 .ap-fab-label {
-  font-size: 14px;
+  font-size: var(--rupv-fs-sm);
 }
 
 /* ── Expanded panel ─────────────────────────────────────────────── */
@@ -74,7 +75,7 @@
 
 .ap-badge {
   font-family: var(--rupv-font-body);
-  font-size: 11px;
+  font-size: var(--rupv-fs-micro);
   font-weight: 700;
   letter-spacing: 0.12em;
   color: var(--rupv-ink);
@@ -86,7 +87,7 @@
 
 .ap-title {
   font-family: var(--rupv-font-heading);
-  font-size: 18px;
+  font-size: var(--rupv-fs-md);
   font-weight: 700;
   color: var(--rupv-cream);
   margin: 0;
@@ -97,11 +98,12 @@
   background: none;
   border: none;
   color: var(--rupv-fg-inv-2);
-  font-size: 18px;
+  font-size: var(--rupv-fs-md);
   cursor: pointer;
   padding: 4px 10px;
   border-radius: var(--rupv-r-1);
-  transition: color 120ms ease-out, background 120ms ease-out;
+  transition: color var(--rupv-dur-1) var(--rupv-ease),
+    background var(--rupv-dur-1) var(--rupv-ease);
   line-height: 1;
 }
 
@@ -129,12 +131,14 @@
   border: none;
   color: var(--rupv-fg-2);
   font-family: var(--rupv-font-body);
-  font-size: 13px;
+  font-size: var(--rupv-fs-caption);
   font-weight: 500;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: color 120ms ease-out, background 120ms ease-out, border-color 120ms ease-out;
+  transition: color var(--rupv-dur-1) var(--rupv-ease),
+    background var(--rupv-dur-1) var(--rupv-ease),
+    border-color var(--rupv-dur-1) var(--rupv-ease);
   border-bottom: var(--rupv-bw-2) solid transparent;
 }
 
@@ -169,40 +173,20 @@
 
 .ap-label {
   font-family: var(--rupv-font-body);
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--rupv-fs-caption);
+  font-weight: 700;
   letter-spacing: 0.08em;
   color: var(--rupv-fg-2);
   text-transform: uppercase;
 }
 
 .ap-required {
-  color: var(--rupv-maroon);
+  color: var(--rupv-error);
   margin-left: 3px;
 }
 
-.ap-input {
-  background: var(--rupv-bg);
-  border: var(--rupv-bw-2) solid var(--rupv-ink);
-  border-radius: var(--rupv-r-1);
-  color: var(--rupv-ink);
-  font-family: var(--rupv-font-body);
-  font-size: var(--rupv-fs-body-sm);
-  padding: 12px 14px;
-  outline: none;
-  transition: border-color var(--rupv-dur-1) var(--rupv-ease),
-    box-shadow var(--rupv-dur-1) var(--rupv-ease);
-  width: 100%;
-}
-
-.ap-input::placeholder {
-  color: var(--rupv-fg-3);
-}
-
-.ap-input:focus {
-  border-color: var(--rupv-maroon);
-  box-shadow: 0 0 0 3px var(--brand-fg-soft);
-}
+/* Inputs use the shared .rupv-input rule (components.css) via the grouped
+   `.ap-input` selector — only the textarea modifier lives here. */
 
 .ap-textarea {
   resize: vertical;
@@ -214,6 +198,9 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--rupv-s-3);
+}
+@media (max-width: 420px) {
+  .ap-row { grid-template-columns: 1fr; }
 }
 
 /* ── Radio group (Facility / Service) ───────────────────────────── */
@@ -235,10 +222,12 @@
   border-radius: var(--rupv-r-1);
   color: var(--rupv-slate);
   font-family: var(--rupv-font-body);
-  font-size: 14px;
+  font-size: var(--rupv-fs-sm);
   font-weight: 500;
   cursor: pointer;
-  transition: background 120ms ease-out, color 120ms ease-out, border-color 120ms ease-out;
+  transition: background var(--rupv-dur-1) var(--rupv-ease),
+    color var(--rupv-dur-1) var(--rupv-ease),
+    border-color var(--rupv-dur-1) var(--rupv-ease);
   user-select: none;
 }
 
@@ -256,76 +245,21 @@
   color: var(--rupv-cream);
 }
 
-/* ── Submit button (primary maroon pill) ────────────────────────── */
-
-.ap-submit {
-  margin-top: var(--rupv-s-1);
-  padding: 10px 28px;
-  background: var(--rupv-grad-maroon);
-  color: var(--rupv-cream);
-  border: none;
-  border-radius: var(--rupv-r-pill);
-  font-family: var(--rupv-font-heading);
-  font-size: 18px;
-  font-weight: 500;
-  letter-spacing: 0;
-  text-transform: none;
-  cursor: pointer;
-  box-shadow: var(--rupv-shadow-2);
-  transition: box-shadow var(--rupv-dur-2) var(--rupv-ease), transform 80ms ease-out;
-}
-
-.ap-submit:hover:not(:disabled) {
-  box-shadow: var(--rupv-glow-maroon), var(--rupv-shadow-2);
-  transform: translateY(-1px);
-}
-
-.ap-submit:active:not(:disabled) {
-  box-shadow: none;
-  transform: translateY(1px);
-}
-
-.ap-submit:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-/* ── Status banners ─────────────────────────────────────────────── */
-
-.ap-status {
-  font-family: var(--rupv-font-body);
-  font-size: 14px;
-  padding: var(--rupv-s-2) var(--rupv-s-3);
-  border-radius: var(--rupv-r-1);
-  border: var(--rupv-bw-1) solid;
-  line-height: var(--rupv-lh-snug);
-}
-
-.ap-status--success {
-  background: #EEF6EE;
-  border-color: #BFD9C0;
-  color: #226A2A;
-}
-
-.ap-status--error {
-  background: var(--rupv-cream);
-  border-color: var(--rupv-maroon);
-  color: var(--rupv-maroon);
-}
+/* Submit + delete-confirm actions use the shared <Button>; status banners
+   are the shared .rupv-alert (components.css). */
 
 /* ── Hint text ──────────────────────────────────────────────────── */
 
 .ap-hint {
   color: var(--rupv-fg-2);
   font-family: var(--rupv-font-body);
-  font-size: 14px;
+  font-size: var(--rupv-fs-sm);
   margin: 0 0 var(--rupv-s-2);
   line-height: var(--rupv-lh-body);
 }
 
 .ap-hint strong {
-  font-weight: 600;
+  font-weight: 700;
   color: var(--rupv-maroon);
 }
 
@@ -341,21 +275,21 @@
 }
 
 .ap-delete-warning {
-  font-size: 36px;
+  display: flex;
   line-height: 1;
 }
 
 .ap-delete-msg {
   color: var(--rupv-ink);
   font-family: var(--rupv-font-body);
-  font-size: 15px;
+  font-size: var(--rupv-fs-sm);
   line-height: var(--rupv-lh-body);
   margin: 0;
 }
 
 .ap-delete-sub {
   color: var(--rupv-fg-3);
-  font-size: 13px;
+  font-size: var(--rupv-fs-caption);
 }
 
 .ap-delete-actions {
@@ -364,52 +298,6 @@
   width: 100%;
 }
 
-.ap-btn-ghost {
+.ap-delete-actions .rupv-btn {
   flex: 1;
-  padding: 10px 14px;
-  background: transparent;
-  border: var(--rupv-bw-2) solid var(--rupv-ink);
-  border-radius: var(--rupv-r-pill);
-  color: var(--rupv-ink);
-  font-family: var(--rupv-font-body);
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 120ms ease-out, color 120ms ease-out;
-}
-
-.ap-btn-ghost:hover {
-  background: var(--rupv-ink);
-  color: var(--rupv-cream);
-}
-
-.ap-btn-danger {
-  flex: 1;
-  padding: 10px 14px;
-  background: var(--rupv-grad-maroon);
-  border: none;
-  border-radius: var(--rupv-r-pill);
-  color: var(--rupv-cream);
-  font-family: var(--rupv-font-heading);
-  font-size: 16px;
-  font-weight: 500;
-  letter-spacing: 0;
-  cursor: pointer;
-  box-shadow: var(--rupv-shadow-2);
-  transition: background 120ms ease-out, box-shadow 120ms ease-out, transform 80ms ease-out;
-}
-
-.ap-btn-danger:hover:not(:disabled) {
-  background: var(--rupv-maroon-deep);
-}
-
-.ap-btn-danger:active:not(:disabled) {
-  box-shadow: none;
-  transform: translateY(1px);
-}
-
-.ap-btn-danger:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-  box-shadow: none;
 }

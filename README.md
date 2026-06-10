@@ -1,36 +1,107 @@
+<div align="center">
+
+<img src="public/rate-upv-logo.svg" alt="Rate UPV logo" width="96" />
+
 # Rate UPV
 
-Student-driven reviews of University of the Philippines Visayas (UPV) campus facilities and services — think "Rate My Professors," but for the places and services around campus. Browse entities, read and write reviews, reply to discussions, and vote on what's helpful.
+**Student-driven reviews of UP Visayas campus facilities and services.**
 
-> CMSC 126 final project — Team JJEM Alert
+Think *Rate My Professors*, but for the places and services around campus — browse, review, reply, and vote on what's helpful.
 
-## About
+[Live site](https://126-final-project-orpin.vercel.app/) · [Report an issue](../../issues)
 
-- **Browse & search** campus facilities and services, each with an aggregate rating shown as a decimal score.
-- **Reviews, replies & votes** — signed-in students can post reviews, reply, and upvote/downvote.
-- **Campus map** — view every entity on an interactive map and jump straight to its reviews.
-- **Guest mode** — browse everything read-only, no account needed.
-- **UP-only accounts** — only `@up.edu.ph` emails can register, with email confirmation.
-- **Roles** — guests (read-only), students (review/reply/vote), and admins (manage entities).
+</div>
 
-**Built with:** React 19, Vite 8, React Router 7, Supabase (Postgres, Auth, RLS), and MapTiler. Deployed on Vercel.
+---
 
-# Access our website
-The website is deployed using vercel [here](https://126-final-project-orpin.vercel.app/)
+## Features
 
-# React + Vite
+- 🏛️ **Browse & search** — every campus facility and service with an aggregate decimal rating, type filters, minimum-rating filter, and sorting.
+- ✍️ **Reviews, replies & votes** — students post one review per place, discuss in reply threads, and upvote/downvote reviews.
+- 🗺️ **Campus map** — an interactive MapTiler map of every entity, with a filterable floating list and fly-to markers; each place also shows a mini-map on its detail page.
+- 👀 **Anonymous browsing** — everything is readable without an account.
+- 🎓 **UP-only accounts** — registration is restricted to `@up.edu.ph` emails, enforced at the database level, with email confirmation.
+- 🛡️ **Roles** — visitors (read-only), students (review / reply / vote), and admins (manage entities).
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Tech stack
 
-Currently, two official plugins are available:
+| Layer | Technology |
+|---|---|
+| Frontend | [React 19](https://react.dev) + [Vite 8](https://vite.dev) |
+| Routing | [React Router 7](https://reactrouter.com) |
+| Backend | [Supabase](https://supabase.com) — Postgres, Auth, Row Level Security |
+| Maps | [MapTiler SDK](https://www.maptiler.com) |
+| Styling | Hand-rolled design-token system (CSS custom properties) |
+| Hosting | [Vercel](https://vercel.com) |
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Getting started
 
-## React Compiler
+### Prerequisites
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Node.js 20+
+- A [Supabase](https://supabase.com) project
+- A [MapTiler](https://www.maptiler.com) API key
 
-## Expanding the ESLint configuration
+### Setup
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Configure environment variables
+cp .env.example .env
+#    …then fill in the values (see below)
+
+# 3. Run the dev server
+npm run dev
+```
+
+### Environment variables
+
+| Variable | Description |
+|---|---|
+| `VITE_SUPABASE_URL` | Your Supabase project URL (`https://<ref>.supabase.co`) |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | The project's publishable (client) API key |
+| `VITE_MAPTILER_API_KEY` | MapTiler Cloud API key |
+
+> These are client-side keys by design. Data access is protected by Postgres Row Level Security, not by key secrecy. Never put a `service_role` / secret key in this project.
+
+### Scripts
+
+| Command | Purpose |
+|---|---|
+| `npm run dev` | Start the Vite dev server |
+| `npm run build` | Production build to `dist/` |
+| `npm run preview` | Preview the production build locally |
+| `npm run lint` | Run ESLint |
+
+## Project structure
+
+```
+src/
+├── components/        # Pages + feature components
+│   ├── layout/        #   Header, Footer, Layout shell
+│   └── ui/            #   Shared primitives (Button, Icon, Avatar, …)
+├── context/           # AuthContext (session, roles, auth modal)
+├── hooks/             # useEntityFilters (shared browse/map filtering)
+├── styles/            # Per-page CSS (all values from design tokens)
+├── index.css          # Design tokens + base styles (single source of truth)
+└── router.jsx         # Route table
+```
+
+## Database
+
+Five tables behind Row Level Security: `user_profiles`, `entities`, `reviews`, `review_replies`, `votes`. Integrity is enforced in Postgres — `CHECK` ratings 1–5, one review per user per entity, one vote per user per review, cascading deletes, a trigger-maintained vote count, and a trigger restricting signups to `@up.edu.ph`.
+
+## Team
+
+CMSC 126 final project — **Team JJEM Alert**
+
+- Ethan Sean Gapulan
+- John Dave Valentin
+- Marc Raven Sian
+- Joseph Patrick Salomeo
+
+---
+
+> 📜 The original course-submission README is preserved as [`README.old.md`](README.old.md).

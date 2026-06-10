@@ -13,12 +13,14 @@ export default function EntityMiniMap({ lat, lng, zoom = 16 }) {
   useEffect(() => {
     if (mapRef.current || lat == null || lng == null) return
 
+    // No explicit style (SDK default Streets) + explicit projection — see the
+    // known-SDK-bug note in map.jsx.
     mapRef.current = new maptilersdk.Map({
       container: containerRef.current,
-      style: maptilersdk.MapStyle.STREETS,
       center: [lng, lat],
       zoom,
       scrollZoom: false,
+      projection: 'mercator',
     })
     new maptilersdk.Marker({ color: '#A31F33' })
       .setLngLat([lng, lat])
@@ -28,7 +30,6 @@ export default function EntityMiniMap({ lat, lng, zoom = 16 }) {
       mapRef.current?.remove()
       mapRef.current = null
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lat, lng, zoom])
 
   return <div ref={containerRef} className="rupv-detail-map-canvas" />

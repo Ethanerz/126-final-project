@@ -79,7 +79,7 @@
 
 .profile-field label {
   font-family: var(--rupv-font-body);
-  font-size: 13px;
+  font-size: var(--rupv-fs-caption);
   font-weight: 500;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -93,30 +93,14 @@
   margin: 0;
 }
 
-.profile-field input {
-  width: 100%;
-  padding: 12px 14px;
-  background: var(--rupv-bg);
-  border: var(--rupv-bw-2) solid var(--rupv-ink);
-  border-radius: var(--rupv-r-1);
-  font-family: var(--rupv-font-body);
-  font-size: var(--rupv-fs-body-sm);
-  color: var(--rupv-ink);
-  outline: none;
-  transition: border-color var(--rupv-dur-1) var(--rupv-ease),
-    box-shadow var(--rupv-dur-1) var(--rupv-ease);
-}
-
-.profile-field input:focus {
-  border-color: var(--rupv-maroon);
-  box-shadow: 0 0 0 3px var(--brand-fg-soft);
-}
+/* Inputs use the shared .rupv-input rule (components.css) via the grouped
+   `.profile-field input` selector — no local input styling here. */
 
 .role-badge {
   display: inline-block;
   align-self: flex-start;
   font-family: var(--rupv-font-body);
-  font-size: 12px;
+  font-size: var(--rupv-fs-caption);
   font-weight: 700;
   letter-spacing: 0.08em;
   color: var(--rupv-cream);
@@ -139,103 +123,10 @@
   border-top: var(--rupv-bw-1) solid var(--rupv-border-soft);
 }
 
-.profile-error {
-  background: var(--rupv-cream);
-  border: var(--rupv-bw-2) solid var(--rupv-maroon);
-  color: var(--rupv-maroon);
-  font-size: 14px;
-  padding: var(--rupv-s-2) var(--rupv-s-3);
-  border-radius: var(--rupv-r-1);
+/* Save/Cancel/Edit use the shared <Button>; the error banner is the shared
+   .rupv-alert — only its placement inside the card is set here. */
+.profile-card .rupv-alert {
   margin-top: var(--rupv-s-4);
-}
-
-/* ── Button utilities (same family as Ratings.css) ─────────────── */
-
-.btn {
-  font-family: var(--rupv-font-heading);
-  font-weight: 500;
-  font-size: 18px;
-  letter-spacing: 0;
-  text-transform: none;
-  padding: 10px 28px;
-  border-radius: var(--rupv-r-pill);
-  border: none;
-  cursor: pointer;
-  transition: background 120ms ease-out, color 120ms ease-out, box-shadow 120ms ease-out, transform 80ms ease-out;
-}
-
-.btn:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.btn-primary {
-  background: var(--rupv-grad-maroon);
-  color: var(--rupv-cream);
-  box-shadow: var(--rupv-shadow-2);
-}
-
-.btn-primary:hover:not(:disabled) {
-  box-shadow: var(--rupv-glow-maroon), var(--rupv-shadow-2);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active:not(:disabled) {
-  box-shadow: none;
-  transform: translateY(1px);
-}
-
-.btn-outline {
-  font-family: var(--rupv-font-body);
-  font-size: 16px;
-  background: transparent;
-  color: var(--rupv-ink);
-  border: var(--rupv-bw-2) solid var(--rupv-ink);
-  border-radius: 8px;
-  padding: 10px 22px;
-}
-
-.btn-outline:hover:not(:disabled) {
-  background: var(--rupv-ink);
-  color: var(--rupv-cream);
-}
-
-.btn-ghost {
-  font-family: var(--rupv-font-body);
-  font-size: 16px;
-  background: var(--rupv-sky);
-  color: var(--rupv-slate);
-  border-radius: var(--rupv-r-pill);
-  padding: 10px 22px;
-}
-
-.btn-ghost:hover:not(:disabled) {
-  background: var(--rupv-sky-deep);
-}
-
-/* ── Back button — shared visual ────────────────────────────────── */
-
-.back-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--rupv-s-1);
-  font-family: var(--rupv-font-body);
-  font-weight: 500;
-  font-size: 13px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  padding: 6px 14px 6px 12px;
-  border-radius: var(--rupv-r-pill);
-  border: var(--rupv-bw-1) solid var(--rupv-ink);
-  background: var(--rupv-bg);
-  color: var(--rupv-ink);
-  cursor: pointer;
-  transition: background 120ms ease-out, color 120ms ease-out;
-}
-
-.back-btn:hover {
-  background: var(--rupv-ink);
-  color: var(--rupv-cream);
 }
 
 /* ── Loading skeleton ───────────────────────────────────────────── */
@@ -244,7 +135,7 @@
    other page skeletons; the shimmer placeholders sit on the cream surface. */
 .profile-card--skeleton {
   border-color: transparent;
-  box-shadow: 0 6px 20px rgba(31, 20, 27, 0.12);
+  box-shadow: var(--rupv-shadow-skeleton);
 }
 .profile-skel-back   { width: 84px;  height: 30px; border-radius: var(--rupv-r-pill); }
 .profile-skel-title  { width: 190px; height: 36px; }

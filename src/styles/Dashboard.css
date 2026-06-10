@@ -1,30 +1,5 @@
 /* ─── Dashboard / Browse ────────────────────────────────────────── */
 
-.rupv-browse-loading {
-  font-family: var(--rupv-font-body);
-  font-size: var(--rupv-fs-body);
-  color: var(--rupv-fg-3);
-  padding: var(--rupv-s-8) 0;
-  text-align: center;
-}
-
-/* ── Page head ──────────────────────────────────────────────────── */
-.rupv-browse-head {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--rupv-s-5);
-  flex-wrap: wrap;
-  margin-bottom: var(--rupv-s-6);
-}
-.rupv-browse-sub {
-  font-family: var(--rupv-font-body);
-  font-size: var(--rupv-fs-body);
-  color: var(--rupv-fg-2);
-  margin-top: var(--rupv-s-2);
-  max-width: 52ch;
-}
-
 /* ── Toolbar ────────────────────────────────────────────────────── */
 .rupv-browse-toolbar {
   margin-bottom: var(--rupv-s-6);
@@ -44,7 +19,7 @@
 }
 .rupv-search:focus-within {
   border-color: var(--rupv-maroon);
-  box-shadow: 0 0 0 3px var(--brand-fg-soft);
+  box-shadow: var(--rupv-ring);
 }
 .rupv-search input {
   flex: 1 1 auto;
@@ -144,8 +119,8 @@
 .rupv-fcard-name {
   font-family: var(--rupv-font-heading);
   font-weight: 700;
-  font-size: 21px;
-  line-height: 1.15;
+  font-size: var(--rupv-fs-body);
+  line-height: var(--rupv-lh-snug);
   color: var(--rupv-ink);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -197,7 +172,8 @@
   border-radius: var(--rupv-r-pill);
   cursor: pointer;
   box-shadow: var(--rupv-shadow-1);
-  transition: background 0.12s ease, color 0.12s ease;
+  transition: background var(--rupv-dur-1) var(--rupv-ease),
+    color var(--rupv-dur-1) var(--rupv-ease);
 }
 .rupv-fcard-iconbtn:hover { background: var(--rupv-ink); color: var(--rupv-cream); }
 .rupv-fcard-iconbtn--danger:hover { background: var(--rupv-maroon); border-color: var(--rupv-maroon); color: var(--rupv-cream); }
@@ -228,7 +204,7 @@
 .rupv-fcard--skeleton {
   pointer-events: none;
   border-color: transparent;
-  box-shadow: 0 6px 20px rgba(31, 20, 27, 0.12);
+  box-shadow: var(--rupv-shadow-skeleton);
 }
 .rupv-fcard--skeleton::before { display: none; }   /* hide the type accent bar */
 
@@ -239,7 +215,7 @@
 .rupv-hero.rupv-hero--skeleton {
   background: var(--rupv-bg);
   border-color: transparent;
-  box-shadow: 0 6px 20px rgba(31, 20, 27, 0.12);
+  box-shadow: var(--rupv-shadow-skeleton);
 }
 .rupv-hero.rupv-hero--skeleton::before,
 .rupv-hero.rupv-hero--skeleton::after { content: none; }   /* drop the dot texture + maroon glow */

@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────── */
 
 /* @import must come before all other rules (only @charset/@layer may precede). */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Raleway:ital,wght@0,400;0,500;0,700;1,400&family=Roboto:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Raleway:ital,wght@0,400;0,500;0,700;1,400&display=swap");
 
 @font-face {
   font-family: "Agency FB";
@@ -55,6 +55,17 @@
   --rupv-rate-ok:       #C78200;
   --rupv-rate-bad:      var(--rupv-maroon);
 
+  /* Status colours (alerts, form validation) */
+  --rupv-error:           var(--rupv-maroon);
+  --rupv-error-bg:        var(--rupv-cream);
+  --rupv-success:         var(--rupv-rate-good);
+  --rupv-success-bg:      #EEF6EE;
+  --rupv-success-border:  #BFD9C0;
+  --rupv-warning:         var(--rupv-rate-ok);
+
+  /* Focus ring — one ring everywhere (inputs, selects, search) */
+  --rupv-ring: 0 0 0 3px rgba(163, 31, 51, 0.12);
+
   /* ── Spacing scale (8-pt) ──────────────────────────────────────── */
   --rupv-s-0:  0;
   --rupv-s-1:  4px;
@@ -87,6 +98,8 @@
   --rupv-shadow-2: 0 4px 4px rgba(0, 0, 0, 0.25);
   --rupv-shadow-3: 0 4px 12px rgba(31, 20, 27, 0.22);
   --rupv-shadow-4: 0 12px 28px rgba(31, 20, 27, 0.20);
+  /* Soft float used by every loading-skeleton surface */
+  --rupv-shadow-skeleton: 0 6px 20px rgba(31, 20, 27, 0.12);
 
   /* ── Motion ────────────────────────────────────────────────────── */
   --rupv-dur-1: 120ms;   /* micro — taps, hovers */
@@ -105,10 +118,14 @@
   --rupv-glow-maroon: 0 6px 20px rgba(163, 31, 51, 0.32);
 
   /* ── Type families ─────────────────────────────────────────────── */
+  /* Three intentional faces: Agency FB is the brand display face (wordmark,
+     hero, big numerals), Raleway carries headings, Inter carries everything
+     else. --rupv-font-micro is kept as an alias so existing references work —
+     micro text is simply Inter now (Roboto was dropped). */
   --rupv-font-display:  "Agency FB", "Oswald", "Impact", sans-serif;
   --rupv-font-heading:  "Raleway", "Helvetica Neue", system-ui, sans-serif;
   --rupv-font-body:     "Inter", system-ui, -apple-system, sans-serif;
-  --rupv-font-micro:    "Roboto", "Inter", system-ui, sans-serif;
+  --rupv-font-micro:    var(--rupv-font-body);
 
   /* ── Type ramp ─────────────────────────────────────────────────── */
   --rupv-fs-display:    96px;
@@ -117,7 +134,9 @@
   --rupv-fs-h3:         30px;
   --rupv-fs-h4:         24px;
   --rupv-fs-body:       20px;
+  --rupv-fs-md:         18px;   /* large UI text — prominent buttons, subheads */
   --rupv-fs-body-sm:    16px;
+  --rupv-fs-sm:         14px;   /* small UI text — compact buttons, helpers, hints */
   --rupv-fs-caption:    13px;
   --rupv-fs-micro:      11px;
 
@@ -127,18 +146,6 @@
   --rupv-lh-loose:  1.6;
 
   --rupv-tracking-display: -0.01em;
-
-  /* ── Backwards-compat aliases (kept for any unrewritten CSS) ──── */
-  --brand-bg:        var(--rupv-cream);
-  --brand-fg:        var(--rupv-maroon);
-  --brand-fg-hover:  var(--rupv-maroon-deep);
-  --brand-fg-soft:   rgba(163, 31, 51, 0.12);
-  --brand-outline:   rgba(163, 31, 51, 0.35);
-  --text:            var(--rupv-fg-2);
-  --text-h:          var(--rupv-fg-1);
-  --border:          var(--rupv-border-soft);
-  --sans:            var(--rupv-font-body);
-  --heading:         var(--rupv-font-display);
 
   color: var(--rupv-fg-1);
   background: var(--rupv-bone);
@@ -227,27 +234,10 @@ a:hover {
 
 /* ── Semantic element classes ───────────────────────────────────── */
 
-.rupv-display {
-  font-family: var(--rupv-font-display);
-  font-weight: 700;
-  font-size: var(--rupv-fs-display);
-  line-height: var(--rupv-lh-tight);
-  letter-spacing: var(--rupv-tracking-display);
-  color: var(--rupv-fg-1);
-}
-
 .rupv-h1 {
   font-family: var(--rupv-font-heading);
   font-weight: 700;
   font-size: var(--rupv-fs-h1);
-  line-height: var(--rupv-lh-tight);
-  color: var(--rupv-fg-1);
-}
-
-.rupv-h2 {
-  font-family: var(--rupv-font-heading);
-  font-weight: 700;
-  font-size: var(--rupv-fs-h2);
   line-height: var(--rupv-lh-tight);
   color: var(--rupv-fg-1);
 }
@@ -268,14 +258,6 @@ a:hover {
   color: var(--rupv-fg-1);
 }
 
-.rupv-body {
-  font-family: var(--rupv-font-body);
-  font-weight: 400;
-  font-size: var(--rupv-fs-body);
-  line-height: var(--rupv-lh-body);
-  color: var(--rupv-fg-1);
-}
-
 .rupv-body-sm {
   font-family: var(--rupv-font-body);
   font-weight: 400;
@@ -283,39 +265,6 @@ a:hover {
   line-height: var(--rupv-lh-body);
   color: var(--rupv-fg-2);
 }
-
-.rupv-caption {
-  font-family: var(--rupv-font-body);
-  font-weight: 500;
-  font-size: var(--rupv-fs-caption);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--rupv-fg-2);
-}
-
-.rupv-micro {
-  font-family: var(--rupv-font-micro);
-  font-weight: 400;
-  font-size: var(--rupv-fs-micro);
-  color: var(--rupv-fg-3);
-}
-
-.rupv-quote {
-  font-family: var(--rupv-font-heading);
-  font-style: italic;
-  font-weight: 400;
-  font-size: var(--rupv-fs-h3);
-  color: var(--rupv-fg-2);
-}
-
-/* ── Surfaces ───────────────────────────────────────────────────── */
-.rupv-card {
-  background: var(--rupv-surface);
-  border-radius: var(--rupv-r-2);
-  box-shadow: var(--rupv-shadow-3);
-}
-.rupv-card--warm  { background: var(--rupv-surface-warm); }
-.rupv-card--ink   { background: var(--rupv-surface-dark); color: var(--rupv-fg-inv); }
 
 /* ─────────────────────────────────────────────────────────────────
    Motion — keyframes, entrance utilities, skeletons, spinner
@@ -340,11 +289,6 @@ a:hover {
 }
 @keyframes rupv-spin {
   to { transform: rotate(360deg); }
-}
-
-/* Entrance: fade-up on mount */
-.rupv-animate-in {
-  animation: rupv-fade-up var(--rupv-dur-3) var(--rupv-ease-out) both;
 }
 
 /* Staggered children — set inline style="--i:N" on each child */

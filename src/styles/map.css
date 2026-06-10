@@ -39,30 +39,10 @@
   flex-wrap: wrap;
 }
 
-.map-back-btn,
-.map-toggle-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--rupv-s-1);
-  font-family: var(--rupv-font-body);
-  font-weight: 500;
-  font-size: 13px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  padding: 8px 14px;
-  border-radius: var(--rupv-r-pill);
-  border: var(--rupv-bw-2) solid var(--rupv-ink);
-  background: var(--rupv-cream);
-  color: var(--rupv-ink);
-  cursor: pointer;
+/* Buttons are the shared .rupv-backbtn (components.css); floating over the
+   map they get the slightly deeper shadow for separation. */
+.map-controls .rupv-backbtn {
   box-shadow: var(--rupv-shadow-2);
-  transition: background 120ms ease-out, color 120ms ease-out;
-}
-
-.map-back-btn:hover,
-.map-toggle-btn:hover {
-  background: var(--rupv-ink);
-  color: var(--rupv-cream);
 }
 
 /* ── Map marker popups ──────────────────────────────────────────── */
@@ -75,7 +55,7 @@
 .popUpTitle {
   font-family: var(--rupv-font-heading);
   font-weight: 700;
-  font-size: 16px;
+  font-size: var(--rupv-fs-body-sm);
   color: var(--rupv-ink);
 }
 
@@ -95,10 +75,10 @@
   padding: 0 8px;
   background: var(--rupv-slate);
   color: var(--rupv-cream);
-  border-radius: 10px;
+  border-radius: var(--rupv-r-2);
   font-family: var(--rupv-font-heading);
   font-weight: 700;
-  font-size: 18px;
+  font-size: var(--rupv-fs-md);
   line-height: 1;
 }
 
@@ -117,9 +97,9 @@
   border-radius: var(--rupv-r-1);
   text-decoration: none;
   font-family: var(--rupv-font-body);
-  font-size: 13px;
+  font-size: var(--rupv-fs-caption);
   font-weight: 500;
-  transition: background 120ms ease-out;
+  transition: background var(--rupv-dur-1) var(--rupv-ease);
 }
 
 .popUpLink:hover {
@@ -197,7 +177,7 @@
   border-radius: var(--rupv-r-2);
   padding: var(--rupv-s-3) var(--rupv-s-4);
   box-shadow: var(--rupv-shadow-3);
-  transition: background 120ms ease-out;
+  transition: background var(--rupv-dur-1) var(--rupv-ease);
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -244,12 +224,25 @@
   min-width: 0;
 }
 
+/* The name is a real <button> (keyboard users can fly to the pin too). */
 .sidebar-entity-name {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
   font-family: var(--rupv-font-heading);
   font-weight: 700;
-  font-size: 16px;
+  font-size: var(--rupv-fs-body-sm);
   color: var(--rupv-ink);
   line-height: var(--rupv-lh-snug);
+}
+.sidebar-entity-name:hover { color: var(--rupv-maroon); }
+.sidebar-entity-name:focus-visible {
+  outline: var(--rupv-bw-2) solid var(--rupv-slate);
+  outline-offset: 2px;
+  border-radius: var(--rupv-r-1);
 }
 
 .sidebar-entity-meta {
@@ -277,11 +270,11 @@
   margin-top: var(--rupv-s-3);
   align-self: flex-start;
   font-family: var(--rupv-font-body);
-  font-size: 14px;
-  font-weight: 600;
+  font-size: var(--rupv-fs-sm);
+  font-weight: 700;
   color: var(--rupv-maroon);
   text-decoration: none;
-  transition: gap 120ms ease-out;
+  transition: gap var(--rupv-dur-1) var(--rupv-ease);
 }
 
 .sidebar-entity-link:hover {
@@ -315,7 +308,7 @@
   pointer-events: none;
   background: var(--rupv-bg);
   border-color: transparent;
-  box-shadow: 0 6px 20px rgba(31, 20, 27, 0.10);
+  box-shadow: var(--rupv-shadow-skeleton);
 }
 .sidebar-skel-image    { width: 100%; height: 140px; border-radius: var(--rupv-r-1); margin-bottom: var(--rupv-s-3); }
 .sidebar-skel-badge    { width: 44px; height: 44px; border-radius: var(--rupv-r-2); flex: none; }

@@ -1,13 +1,18 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { UserAuth } from '../context/AuthContext'
 import Avatar from './ui/Avatar'
 import Button from './ui/Button'
+import ErrorState from './ui/ErrorState'
 import Icon from './ui/Icon'
 import RatingBadge from './ui/RatingBadge'
 import VoteStack from './ui/VoteStack'
+import { usePageTitle } from '../hooks/usePageTitle'
+import { computeVoteTransition } from '../utils/votes'
 import '../styles/Ratings.css'
+
+const REPLY_MAX = 2000
 
 const formatDate = (value) =>
   new Date(value).toLocaleDateString(undefined, {
@@ -16,107 +21,183 @@ const formatDate = (value) =>
     day: 'numeric',
   })
 
+// Postgres rejects a malformed uuid with 22P02 — for the UI that is simply
+// "no such record", not a retryable failure.
+const isBadIdError = (err) => err?.code === '22P02'
+
+async function fetchReviewWithReplies(reviewId) {
+  const { data: review, error } = await supabase
+    .from('reviews')
+    .select('*, user_profiles(full_name)')
+    .eq('id', reviewId)
+    .maybeSingle()
+  if (error) {
+    if (isBadIdError(error)) return null
+    throw error
+  }
+  if (!review) return null
+
+  const { data: replies, error: repliesError } = await supabase
+    .from('review_replies')
+    .select('*, user_profiles(full_name)')
+    .eq('review_id', reviewId)
+    .is('parent_reply_id', null)
+    .order('created_at', { ascending: true })
+  if (repliesError) throw repliesError
+
+  return { review, replies: replies ?? [] }
+}
+
 const Replies = () => {
-  const [review, setReview] = useState(null)
-  const [replies, setReplies] = useState([])
-  const [loading, setLoading] = useState(true)
+  const { entityId, reviewId } = useParams()
+  // page.key tracks which review the data belongs to — loading is derived.
+  const [page, setPage] = useState({ key: null, data: null, status: 'idle' })
   const [userVote, setUserVote] = useState(null)
   const [replyText, setReplyText] = useState('')
   const [replyError, setReplyError] = useState(null)
   const [busy, setBusy] = useState(false)
-  const { session, isGuest, openAuth } = UserAuth()
-  const { entityId, reviewId } = useParams()
+  const { session, isVisitor, canWrite, openAuth } = UserAuth()
 
+  usePageTitle('Replies')
+
+  const loading = page.key !== reviewId
+  const review = loading ? null : page.data?.review ?? null
+  const replies = useMemo(
+    () => (loading ? [] : page.data?.replies ?? []),
+    [loading, page.data]
+  )
+  const notFound = !loading && page.status === 'notfound'
+  const fetchFailed = !loading && page.status === 'error'
+
+  // Public data — load for everyone, signed in or not.
   useEffect(() => {
-    if (session && reviewId) fetchReview()
-    else setLoading(false)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (!reviewId) return
+    let cancelled = false
+    fetchReviewWithReplies(reviewId)
+      .then((data) => {
+        if (cancelled) return
+        setPage({ key: reviewId, data, status: data ? 'ready' : 'notfound' })
+      })
+      .catch((err) => {
+        console.error('Error fetching review:', err)
+        if (!cancelled) setPage({ key: reviewId, data: null, status: 'error' })
+      })
+    return () => { cancelled = true }
+  }, [reviewId])
+
+  const retry = () => {
+    setPage({ key: null, data: null, status: 'idle' })
+    fetchReviewWithReplies(reviewId)
+      .then((data) => setPage({ key: reviewId, data, status: data ? 'ready' : 'notfound' }))
+      .catch((err) => {
+        console.error('Error fetching review:', err)
+        setPage({ key: reviewId, data: null, status: 'error' })
+      })
+  }
+
+  // In-place refresh (after posting a reply) — no skeleton flash.
+  const refresh = async () => {
+    try {
+      const data = await fetchReviewWithReplies(reviewId)
+      setPage({ key: reviewId, data, status: data ? 'ready' : 'notfound' })
+    } catch (err) {
+      console.error('Error refreshing review:', err)
+    }
+  }
+
+  // The signed-in user's existing vote on this review.
+  useEffect(() => {
+    if (!session || !reviewId) return
+    let cancelled = false
+    const load = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('votes')
+          .select('vote_type')
+          .eq('user_id', session.user.id)
+          .eq('target_type', 'review')
+          .eq('target_id', reviewId)
+          .maybeSingle()
+        if (error) throw error
+        if (!cancelled) setUserVote(data?.vote_type || null)
+      } catch (err) {
+        console.error('Error loading vote:', err)
+      }
+    }
+    load()
+    return () => { cancelled = true }
   }, [session, reviewId])
 
-  useEffect(() => {
-    if (session && review) loadUserVote()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [review, session])
-
-  async function fetchReview() {
-    try {
-      setLoading(true)
-
-      const { data, error } = await supabase
-        .from('reviews')
-        .select('*, user_profiles(full_name)')
-        .eq('id', reviewId)
-        .single()
-      if (error) throw error
-      setReview(data)
-
-      const { data: repliesData, error: repliesError } = await supabase
-        .from('review_replies')
-        .select('*, user_profiles(full_name)')
-        .eq('review_id', reviewId)
-        .is('parent_reply_id', null)
-        .order('created_at', { ascending: true })
-      if (repliesError) throw repliesError
-      setReplies(repliesData || [])
-    } catch (error) {
-      console.error('Error fetching review:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  async function loadUserVote() {
-    try {
-      const { data, error } = await supabase
-        .from('votes')
-        .select('vote_type')
-        .eq('user_id', session.user.id)
-        .eq('target_type', 'review')
-        .eq('target_id', reviewId)
-        .maybeSingle()
-      if (error) throw error
-      setUserVote(data?.vote_type || null)
-    } catch (error) {
-      console.error('Error loading vote:', error)
-    }
-  }
-
+  // Optimistic vote — mirrors the Rating page: update UI instantly, write in
+  // the background, roll back on failure. No full refetch.
   async function handleVote(voteType) {
+    if (!canWrite || !review) return
+
+    const { newVote, upDelta, downDelta } = computeVoteTransition(userVote, voteType)
+
+    const prevVote = userVote
+    const prevPage = page
+
+    setUserVote(newVote)
+    setPage((prev) =>
+      prev.data
+        ? {
+            ...prev,
+            data: {
+              ...prev.data,
+              review: {
+                ...prev.data.review,
+                upvote_count: (prev.data.review.upvote_count || 0) + upDelta,
+                downvote_count: (prev.data.review.downvote_count || 0) + downDelta,
+              },
+            },
+          }
+        : prev
+    )
+
     try {
-      if (userVote === voteType) {
-        await supabase
+      if (prevVote === voteType) {
+        const { error } = await supabase
           .from('votes')
           .delete()
           .eq('target_id', reviewId)
           .eq('user_id', session.user.id)
           .eq('target_type', 'review')
+        if (error) throw error
       } else {
-        if (userVote) {
-          await supabase
+        if (prevVote) {
+          const { error: delError } = await supabase
             .from('votes')
             .delete()
             .eq('target_id', reviewId)
             .eq('user_id', session.user.id)
             .eq('target_type', 'review')
+          if (delError) throw delError
         }
-        await supabase.from('votes').insert([
+        const { error } = await supabase.from('votes').insert([
           {
             user_id: session.user.id,
             target_id: reviewId,
             target_type: 'review',
             vote_type: voteType,
-            created_at: new Date(),
           },
         ])
+        if (error) throw error
       }
-      await fetchReview()
-    } catch (error) {
-      console.error('Error handling vote:', error)
+    } catch (err) {
+      console.error('Error handling vote:', err)
+      setUserVote(prevVote)
+      setPage(prevPage)
     }
   }
 
   async function submitReply(e) {
     e.preventDefault()
+    const cleanText = replyText.trim()
+    if (!cleanText) {
+      setReplyError("Your reply can't be just spaces.")
+      return
+    }
     setReplyError(null)
     try {
       setBusy(true)
@@ -125,18 +206,14 @@ const Replies = () => {
           review_id: reviewId,
           user_id: session.user.id,
           parent_reply_id: null,
-          reply_text: replyText,
-          upvote_count: 0,
-          downvote_count: 0,
-          created_at: new Date(),
-          updated_at: new Date(),
+          reply_text: cleanText,
         },
       ])
       if (error) throw error
       setReplyText('')
-      await fetchReview()
-    } catch (error) {
-      console.error('Error submitting reply:', error)
+      await refresh()
+    } catch (err) {
+      console.error('Error submitting reply:', err)
       setReplyError('Failed to submit reply. Please try again.')
     } finally {
       setBusy(false)
@@ -185,13 +262,32 @@ const Replies = () => {
     )
   }
 
-  if (!review) {
+  if (fetchFailed) {
     return (
       <div className="rupv-container rupv-detail">
-        <p className="rupv-detail-status">That review could not be found.</p>
-        <Button variant="ghost" size="md" to={`/rating/${entityId}`}>
-          <Icon name="arrowLeft" size={18} /> Back
-        </Button>
+        <Link className="rupv-detail-back" to={`/rating/${entityId}`}>
+          <Icon name="arrowLeft" size={18} /> Back to ratings
+        </Link>
+        <ErrorState
+          title="Couldn't load this discussion"
+          message="The replies didn't come through. Check your connection and try again."
+          onRetry={retry}
+        />
+      </div>
+    )
+  }
+
+  if (notFound || !review) {
+    return (
+      <div className="rupv-container rupv-detail">
+        <div className="rupv-detail-gone">
+          <Icon name="message" size={44} stroke="var(--rupv-fg-3)" />
+          <p className="rupv-h4">That review could not be found</p>
+          <p className="rupv-body-sm">It may have been deleted, or the link may be wrong.</p>
+          <Button variant="ghost" size="md" to={`/rating/${entityId}`}>
+            <Icon name="arrowLeft" size={18} /> Back to ratings
+          </Button>
+        </div>
       </div>
     )
   }
@@ -227,7 +323,7 @@ const Replies = () => {
               active={userVote}
               onUp={() => handleVote('upvote')}
               onDown={() => handleVote('downvote')}
-              disabled={isGuest}
+              disabled={!canWrite}
             />
           </footer>
         </article>
@@ -267,13 +363,13 @@ const Replies = () => {
         )}
 
         <div className="rupv-rform-slot">
-          {isGuest ? (
+          {isVisitor ? (
             <div className="rupv-rform rupv-rform-guest">
               <p className="rupv-h4">Join the conversation</p>
               <p className="rupv-body-sm">Log in with your UP account to leave a reply.</p>
               <Button variant="primary" size="md" onClick={() => openAuth('signin')}>Log in</Button>
             </div>
-          ) : (
+          ) : canWrite ? (
             <form className="rupv-rform" onSubmit={submitReply}>
               <h3 className="rupv-h4">Leave a reply</h3>
               <label className="rupv-field">
@@ -281,19 +377,21 @@ const Replies = () => {
                 <textarea
                   rows="4"
                   required
+                  maxLength={REPLY_MAX}
                   placeholder="Add to the conversation…"
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
+                  aria-invalid={replyError && !replyText.trim() ? 'true' : undefined}
                 />
               </label>
-              {replyError && <p className="rupv-rform-error">{replyError}</p>}
+              {replyError && <p className="rupv-alert rupv-alert--error" role="alert">{replyError}</p>}
               <div className="rupv-rform-actions">
-                <Button type="submit" variant="primary" size="md" loading={busy}>
+                <Button type="submit" variant="primary" size="md" loading={busy} disabled={busy}>
                   Submit reply
                 </Button>
               </div>
             </form>
-          )}
+          ) : null}
         </div>
       </section>
     </div>

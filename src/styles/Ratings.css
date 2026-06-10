@@ -1,12 +1,15 @@
 /* ─── Ratings.css — Entity detail + Replies ─────────────────────── */
 
-.rupv-detail-status {
-  font-family: var(--rupv-font-body);
-  font-size: var(--rupv-fs-body);
-  color: var(--rupv-fg-3);
-  padding: var(--rupv-s-8) 0;
+/* Deleted/missing resource — distinct from a fetch error (no retry). */
+.rupv-detail-gone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--rupv-s-3);
   text-align: center;
+  padding: var(--rupv-s-9) var(--rupv-s-5);
 }
+.rupv-detail-gone .rupv-body-sm { max-width: 40ch; }
 
 /* ── Back link ──────────────────────────────────────────────────── */
 .rupv-detail-back {
@@ -14,7 +17,7 @@
   align-items: center;
   gap: var(--rupv-s-1);
   font-family: var(--rupv-font-body);
-  font-weight: 600;
+  font-weight: 700;
   font-size: var(--rupv-fs-body-sm);
   color: var(--rupv-ink);
   text-decoration: none;
@@ -122,7 +125,7 @@
   border: var(--rupv-bw-2) solid var(--rupv-ink);
   border-radius: var(--rupv-r-pill);
   font-family: var(--rupv-font-body);
-  font-weight: 600;
+  font-weight: 700;
   font-size: var(--rupv-fs-body-sm);
   line-height: 1;
   text-decoration: none;
@@ -200,7 +203,7 @@
 .rupv-review-title {
   font-family: var(--rupv-font-heading);
   font-weight: 700;
-  font-size: 20px;
+  font-size: var(--rupv-fs-body);
   line-height: var(--rupv-lh-snug);
   color: var(--rupv-ink);
   margin: 0;
@@ -227,7 +230,7 @@
   align-items: center;
   gap: var(--rupv-s-1);
   font-family: var(--rupv-font-body);
-  font-weight: 600;
+  font-weight: 700;
   font-size: var(--rupv-fs-body-sm);
   color: var(--rupv-ink);
   text-decoration: none;
@@ -251,11 +254,19 @@
   font-weight: 500;
   font-size: var(--rupv-fs-caption);
   cursor: pointer;
-  transition: background 0.12s ease, color 0.12s ease;
+  transition: background var(--rupv-dur-1) var(--rupv-ease),
+    color var(--rupv-dur-1) var(--rupv-ease);
 }
 .rupv-review-ownbtn:hover { background: var(--rupv-ink); color: var(--rupv-cream); }
 .rupv-review-ownbtn--danger { border-color: var(--rupv-maroon); color: var(--rupv-maroon); }
 .rupv-review-ownbtn--danger:hover { background: var(--rupv-maroon); border-color: var(--rupv-maroon); color: var(--rupv-cream); }
+/* Armed two-step delete — filled so the state change is unmistakable. */
+.rupv-review-ownbtn--danger.is-arming {
+  background: var(--rupv-maroon);
+  border-color: var(--rupv-maroon);
+  color: var(--rupv-cream);
+}
+.rupv-review-ownbtn:disabled { opacity: 0.55; cursor: not-allowed; }
 
 /* ── Vote stack ─────────────────────────────────────────────────── */
 .rupv-votes {
@@ -272,7 +283,7 @@
   border: var(--rupv-bw-2) solid var(--rupv-slate);
   border-radius: var(--rupv-r-pill);
   font-family: var(--rupv-font-body);
-  font-weight: 600;
+  font-weight: 700;
   font-size: var(--rupv-fs-body-sm);
   cursor: pointer;
   transition: background var(--rupv-dur-1) var(--rupv-ease),
@@ -325,29 +336,12 @@
 }
 .rupv-field-label {
   font-family: var(--rupv-font-body);
-  font-weight: 600;
+  font-weight: 700;
   font-size: var(--rupv-fs-body-sm);
   color: var(--rupv-ink);
 }
-.rupv-field input,
-.rupv-field textarea {
-  width: 100%;
-  padding: 12px 14px;
-  background: var(--rupv-bg);
-  border: var(--rupv-bw-2) solid var(--rupv-ink);
-  border-radius: var(--rupv-r-1);
-  font-family: var(--rupv-font-body);
-  font-size: var(--rupv-fs-body-sm);
-  color: var(--rupv-ink);
-  outline: none;
-  transition: border-color var(--rupv-dur-1) var(--rupv-ease),
-    box-shadow var(--rupv-dur-1) var(--rupv-ease);
-}
-.rupv-field input:focus,
-.rupv-field textarea:focus {
-  border-color: var(--rupv-maroon);
-  box-shadow: 0 0 0 3px var(--brand-fg-soft);
-}
+/* Inputs use the shared .rupv-input rule (components.css) via the grouped
+   `.rupv-field input/textarea` selectors — only the textarea sizing is local. */
 .rupv-field textarea { resize: vertical; min-height: 110px; line-height: var(--rupv-lh-body); }
 
 .rupv-rate-row { display: flex; gap: var(--rupv-s-2); }
@@ -363,9 +357,11 @@
   border-radius: var(--rupv-r-2);
   font-family: var(--rupv-font-heading);
   font-weight: 700;
-  font-size: 20px;
+  font-size: var(--rupv-fs-body);
   cursor: pointer;
-  transition: background 0.12s ease, color 0.12s ease, transform 0.05s ease;
+  transition: background var(--rupv-dur-1) var(--rupv-ease),
+    color var(--rupv-dur-1) var(--rupv-ease),
+    transform var(--rupv-dur-1) var(--rupv-ease);
 }
 .rupv-rate-chip:hover { background: var(--rupv-sky); }
 .rupv-rate-chip:active { transform: translateY(1px); }
@@ -376,16 +372,7 @@
   animation: rupv-pop-in var(--rupv-dur-2) var(--rupv-ease-spring);
 }
 
-.rupv-rform-error {
-  background: var(--rupv-bg);
-  border: var(--rupv-bw-2) solid var(--rupv-maroon);
-  color: var(--rupv-maroon);
-  font-family: var(--rupv-font-body);
-  font-size: var(--rupv-fs-body-sm);
-  padding: var(--rupv-s-2) var(--rupv-s-3);
-  border-radius: var(--rupv-r-1);
-  margin: 0;
-}
+/* Form errors use the shared .rupv-alert (components.css). */
 .rupv-rform-actions { display: flex; gap: var(--rupv-s-2); }
 
 /* ── Responsive ─────────────────────────────────────────────────── */
@@ -401,7 +388,7 @@
    for a soft shadow; borders kept transparent to avoid layout shift. */
 .rupv-detail-media--skeleton {
   border-color: transparent;
-  box-shadow: 0 6px 20px rgba(31, 20, 27, 0.12);
+  box-shadow: var(--rupv-shadow-skeleton);
 }
 .rupv-detail-skel-fill { width: 100%; height: 100%; border-radius: 0; }
 
@@ -418,7 +405,7 @@
 
 .rupv-review--skeleton {
   border-color: transparent;
-  box-shadow: 0 6px 20px rgba(31, 20, 27, 0.12);
+  box-shadow: var(--rupv-shadow-skeleton);
 }
 .rupv-review-skel-avatar { width: 44px; height: 44px; border-radius: 50%; flex: none; }
 .rupv-review-skel-author { display: flex; flex-direction: column; gap: 6px; margin-right: auto; }

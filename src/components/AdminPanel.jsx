@@ -1,10 +1,15 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../supabaseClient'
 import { UserAuth } from '../context/AuthContext'
+import Button from './ui/Button'
 import Icon from './ui/Icon'
+import { useModalA11y } from '../hooks/useModalA11y'
+import { validateCoordinates } from '../utils/validation'
 import '../styles/AdminPanel.css'
 
 const ENTITY_TYPES = ['facility', 'service']
+const NAME_MAX = 120
+const DESC_MAX = 500
 
 const emptyForm = {
   name: '',
@@ -15,9 +20,9 @@ const emptyForm = {
   image_link: '',
 }
 
-// ── Defined OUTSIDE component so inputs never remount on re-render ────────────
+// ── Defined OUTSIDE the panel so inputs never remount on parent re-render ────
 
-const Field = ({ label, name, type = 'text', placeholder, required, form, setForm }) => (
+const Field = ({ label, name, type = 'text', placeholder, required, form, setForm, inputProps }) => (
   <div className="ap-field">
     <label className="ap-label">
       {label}
@@ -31,113 +36,142 @@ const Field = ({ label, name, type = 'text', placeholder, required, form, setFor
       onChange={(e) => setForm((f) => ({ ...f, [name]: e.target.value }))}
       required={required}
       step={type === 'number' ? 'any' : undefined}
+      {...inputProps}
     />
   </div>
 )
 
-const EntityForm = ({ form, setForm, onSubmit, submitLabel, status, loading }) => (
-  <form className="ap-form" onSubmit={onSubmit}>
-    <Field label="Name" name="name" placeholder="e.g. Main Library" required form={form} setForm={setForm} />
-    <div className="ap-field">
-      <label className="ap-label">Type<span className="ap-required">*</span></label>
-      <div className="ap-radio-group">
-        {ENTITY_TYPES.map((t) => (
-          <label key={t} className={`ap-radio ${form.entity_type === t ? 'active' : ''}`}>
-            <input
-              type="radio"
-              name="entity_type"
-              value={t}
-              checked={form.entity_type === t}
-              onChange={() => setForm((f) => ({ ...f, entity_type: t }))}
-            />
-            <Icon name={t === 'facility' ? 'building' : 'bell'} size={16} />
-            {t === 'facility' ? 'Facility' : 'Service'}
-          </label>
-        ))}
+// EntityForm owns its field state, seeded from `initial` — the parent remounts
+// it (via key) when the target entity changes, so no copy-into-state effects.
+const EntityForm = ({ initial, onSubmit, submitLabel, status, loading }) => {
+  const [form, setForm] = useState(() =>
+    initial
+      ? {
+          name: initial.name || '',
+          entity_type: initial.entity_type || 'facility',
+          latitude: initial.latitude ?? '',
+          longitude: initial.longitude ?? '',
+          description: initial.description || '',
+          image_link: initial.image_link || '',
+        }
+      : emptyForm
+  )
+  const [localError, setLocalError] = useState(null)
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    const name = form.name.trim()
+    const latitude = parseFloat(form.latitude)
+    const longitude = parseFloat(form.longitude)
+
+    if (!name) {
+      setLocalError("The name can't be just spaces.")
+      return
+    }
+    const coordError = validateCoordinates(latitude, longitude)
+    if (coordError) {
+      setLocalError(coordError)
+      return
+    }
+    setLocalError(null)
+    onSubmit({
+      name,
+      entity_type: form.entity_type,
+      latitude,
+      longitude,
+      description: form.description.trim() || null,
+      image_link: form.image_link.trim() || null,
+    })
+  }
+
+  return (
+    <form className="ap-form" onSubmit={handleSubmit}>
+      <Field
+        label="Name" name="name" placeholder="e.g. Main Library" required
+        form={form} setForm={setForm} inputProps={{ maxLength: NAME_MAX }}
+      />
+      <div className="ap-field">
+        <label className="ap-label">Type<span className="ap-required">*</span></label>
+        <div className="ap-radio-group">
+          {ENTITY_TYPES.map((t) => (
+            <label key={t} className={`ap-radio ${form.entity_type === t ? 'active' : ''}`}>
+              <input
+                type="radio"
+                name="entity_type"
+                value={t}
+                checked={form.entity_type === t}
+                onChange={() => setForm((f) => ({ ...f, entity_type: t }))}
+              />
+              <Icon name={t === 'facility' ? 'building' : 'bell'} size={16} />
+              {t === 'facility' ? 'Facility' : 'Service'}
+            </label>
+          ))}
+        </div>
       </div>
-    </div>
-    <div className="ap-row">
-      <Field label="Latitude" name="latitude" type="number" placeholder="10.6419" required form={form} setForm={setForm} />
-      <Field label="Longitude" name="longitude" type="number" placeholder="122.5854" required form={form} setForm={setForm} />
-    </div>
-    <div className="ap-field">
-      <label className="ap-label">Description</label>
-      <textarea
-        className="ap-input ap-textarea"
-        placeholder="Brief description (optional)"
-        value={form.description}
-        onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-        rows={3}
-      />
-    </div>
-    <div className="ap-field">
-      <label className="ap-label">Image link</label>
-      <input
-        className="ap-input"
-        type="url"
-        placeholder="https://i.imgur.com/abc123.jpg"
-        value={form.image_link}
-        onChange={(e) => setForm((f) => ({ ...f, image_link: e.target.value }))}
-      />
-    </div>
-    {status && (
-      <div className={`ap-status ap-status--${status.type}`}>{status.msg}</div>
-    )}
-    <button className="ap-submit" type="submit" disabled={loading}>
-      {loading ? 'Saving…' : submitLabel}
-    </button>
-  </form>
-)
+      <div className="ap-row">
+        <Field
+          label="Latitude" name="latitude" type="number" placeholder="10.6419" required
+          form={form} setForm={setForm} inputProps={{ min: -90, max: 90 }}
+        />
+        <Field
+          label="Longitude" name="longitude" type="number" placeholder="122.5854" required
+          form={form} setForm={setForm} inputProps={{ min: -180, max: 180 }}
+        />
+      </div>
+      <div className="ap-field">
+        <label className="ap-label">Description</label>
+        <textarea
+          className="ap-input ap-textarea"
+          placeholder="Brief description (optional)"
+          value={form.description}
+          maxLength={DESC_MAX}
+          onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+          rows={3}
+        />
+      </div>
+      <div className="ap-field">
+        <label className="ap-label">Image link</label>
+        <input
+          className="ap-input"
+          type="url"
+          placeholder="https://i.imgur.com/abc123.jpg"
+          value={form.image_link}
+          onChange={(e) => setForm((f) => ({ ...f, image_link: e.target.value }))}
+        />
+      </div>
+      {(localError || status) && (
+        <div
+          className={`rupv-alert rupv-alert--${localError ? 'error' : status.type}`}
+          role="alert"
+        >
+          {localError || status.msg}
+        </div>
+      )}
+      <Button type="submit" variant="primary" size="md" block loading={loading}>
+        {loading ? 'Saving…' : submitLabel}
+      </Button>
+    </form>
+  )
+}
 
 // ── Main component ────────────────────────────────────────────────────────────
-// pendingEdit / pendingDelete: entity object passed from Dashboard card buttons
-// onConsumed: called after panel has consumed the pending action (resets parent state)
+// pendingEdit / pendingDelete: entity objects passed from Dashboard card
+// buttons. They stay set while the panel works with them; the panel calls
+// onConsumed when it is done with them (close, tab switch, delete done).
 
 const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) => {
   const { session } = UserAuth()
-  const [open, setOpen] = useState(false)
-  const [mode, setMode] = useState('add')
-  const [form, setForm] = useState(emptyForm)
-  const [editId, setEditId] = useState(null)
-  const [deleteId, setDeleteId] = useState(null)
-  const [deleteName, setDeleteName] = useState('')
+  const [internalOpen, setInternalOpen] = useState(false)
+  const [internalMode, setInternalMode] = useState('add')
   const [status, setStatus] = useState(null)
   const [loading, setLoading] = useState(false)
   const [closing, setClosing] = useState(false)
+  const [addFormKey, setAddFormKey] = useState(0)
+  const cardRef = useRef(null)
 
-  // When Dashboard passes a pendingEdit, load it and open panel
-  useEffect(() => {
-    if (!pendingEdit) return
-    setForm({
-      name: pendingEdit.name || '',
-      entity_type: pendingEdit.entity_type || 'facility',
-      latitude: pendingEdit.latitude ?? '',
-      longitude: pendingEdit.longitude ?? '',
-      description: pendingEdit.description || '',
-      image_link: pendingEdit.image_link || '',
-    })
-    setEditId(pendingEdit.id)
-    setDeleteId(null)
-    setMode('edit')
-    setStatus(null)
-    setOpen(true)
-    onConsumed()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pendingEdit])
-
-  // When Dashboard passes a pendingDelete, load it and open panel
-  useEffect(() => {
-    if (!pendingDelete) return
-    setDeleteId(pendingDelete.id)
-    setDeleteName(pendingDelete.name)
-    setEditId(null)
-    setForm(emptyForm)
-    setMode('delete')
-    setStatus(null)
-    setOpen(true)
-    onConsumed()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pendingDelete])
+  // Pending intents from the Dashboard cards take priority over local state.
+  const open = internalOpen || !!pendingEdit || !!pendingDelete
+  const mode = pendingDelete ? 'delete' : pendingEdit ? 'edit' : internalMode
 
   // Escape to close + lock body scroll while the modal is open (like AuthModal).
   useEffect(() => {
@@ -152,17 +186,14 @@ const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) 
     }
   }, [open])
 
-  const reset = () => {
-    setForm(emptyForm)
-    setEditId(null)
-    setDeleteId(null)
-    setDeleteName('')
-    setStatus(null)
-  }
+  // Focus trap + restore while open.
+  useModalA11y(cardRef, open)
 
   const switchMode = (m) => {
-    reset()
-    setMode(m)
+    setInternalMode(m)
+    setInternalOpen(true)
+    setStatus(null)
+    onConsumed?.()
   }
 
   // Play the exit animation, then actually close (mirrors AuthModal).
@@ -170,8 +201,10 @@ const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) 
   const handleScrimAnimEnd = (e) => {
     if (e.target === e.currentTarget && closing) {
       setClosing(false)
-      setOpen(false)
-      reset()
+      setInternalOpen(false)
+      setInternalMode('add')
+      setStatus(null)
+      onConsumed?.()
     }
   }
 
@@ -183,20 +216,13 @@ const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) 
   const PERMISSION_HINT =
     'No rows were affected. You may not have permission to modify this entity (admins can only manage entities they own).'
 
-  const handleAdd = async (e) => {
-    e.preventDefault()
+  const handleAdd = async (payload) => {
     setLoading(true)
     setStatus(null)
-    const payload = {
-      name: form.name.trim(),
-      entity_type: form.entity_type,
-      latitude: parseFloat(form.latitude),
-      longitude: parseFloat(form.longitude),
-      admin_id: session.user.id,
-      description: form.description.trim() || null,
-      image_link: form.image_link.trim() || null,
-    }
-    const { data, error } = await supabase.from('entities').insert([payload]).select()
+    const { data, error } = await supabase
+      .from('entities')
+      .insert([{ ...payload, admin_id: session.user.id }])
+      .select()
     setLoading(false)
     if (error) {
       setStatus({ type: 'error', msg: error.message })
@@ -204,28 +230,19 @@ const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) 
       setStatus({ type: 'error', msg: PERMISSION_HINT })
     } else {
       setStatus({ type: 'success', msg: `"${payload.name}" added successfully.` })
-      setForm(emptyForm)
+      setAddFormKey((k) => k + 1) // remount the add form empty
       onEntityChange?.()
     }
   }
 
-  const handleEditSave = async (e) => {
-    e.preventDefault()
-    if (!editId) return
+  const handleEditSave = async (payload) => {
+    if (!pendingEdit) return
     setLoading(true)
     setStatus(null)
-    const payload = {
-      name: form.name.trim(),
-      entity_type: form.entity_type,
-      latitude: parseFloat(form.latitude),
-      longitude: parseFloat(form.longitude),
-      description: form.description.trim() || null,
-      image_link: form.image_link.trim() || null,
-    }
     const { data, error } = await supabase
       .from('entities')
       .update(payload)
-      .eq('id', editId)
+      .eq('id', pendingEdit.id)
       .select()
     setLoading(false)
     if (error) {
@@ -239,14 +256,14 @@ const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) 
   }
 
   const handleDelete = async () => {
-    if (!deleteId) return
-    const name = deleteName
+    if (!pendingDelete) return
+    const name = pendingDelete.name
     setLoading(true)
     setStatus(null)
     const { data, error } = await supabase
       .from('entities')
       .delete()
-      .eq('id', deleteId)
+      .eq('id', pendingDelete.id)
       .select()
     setLoading(false)
     if (error) {
@@ -254,19 +271,31 @@ const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) 
     } else if (!data || data.length === 0) {
       setStatus({ type: 'error', msg: PERMISSION_HINT })
     } else {
-      // reset() clears status, so switch mode and reset first, then set the banner
-      reset()
-      setMode('add')
+      // Land back on the Add tab with a success banner.
+      setInternalMode('add')
+      setInternalOpen(true)
       setStatus({ type: 'success', msg: `"${name}" deleted.` })
+      onConsumed?.()
       onEntityChange?.()
     }
+  }
+
+  const cancelDelete = () => {
+    setInternalMode('add')
+    setInternalOpen(true)
+    setStatus(null)
+    onConsumed?.()
   }
 
   // ── Collapsed FAB ─────────────────────────────────────────────────────────
 
   if (!open) {
     return (
-      <button className="ap-fab" onClick={() => { setMode('add'); reset(); setOpen(true) }} title="Admin panel">
+      <button
+        className="ap-fab"
+        onClick={() => { setInternalMode('add'); setStatus(null); setInternalOpen(true) }}
+        title="Admin panel"
+      >
         <Icon name="building" size={16} />
         <span className="ap-fab-label">Admin</span>
       </button>
@@ -278,100 +307,104 @@ const AdminPanel = ({ onEntityChange, pendingEdit, pendingDelete, onConsumed }) 
   return (
     <div
       className={`rupv-modal-scrim${closing ? ' is-closing' : ''}`}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Manage entities"
       onMouseDown={(e) => { if (e.target === e.currentTarget) requestClose() }}
       onAnimationEnd={handleScrimAnimEnd}
     >
-      <div className={`rupv-modal ap-modal${closing ? ' is-closing' : ''}`}>
+      <div
+        ref={cardRef}
+        className={`rupv-modal ap-modal${closing ? ' is-closing' : ''}`}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="ap-modal-title"
+      >
         <div className="ap-header">
           <div className="ap-header-left">
             <span className="ap-badge">Admin</span>
-            <h2 className="ap-title">Manage entities</h2>
+            <h2 className="ap-title" id="ap-modal-title">Manage entities</h2>
           </div>
           <button className="ap-close" onClick={requestClose} aria-label="Close admin panel">
             <Icon name="close" size={18} stroke="var(--rupv-cream)" />
           </button>
         </div>
 
-      <div className="ap-tabs">
-        {[
-          { m: 'add', icon: 'plus', label: 'Add' },
-          { m: 'edit', icon: 'edit', label: 'Edit' },
-          { m: 'delete', icon: 'trash', label: 'Delete' },
-        ].map(({ m, icon, label }) => (
-          <button
-            key={m}
-            className={`ap-tab ${mode === m ? 'active' : ''}`}
-            onClick={() => switchMode(m)}
-          >
-            <Icon name={icon} size={15} /> {label}
-          </button>
-        ))}
-      </div>
+        <div className="ap-tabs" role="tablist" aria-label="Entity actions">
+          {[
+            { m: 'add', icon: 'plus', label: 'Add' },
+            { m: 'edit', icon: 'edit', label: 'Edit' },
+            { m: 'delete', icon: 'trash', label: 'Delete' },
+          ].map(({ m, icon, label }) => (
+            <button
+              key={m}
+              role="tab"
+              aria-selected={mode === m}
+              className={`ap-tab ${mode === m ? 'active' : ''}`}
+              onClick={() => switchMode(m)}
+            >
+              <Icon name={icon} size={15} /> {label}
+            </button>
+          ))}
+        </div>
 
-      <div className="ap-body">
+        <div className="ap-body">
 
-        {mode === 'add' && (
-          <EntityForm
-            form={form}
-            setForm={setForm}
-            onSubmit={handleAdd}
-            submitLabel="Add entity"
-            status={status}
-            loading={loading}
-          />
-        )}
+          {mode === 'add' && (
+            <EntityForm
+              key={`add-${addFormKey}`}
+              onSubmit={handleAdd}
+              submitLabel="Add entity"
+              status={status}
+              loading={loading}
+            />
+          )}
 
-        {mode === 'edit' && (
-          editId ? (
-            <>
-              <p className="ap-hint">
-                Editing: <strong>{form.name || '—'}</strong>
-              </p>
-              <EntityForm
-                form={form}
-                setForm={setForm}
-                onSubmit={handleEditSave}
-                submitLabel="Save changes"
-                status={status}
-                loading={loading}
-              />
-            </>
-          ) : (
-            <p className="ap-hint">Select the edit button on any entity card to load it here.</p>
-          )
-        )}
+          {mode === 'edit' && (
+            pendingEdit ? (
+              <>
+                <p className="ap-hint">
+                  Editing: <strong>{pendingEdit.name || '—'}</strong>
+                </p>
+                <EntityForm
+                  key={`edit-${pendingEdit.id}`}
+                  initial={pendingEdit}
+                  onSubmit={handleEditSave}
+                  submitLabel="Save changes"
+                  status={status}
+                  loading={loading}
+                />
+              </>
+            ) : (
+              <p className="ap-hint">Select the edit button on any entity card to load it here.</p>
+            )
+          )}
 
-        {mode === 'delete' && (
-          deleteId ? (
-            <div className="ap-delete-confirm">
-              <div className="ap-delete-warning">
-                <Icon name="trash" size={36} stroke="var(--rupv-maroon)" />
+          {mode === 'delete' && (
+            pendingDelete ? (
+              <div className="ap-delete-confirm">
+                <div className="ap-delete-warning">
+                  <Icon name="trash" size={36} stroke="var(--rupv-maroon)" />
+                </div>
+                <p className="ap-delete-msg">
+                  Permanently delete <strong>"{pendingDelete.name}"</strong>?<br />
+                  <span className="ap-delete-sub">This will also remove all associated reviews.</span>
+                </p>
+                {status && (
+                  <div className={`rupv-alert rupv-alert--${status.type}`} role="alert">{status.msg}</div>
+                )}
+                <div className="ap-delete-actions">
+                  <Button variant="ghost" size="md" onClick={cancelDelete}>
+                    Cancel
+                  </Button>
+                  <Button variant="danger" size="md" onClick={handleDelete} loading={loading}>
+                    {loading ? 'Deleting…' : 'Yes, delete'}
+                  </Button>
+                </div>
               </div>
-              <p className="ap-delete-msg">
-                Permanently delete <strong>"{deleteName}"</strong>?<br />
-                <span className="ap-delete-sub">This will also remove all associated reviews.</span>
-              </p>
-              {status && (
-                <div className={`ap-status ap-status--${status.type}`}>{status.msg}</div>
-              )}
-              <div className="ap-delete-actions">
-                <button className="ap-btn-ghost" onClick={() => { reset(); setMode('add') }}>
-                  Cancel
-                </button>
-                <button className="ap-btn-danger" onClick={handleDelete} disabled={loading}>
-                  {loading ? 'Deleting…' : 'Yes, delete'}
-                </button>
-              </div>
-            </div>
-          ) : (
-            <p className="ap-hint">Select the delete button on any entity card to remove it.</p>
-          )
-        )}
+            ) : (
+              <p className="ap-hint">Select the delete button on any entity card to remove it.</p>
+            )
+          )}
 
-      </div>
+        </div>
       </div>
     </div>
   )

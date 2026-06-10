@@ -52,9 +52,9 @@
 }
 
 /* sizes */
-.rupv-btn--sm { padding: 8px 16px;  font-size: 14px; }
-.rupv-btn--md { padding: 12px 22px; font-size: 16px; }
-.rupv-btn--lg { padding: 16px 30px; font-size: 20px; }
+.rupv-btn--sm { padding: 8px 16px;  font-size: var(--rupv-fs-sm); }
+.rupv-btn--md { padding: 12px 22px; font-size: var(--rupv-fs-body-sm); }
+.rupv-btn--lg { padding: 16px 30px; font-size: var(--rupv-fs-body); }
 .rupv-btn--block { display: flex; width: 100%; }
 
 /* variants */
@@ -104,11 +104,12 @@
 }
 
 .rupv-btn--danger {
-  background: var(--rupv-bg);
-  color: var(--rupv-maroon);
-  border-color: var(--rupv-maroon);
+  background: var(--rupv-grad-maroon);
+  color: var(--rupv-cream);
+  border-color: var(--rupv-ink);
+  box-shadow: var(--rupv-shadow-1);
 }
-.rupv-btn--danger:hover { background: var(--rupv-maroon); color: var(--rupv-cream); }
+.rupv-btn--danger:hover { background: var(--rupv-maroon-deep); color: var(--rupv-cream); }
 
 /* ── RatingBadge ────────────────────────────────────────────────── */
 .rupv-badge {
@@ -174,7 +175,7 @@
   border-radius: var(--rupv-r-pill);
   font-family: var(--rupv-font-heading);
   font-weight: 500;
-  font-size: 14px;
+  font-size: var(--rupv-fs-sm);
   line-height: 1.2;
   white-space: nowrap;
 }
@@ -232,15 +233,52 @@
 .rupv-header-name {
   font-family: var(--rupv-font-heading);
   font-weight: 700;
-  font-size: 22px;
+  font-size: var(--rupv-fs-body);
   color: var(--rupv-cream);
+  white-space: nowrap;
 }
 .rupv-header-tagline {
   font-family: var(--rupv-font-micro);
-  font-size: 11px;
+  font-size: var(--rupv-fs-micro);
   letter-spacing: 0.02em;
   color: var(--rupv-fg-inv-2);
   margin-top: 3px;
+}
+
+/* Primary nav links (Browse / Map) — active page gets the filled pill. */
+.rupv-header-links {
+  display: flex;
+  align-items: center;
+  gap: var(--rupv-s-1);
+  margin-right: auto;
+  margin-left: var(--rupv-s-5);
+}
+.rupv-header-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rupv-s-1);
+  padding: 7px 14px;
+  border-radius: var(--rupv-r-pill);
+  font-family: var(--rupv-font-body);
+  font-weight: 500;
+  font-size: var(--rupv-fs-sm);
+  color: var(--rupv-fg-inv-2);
+  text-decoration: none;
+  transition: background var(--rupv-dur-1) var(--rupv-ease),
+    color var(--rupv-dur-1) var(--rupv-ease);
+}
+.rupv-header-link:hover {
+  color: var(--rupv-cream);
+  background: rgba(255, 247, 240, 0.08);
+  text-decoration: none;
+}
+.rupv-header-link.active {
+  color: var(--rupv-cream);
+  background: var(--rupv-grad-maroon);
+}
+.rupv-header-link:focus-visible {
+  outline: var(--rupv-bw-2) solid var(--rupv-cream);
+  outline-offset: 2px;
 }
 
 .rupv-header-nav {
@@ -263,7 +301,7 @@
 }
 .rupv-header-greeting {
   font-family: var(--rupv-font-body);
-  font-size: 15px;
+  font-size: var(--rupv-fs-sm);
   color: var(--rupv-fg-inv-2);
 }
 .rupv-header-account {
@@ -309,7 +347,7 @@
 .rupv-footer-name {
   font-family: var(--rupv-font-heading);
   font-weight: 700;
-  font-size: 18px;
+  font-size: var(--rupv-fs-md);
   color: var(--rupv-ink);
 }
 .rupv-footer-copy {
@@ -327,22 +365,40 @@
 .rupv-footer-link {
   font-family: var(--rupv-font-body);
   font-weight: 500;
-  font-size: 15px;
+  font-size: var(--rupv-fs-sm);
   color: var(--rupv-ink);
 }
 .rupv-footer-link:hover { color: var(--rupv-maroon); text-decoration: underline; }
 
 /* ── Responsive chrome ──────────────────────────────────────────── */
+@media (max-width: 760px) {
+  /* Tuck the nav labels behind icons before the header gets crowded. */
+  .rupv-header-links { margin-left: var(--rupv-s-3); gap: 2px; }
+  .rupv-header-link { padding: 8px 10px; }
+}
 @media (max-width: 640px) {
   :root { --rupv-header-h: 68px; }
   .rupv-header { padding: 0 var(--rupv-s-4); }
-  .rupv-header-logo { height: 38px; }
-  .rupv-header-name { font-size: 18px; }
+  .rupv-header-logo { height: 38px; width: 38px; }
+  .rupv-header-name { font-size: var(--rupv-fs-md); }
   .rupv-header-tagline { display: none; }
   .rupv-header-greeting { display: none; }
   .rupv-header-nav { gap: var(--rupv-s-2); }
   .rupv-container { padding: var(--rupv-s-5) var(--rupv-s-4); }
   .rupv-footer-inner { padding: var(--rupv-s-5) var(--rupv-s-4); }
+}
+@media (max-width: 480px) {
+  /* 320–480px: icon-only nav pills; brand wordmark shrinks. */
+  .rupv-header-link span { display: none; }
+  .rupv-header-name { font-size: var(--rupv-fs-body-sm); }
+  .rupv-header-nav .rupv-btn--sm { padding: 8px 12px; font-size: var(--rupv-fs-caption); }
+}
+@media (max-width: 360px) {
+  /* 320-class devices: logo-only brand keeps everything on one row. */
+  .rupv-header { gap: var(--rupv-s-2); }
+  .rupv-header-wordmark { display: none; }
+  .rupv-header-links { margin-left: 0; }
+  .rupv-header-role { display: none; }
 }
 
 /* ── Filter bar (shared by Browse + Map) ────────────────────────── */
@@ -404,7 +460,7 @@
 .rupv-select:focus-visible {
   outline: none;
   border-color: var(--rupv-maroon);
-  box-shadow: 0 0 0 3px var(--brand-fg-soft);
+  box-shadow: var(--rupv-ring);
 }
 
 /* Reviewed-only checkbox toggle */
@@ -423,4 +479,174 @@
   height: 18px;
   accent-color: var(--rupv-maroon);
   cursor: pointer;
+}
+
+/* ── Text input — THE input. One rule for every text field ──────── */
+/* The grouped selectors keep legacy per-page markup (.auth-field input etc.)
+   on the same single source of truth without JSX churn. */
+.rupv-input,
+.rupv-field input,
+.rupv-field textarea,
+.auth-field input,
+.profile-field input,
+.ap-input {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--rupv-bg);
+  border: var(--rupv-bw-2) solid var(--rupv-ink);
+  border-radius: var(--rupv-r-1);
+  font-family: var(--rupv-font-body);
+  font-size: var(--rupv-fs-body-sm);
+  color: var(--rupv-ink);
+  outline: none;
+  transition: border-color var(--rupv-dur-1) var(--rupv-ease),
+    box-shadow var(--rupv-dur-1) var(--rupv-ease);
+}
+.rupv-input::placeholder,
+.rupv-field input::placeholder,
+.rupv-field textarea::placeholder,
+.auth-field input::placeholder,
+.profile-field input::placeholder,
+.ap-input::placeholder {
+  color: var(--rupv-fg-3);
+}
+.rupv-input:focus,
+.rupv-field input:focus,
+.rupv-field textarea:focus,
+.auth-field input:focus,
+.profile-field input:focus,
+.ap-input:focus {
+  border-color: var(--rupv-maroon);
+  box-shadow: var(--rupv-ring);
+}
+.rupv-input:disabled,
+.rupv-field input:disabled,
+.rupv-field textarea:disabled,
+.auth-field input:disabled,
+.profile-field input:disabled,
+.ap-input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: var(--rupv-bg-alt);
+}
+/* Validation error — set aria-invalid="true" on the field */
+.rupv-input[aria-invalid='true'],
+.rupv-field input[aria-invalid='true'],
+.rupv-field textarea[aria-invalid='true'],
+.auth-field input[aria-invalid='true'],
+.profile-field input[aria-invalid='true'],
+.ap-input[aria-invalid='true'] {
+  border-color: var(--rupv-error);
+}
+
+/* ── Alert / status banner — error + success, used by every form ── */
+.rupv-alert {
+  font-family: var(--rupv-font-body);
+  font-size: var(--rupv-fs-sm);
+  padding: var(--rupv-s-2) var(--rupv-s-3);
+  border-radius: var(--rupv-r-1);
+  border: var(--rupv-bw-2) solid;
+  line-height: var(--rupv-lh-body);
+  text-align: left;
+  width: 100%;
+  margin: 0;
+}
+.rupv-alert--error {
+  background: var(--rupv-error-bg);
+  border-color: var(--rupv-error);
+  color: var(--rupv-error);
+}
+.rupv-alert--success {
+  background: var(--rupv-success-bg);
+  border-color: var(--rupv-success-border);
+  color: var(--rupv-success);
+}
+
+/* ── Back / floating pill button (Profile header, map controls) ─── */
+.rupv-backbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rupv-s-1);
+  font-family: var(--rupv-font-body);
+  font-weight: 500;
+  font-size: var(--rupv-fs-caption);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 8px 14px;
+  border-radius: var(--rupv-r-pill);
+  border: var(--rupv-bw-2) solid var(--rupv-ink);
+  background: var(--rupv-cream);
+  color: var(--rupv-ink);
+  cursor: pointer;
+  box-shadow: var(--rupv-shadow-1);
+  transition: background var(--rupv-dur-1) var(--rupv-ease),
+    color var(--rupv-dur-1) var(--rupv-ease);
+}
+.rupv-backbtn:hover { background: var(--rupv-ink); color: var(--rupv-cream); }
+.rupv-backbtn:focus-visible {
+  outline: var(--rupv-bw-2) solid var(--rupv-slate);
+  outline-offset: 2px;
+}
+
+/* ── Error state — fetch failures, with retry ───────────────────── */
+.rupv-error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--rupv-s-3);
+  text-align: center;
+  padding: var(--rupv-s-8) var(--rupv-s-5);
+  background: var(--rupv-bg);
+  border: var(--rupv-bw-2) dashed var(--rupv-error);
+  border-radius: var(--rupv-r-3);
+}
+.rupv-error-state .rupv-body-sm { max-width: 42ch; }
+.rupv-error-state--compact {
+  padding: var(--rupv-s-5) var(--rupv-s-4);
+  border-radius: var(--rupv-r-2);
+}
+
+/* ── 404 page ───────────────────────────────────────────────────── */
+.rupv-notfound {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--rupv-s-3);
+  text-align: center;
+  padding-top: var(--rupv-s-9);
+  padding-bottom: var(--rupv-s-9);
+}
+.rupv-notfound-code {
+  font-family: var(--rupv-font-display);
+  font-weight: 700;
+  font-size: var(--rupv-fs-display);
+  line-height: var(--rupv-lh-tight);
+  letter-spacing: var(--rupv-tracking-display);
+  color: var(--rupv-maroon);
+  margin: 0;
+}
+.rupv-notfound .rupv-body-sm { max-width: 44ch; }
+.rupv-notfound-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--rupv-s-4);
+  margin-top: var(--rupv-s-3);
+}
+.rupv-notfound-maplink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rupv-s-1);
+  font-family: var(--rupv-font-body);
+  font-weight: 500;
+  font-size: var(--rupv-fs-sm);
+  color: var(--rupv-ink);
+}
+.rupv-notfound-maplink:hover { color: var(--rupv-maroon); }
+
+/* ── Focus visibility — baseline for links and custom controls ──── */
+a:focus-visible {
+  outline: var(--rupv-bw-2) solid var(--rupv-slate);
+  outline-offset: 2px;
+  border-radius: var(--rupv-r-1);
 }

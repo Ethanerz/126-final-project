@@ -3,15 +3,16 @@ import { supabase } from "../supabaseClient";
 
 const AuthContext = createContext();
 
-// The shared read-only demo account. Guests can browse but never write.
-export const GUEST_EMAIL = 'guest@up.edu.ph';
-const GUEST_PASSWORD = 'guest12345';
-
 export const AuthContextProvider = ({ children }) => {
+  // undefined = still resolving, null = signed-out visitor, object = session.
   const [session, setSession] = useState(undefined);
   const [userRole, setUserRole] = useState(null);
 
-  const isGuest = session?.user?.email === GUEST_EMAIL;
+  // Signed-out visitors browse anonymously (RLS grants the `anon` role read
+  // access). There is no shared guest account — writes require a real session
+  // with the student role.
+  const isVisitor = session === null;
+  const canWrite = !!session && userRole !== 'guest';
 
   // Auth modal (login/signup overlay) state + controls.
   const [authModal, setAuthModal] = useState({ open: false, mode: 'signin' });
@@ -29,7 +30,6 @@ export const AuthContextProvider = ({ children }) => {
       }
     });
     if (error) {
-      console.error("there was a problem signing up: ", error);
       return { success: false, error };
     }
     return { success: true, data };
@@ -42,18 +42,13 @@ export const AuthContextProvider = ({ children }) => {
         password: password
       });
       if (error) {
-        console.error("Sign-in error occurred: ", error);
         return { success: false, error: error.message };
       }
-      console.log("Sign-in Success: ", data);
       return { success: true, data };
     } catch (error) {
-      console.error("an error occurred: ", error);
       return { success: false, error: error.message };
     }
   };
-
-  const signInAsGuest = () => signInUser(GUEST_EMAIL, GUEST_PASSWORD);
 
   // Get session on mount
   useEffect(() => {
@@ -74,7 +69,7 @@ export const AuthContextProvider = ({ children }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // ========== NEW: Fetch user role when session changes ==========
+  // Fetch user role when session changes
   useEffect(() => {
     const fetchUserRole = async () => {
       if (session?.user?.id) {
@@ -85,10 +80,8 @@ export const AuthContextProvider = ({ children }) => {
           .single();
 
         if (!error && data) {
-          console.log('Fetched user role:', data.role);
           setUserRole(data.role);
         } else {
-          console.log('No role found, defaulting to student');
           setUserRole('student');
         }
       } else {
@@ -102,12 +95,12 @@ export const AuthContextProvider = ({ children }) => {
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
-      console.error("there was an error: ", error);
+      console.error("Error signing out:", error);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ session, userRole, isGuest, signUpNewUser, signOut, signInUser, signInAsGuest, authModal, openAuth, closeAuth }}>
+    <AuthContext.Provider value={{ session, userRole, isVisitor, canWrite, signUpNewUser, signOut, signInUser, authModal, openAuth, closeAuth }}>
       {children}
     </AuthContext.Provider>
   );
