@@ -45,10 +45,17 @@ HSTS. Notes:
   panel) may name constraints. Acceptable: schema names are not secret and
   the panel is admin-only.
 
-## Operational checklist (Supabase dashboard)
+## Operational notes (Supabase dashboard)
 
-- [ ] **Auth → Settings → enable leaked-password protection** (HaveIBeenPwned)
-- [ ] **Auth → Users → delete `guest@up.edu.ph`** (retired in Phase 2 —
-      anonymous browsing replaced it; its password is in old git history)
-- [ ] Keep **Authentication → URL Configuration → Redirect URLs** in sync
-      with the deployed domain (email-confirmation links depend on it)
+- **Leaked-password protection (HaveIBeenPwned)** is a Supabase Pro feature
+  and is not enabled on the current free plan. The 6-character minimum is
+  enforced client- and server-side. Enable the HIBP check if the project
+  ever moves to Pro.
+- **`guest@up.edu.ph` is intentionally kept** as a historical artifact of the
+  pre-anonymous-browsing guest mode. Nothing in the app references it, and
+  RLS makes a `guest`-role session inert: it cannot write reviews, replies,
+  or votes, and cannot edit its own profile. Its old password being public
+  is therefore harmless — a hijacker gains nothing the `anon` role doesn't
+  already have.
+- Keep **Authentication → URL Configuration → Redirect URLs** in sync with
+  the deployed domain (email-confirmation links depend on it).
