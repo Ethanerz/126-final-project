@@ -21,13 +21,20 @@ const formatDate = (value) =>
     day: 'numeric',
   })
 
+// Postgres rejects a malformed uuid with 22P02 — for the UI that is simply
+// "no such record", not a retryable failure.
+const isBadIdError = (err) => err?.code === '22P02'
+
 async function fetchReviewWithReplies(reviewId) {
   const { data: review, error } = await supabase
     .from('reviews')
     .select('*, user_profiles(full_name)')
     .eq('id', reviewId)
     .maybeSingle()
-  if (error) throw error
+  if (error) {
+    if (isBadIdError(error)) return null
+    throw error
+  }
   if (!review) return null
 
   const { data: replies, error: repliesError } = await supabase

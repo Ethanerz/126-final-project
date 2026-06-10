@@ -113,13 +113,20 @@ function ReviewForm({ initial, onSubmit, onCancel, error, busy }) {
   )
 }
 
+// Postgres rejects a malformed uuid with 22P02 — for the UI that is simply
+// "no such record", not a retryable failure.
+const isBadIdError = (err) => err?.code === '22P02'
+
 async function fetchEntityWithReviews(entityId) {
   const { data: entity, error: entityError } = await supabase
     .from('entities')
     .select('*')
     .eq('id', entityId)
     .maybeSingle()
-  if (entityError) throw entityError
+  if (entityError) {
+    if (isBadIdError(entityError)) return null
+    throw entityError
+  }
   if (!entity) return null
 
   const { data: reviews, error: reviewsError } = await supabase

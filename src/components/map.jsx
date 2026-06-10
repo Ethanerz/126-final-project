@@ -22,9 +22,11 @@ const Map = ({ onEntitiesLoaded, onError, externalMapRef, markersRef }) => {
   useEffect(() => {
     if (mapRef.current) return;
 
+    // No explicit style: the SDK default (Streets) applies. Passing
+    // MapStyle.STREETS triggers a deprecation + invalid-style fallback and an
+    // internal projection-migration TypeError in the current SDK.
     const map = new maptilersdk.Map({
       container: mapContainer.current,
-      style: maptilersdk.MapStyle.STREETS,
       center: [UPV_CENTER.lng, UPV_CENTER.lat],
       zoom: DEFAULT_ZOOM,
     });

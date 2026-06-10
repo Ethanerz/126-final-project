@@ -13,9 +13,9 @@ export default function EntityMiniMap({ lat, lng, zoom = 16 }) {
   useEffect(() => {
     if (mapRef.current || lat == null || lng == null) return
 
+    // No explicit style: the SDK default (Streets) applies — see map.jsx.
     mapRef.current = new maptilersdk.Map({
       container: containerRef.current,
-      style: maptilersdk.MapStyle.STREETS,
       center: [lng, lat],
       zoom,
       scrollZoom: false,

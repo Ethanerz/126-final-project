@@ -235,6 +235,7 @@
   font-weight: 700;
   font-size: var(--rupv-fs-body);
   color: var(--rupv-cream);
+  white-space: nowrap;
 }
 .rupv-header-tagline {
   font-family: var(--rupv-font-micro);
@@ -391,6 +392,13 @@
   .rupv-header-link span { display: none; }
   .rupv-header-name { font-size: var(--rupv-fs-body-sm); }
   .rupv-header-nav .rupv-btn--sm { padding: 8px 12px; font-size: var(--rupv-fs-caption); }
+}
+@media (max-width: 360px) {
+  /* 320-class devices: logo-only brand keeps everything on one row. */
+  .rupv-header { gap: var(--rupv-s-2); }
+  .rupv-header-wordmark { display: none; }
+  .rupv-header-links { margin-left: 0; }
+  .rupv-header-role { display: none; }
 }
 
 /* ── Filter bar (shared by Browse + Map) ────────────────────────── */
