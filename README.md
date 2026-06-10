@@ -8,7 +8,7 @@
 
 Think *Rate My Professors*, but for the places and services around campus — browse, review, reply, and vote on what's helpful.
 
-[Live site](https://126-final-project-orpin.vercel.app/) · [Report an issue](../../issues)
+[Live site](https://rateupv.vercel.app/) · [Report an issue](../../issues)
 
 </div>
 
