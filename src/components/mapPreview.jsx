@@ -1,24 +1,38 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Map from './map.jsx';
+import ErrorState from './ui/ErrorState';
 import Icon from './ui/Icon';
 import RatingBadge from './ui/RatingBadge';
 import EntityFilters from './ui/EntityFilters';
 import { useEntityFilters } from '../hooks/useEntityFilters';
+import { usePageTitle } from '../hooks/usePageTitle';
 import '../styles/map.css';
 
 const MapPreview = () => {
   const navigate = useNavigate();
   const [entities, setEntities] = useState([]);
   const [loaded, setLoaded] = useState(false);
+  const [loadError, setLoadError] = useState(false);
   const [listOpen, setListOpen] = useState(true);
-  const mapRefExternal = useRef(null);
+  // Bumping this key remounts the Map (fresh fetch + markers) on retry.
+  const [mapKey, setMapKey] = useState(0);
+  const externalMapRef = useRef(null);
   const markersRef = useRef({});
+
+  usePageTitle('Campus map');
 
   const { filtered, filterProps } = useEntityFilters(entities);
 
+  const retry = () => {
+    setEntities([]);
+    setLoaded(false);
+    setLoadError(false);
+    setMapKey((k) => k + 1);
+  };
+
   const flyToMarker = (entity) => {
-    const map = mapRefExternal.current;
+    const map = externalMapRef.current;
     if (!map) return;
 
     // Fly to the marker
@@ -52,12 +66,14 @@ const MapPreview = () => {
       {/* Map fills the page; the list floats over it. */}
       <div className="map-area">
         <Map
+          key={mapKey}
           onEntitiesLoaded={(data) => { setEntities(data); setLoaded(true); }}
-          mapRefExternal={mapRefExternal}
+          onError={() => setLoadError(true)}
+          externalMapRef={externalMapRef}
           markersRef={markersRef}
         />
         <div
-          className={`map-skeleton rupv-skeleton ${loaded ? 'map-skeleton--done' : ''}`}
+          className={`map-skeleton rupv-skeleton ${loaded || loadError ? 'map-skeleton--done' : ''}`}
           aria-hidden="true"
         />
       </div>
@@ -85,7 +101,14 @@ const MapPreview = () => {
         </div>
 
         <div className="sidebar-content-info rupv-stagger">
-          {!loaded ? (
+          {loadError ? (
+            <ErrorState
+              compact
+              title="Couldn't load places"
+              message="The map data didn't come through. Check your connection and try again."
+              onRetry={retry}
+            />
+          ) : !loaded ? (
             Array.from({ length: 5 }).map((_, i) => (
               <div
                 key={i}
@@ -117,10 +140,15 @@ const MapPreview = () => {
                 ? entity.reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
                 : 0;
               return (
-                <div key={entity.id} className="sidebar-entity-card" style={{ '--i': Math.min(i, 8) }} onClick={() => flyToMarker(entity)}>
+                <div
+                  key={entity.id}
+                  className="sidebar-entity-card"
+                  style={{ '--i': Math.min(i, 8) }}
+                  onClick={() => flyToMarker(entity)}
+                >
                   <div className="sidebar-entity-image">
                     {entity.image_link ? (
-                      <img src={entity.image_link} alt={entity.name} />
+                      <img src={entity.image_link} alt="" loading="lazy" decoding="async" />
                     ) : (
                       <div className="sidebar-image-placeholder">
                         <Icon name="building" size={32} stroke="var(--rupv-slate-soft)" />
@@ -134,7 +162,15 @@ const MapPreview = () => {
                       size="sm"
                     />
                     <div className="sidebar-entity-headings">
-                      <strong className="sidebar-entity-name">{entity.name}</strong>
+                      {/* A real button, so keyboard users can fly to the pin too. */}
+                      <button
+                        type="button"
+                        className="sidebar-entity-name"
+                        onClick={(e) => { e.stopPropagation(); flyToMarker(entity); }}
+                        aria-label={`Show ${entity.name} on the map`}
+                      >
+                        {entity.name}
+                      </button>
                       <span className="sidebar-entity-meta">
                         {reviewCount === 0
                           ? 'No reviews yet'

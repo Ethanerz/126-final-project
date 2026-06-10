@@ -1,12 +1,15 @@
 /* ─── Ratings.css — Entity detail + Replies ─────────────────────── */
 
-.rupv-detail-status {
-  font-family: var(--rupv-font-body);
-  font-size: var(--rupv-fs-body);
-  color: var(--rupv-fg-3);
-  padding: var(--rupv-s-8) 0;
+/* Deleted/missing resource — distinct from a fetch error (no retry). */
+.rupv-detail-gone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--rupv-s-3);
   text-align: center;
+  padding: var(--rupv-s-9) var(--rupv-s-5);
 }
+.rupv-detail-gone .rupv-body-sm { max-width: 40ch; }
 
 /* ── Back link ──────────────────────────────────────────────────── */
 .rupv-detail-back {
@@ -257,6 +260,13 @@
 .rupv-review-ownbtn:hover { background: var(--rupv-ink); color: var(--rupv-cream); }
 .rupv-review-ownbtn--danger { border-color: var(--rupv-maroon); color: var(--rupv-maroon); }
 .rupv-review-ownbtn--danger:hover { background: var(--rupv-maroon); border-color: var(--rupv-maroon); color: var(--rupv-cream); }
+/* Armed two-step delete — filled so the state change is unmistakable. */
+.rupv-review-ownbtn--danger.is-arming {
+  background: var(--rupv-maroon);
+  border-color: var(--rupv-maroon);
+  color: var(--rupv-cream);
+}
+.rupv-review-ownbtn:disabled { opacity: 0.55; cursor: not-allowed; }
 
 /* ── Vote stack ─────────────────────────────────────────────────── */
 .rupv-votes {

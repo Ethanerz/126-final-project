@@ -1,8 +1,13 @@
-import React, { useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import * as maptilersdk from '@maptiler/sdk';
 import "@maptiler/sdk/dist/maptiler-sdk.css";
 import '../styles/map.css';
 import { supabase } from '../supabaseClient';
+
+maptilersdk.config.apiKey = import.meta.env.VITE_MAPTILER_API_KEY;
+
+const UPV_CENTER = { lng: 122.230924083072, lat: 10.6419865561452 };
+const DEFAULT_ZOOM = 14;
 
 // Popups are injected as raw HTML, so escape any entity-supplied text.
 const escapeHtml = (str) =>
@@ -10,38 +15,40 @@ const escapeHtml = (str) =>
     { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
   ));
 
-const Map = ({ onEntitiesLoaded, mapRefExternal, markersRef }) => {
+const Map = ({ onEntitiesLoaded, onError, externalMapRef, markersRef }) => {
   const mapContainer = useRef(null);
   const mapRef = useRef(null);
-  const upv = { lng: 122.230924083072, lat: 10.6419865561452 };
-  const zoom = 14;
-
-  maptilersdk.config.apiKey = import.meta.env.VITE_MAPTILER_API_KEY;
 
   useEffect(() => {
     if (mapRef.current) return;
 
-    mapRef.current = new maptilersdk.Map({
+    const map = new maptilersdk.Map({
       container: mapContainer.current,
       style: maptilersdk.MapStyle.STREETS,
-      center: [upv.lng, upv.lat],
-      zoom: zoom,
+      center: [UPV_CENTER.lng, UPV_CENTER.lat],
+      zoom: DEFAULT_ZOOM,
     });
+    mapRef.current = map;
 
     // Share map instance with parent
-    if (mapRefExternal) mapRefExternal.current = mapRef.current;
+    if (externalMapRef) externalMapRef.current = map;
+
+    let cancelled = false;
 
     const addMarkers = async () => {
       const { data: entities, error } = await supabase
         .from('entities')
         .select('id, name, entity_type, description, image_link, latitude, longitude, reviews(rating)');
 
+      if (cancelled) return;
+
       if (error) {
         console.error('Error fetching entities:', error.message);
+        onError?.(error);
         return;
       }
 
-      if (onEntitiesLoaded) onEntitiesLoaded(entities);
+      onEntitiesLoaded?.(entities);
 
       entities.forEach((entity) => {
         const { id, name, latitude, longitude, reviews } = entity;
@@ -72,11 +79,11 @@ const Map = ({ onEntitiesLoaded, mapRefExternal, markersRef }) => {
         const marker = new maptilersdk.Marker({ color: '#A31F33' })
           .setLngLat([longitude, latitude])
           .setPopup(popup)
-          .addTo(mapRef.current);
+          .addTo(map);
 
         marker.getElement().style.cursor = 'pointer';
 
-        // Store marker by entity id so parent can access it
+        // Store marker by entity id so the parent can access it
         if (markersRef) markersRef.current[id] = marker;
       });
     };
@@ -86,6 +93,18 @@ const Map = ({ onEntitiesLoaded, mapRefExternal, markersRef }) => {
     // positioned overlays that tolerate a still-loading map, so add them
     // directly instead of gating on 'load' (same approach as EntityMiniMap).
     addMarkers();
+
+    // Tear the map down on unmount — without this, navigating to and from the
+    // map page accumulates WebGL contexts until the browser starts dropping them.
+    return () => {
+      cancelled = true;
+      map.remove();
+      mapRef.current = null;
+      if (externalMapRef) externalMapRef.current = null;
+      if (markersRef) markersRef.current = {};
+    };
+    // Mount-once map instance; the refs and callbacks are stable for its lifetime.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

@@ -28,7 +28,6 @@ export default function EntityMiniMap({ lat, lng, zoom = 16 }) {
       mapRef.current?.remove()
       mapRef.current = null
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lat, lng, zoom])
 
   return <div ref={containerRef} className="rupv-detail-map-canvas" />

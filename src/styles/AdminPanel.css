@@ -199,6 +199,9 @@
   grid-template-columns: 1fr 1fr;
   gap: var(--rupv-s-3);
 }
+@media (max-width: 420px) {
+  .ap-row { grid-template-columns: 1fr; }
+}
 
 /* ── Radio group (Facility / Service) ───────────────────────────── */
 

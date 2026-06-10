@@ -4,79 +4,89 @@ import { supabase } from '../supabaseClient'
 import { UserAuth } from '../context/AuthContext'
 import AdminPanel from './AdminPanel'
 import Button from './ui/Button'
+import ErrorState from './ui/ErrorState'
 import Icon from './ui/Icon'
 import Pill from './ui/Pill'
 import RatingBadge from './ui/RatingBadge'
 import EntityFilters from './ui/EntityFilters'
 import { useEntityFilters } from '../hooks/useEntityFilters'
+import { usePageTitle } from '../hooks/usePageTitle'
 import '../styles/Dashboard.css'
 
+// One request: entities with their review ratings embedded (no N+1).
+async function fetchEntitiesWithRatings() {
+  const { data, error } = await supabase
+    .from('entities')
+    .select('*, reviews(rating)')
+    .order('name')
+  if (error) throw error
+  return (data ?? []).map(({ reviews, ...entity }) => {
+    const reviewCount = reviews?.length ?? 0
+    const avgRating = reviewCount > 0
+      ? Number((reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount).toFixed(1))
+      : 0
+    return { ...entity, avgRating, reviewCount }
+  })
+}
+
 const Dashboard = () => {
-  const [entities, setEntities] = useState([])
-  const [loading, setLoading] = useState(true)
+  // null = not loaded yet (skeleton); [] = loaded, empty.
+  const [entities, setEntities] = useState(null)
+  const [error, setError] = useState(null)
   const [pendingEdit, setPendingEdit] = useState(null)
   const [pendingDelete, setPendingDelete] = useState(null)
-  const { session, userRole, signInAsGuest } = UserAuth()
+  const { userRole } = UserAuth()
+
+  usePageTitle('Browse campus')
 
   const isAdmin = userRole === 'admin'
 
-  async function fetchEntitiesWithRatings() {
-    const { data: entitiesData, error: entitiesError } = await supabase
-      .from('entities')
-      .select('*')
-      .order('name')
-
-    if (entitiesError) {
-      console.error('Error fetching entities:', entitiesError)
-      setLoading(false)
-      return
-    }
-
-    const entitiesWithRatings = await Promise.all(
-      entitiesData.map(async (entity) => {
-        const { data: reviews, error: reviewsError } = await supabase
-          .from('reviews')
-          .select('rating')
-          .eq('entity_id', entity.id)
-
-        if (reviewsError) return { ...entity, avgRating: 0, reviewCount: 0 }
-
-        const reviewCount = reviews.length
-        const avgRating = reviewCount > 0
-          ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
-          : 0
-
-        return { ...entity, avgRating: Number(avgRating.toFixed(1)), reviewCount }
+  // Public data — fetched immediately, signed in or not (anon RLS read).
+  useEffect(() => {
+    let cancelled = false
+    fetchEntitiesWithRatings()
+      .then((list) => { if (!cancelled) setEntities(list) })
+      .catch((err) => {
+        console.error('Error fetching entities:', err)
+        if (!cancelled) setError(err)
       })
-    )
+    return () => { cancelled = true }
+  }, [])
 
-    setEntities(entitiesWithRatings)
-    setLoading(false)
+  const retry = () => {
+    setError(null)
+    setEntities(null)
+    fetchEntitiesWithRatings()
+      .then(setEntities)
+      .catch((err) => {
+        console.error('Error fetching entities:', err)
+        setError(err)
+      })
   }
 
-  // A logged-out visitor browses as the shared read-only guest account.
-  useEffect(() => {
-    if (session === null) signInAsGuest()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session])
+  // Silent refresh after admin add/edit/delete — keeps current data visible.
+  const refresh = () => {
+    fetchEntitiesWithRatings()
+      .then(setEntities)
+      .catch((err) => console.error('Error refreshing entities:', err))
+  }
 
-  useEffect(() => {
-    if (session) fetchEntitiesWithRatings()
-  }, [session])
+  const loading = entities === null && !error
 
-  const { filtered, filterProps } = useEntityFilters(entities)
+  const { filtered, filterProps } = useEntityFilters(entities ?? [])
 
   const stats = useMemo(() => {
-    const places = entities.length
-    const totalReviews = entities.reduce((sum, e) => sum + (e.reviewCount || 0), 0)
-    const rated = entities.filter((e) => e.reviewCount > 0)
+    const list = entities ?? []
+    const places = list.length
+    const totalReviews = list.reduce((sum, e) => sum + (e.reviewCount || 0), 0)
+    const rated = list.filter((e) => e.reviewCount > 0)
     const avg = rated.length
       ? rated.reduce((sum, e) => sum + e.avgRating, 0) / rated.length
       : 0
     return { places, totalReviews, avg }
   }, [entities])
 
-  if (session === undefined || loading) {
+  if (loading) {
     return (
       <div className="rupv-container rupv-browse" aria-busy="true">
         {/* Hero band — mirrors the real hero so content loads in place */}
@@ -127,11 +137,23 @@ const Dashboard = () => {
     )
   }
 
+  if (error) {
+    return (
+      <div className="rupv-container rupv-browse">
+        <ErrorState
+          title="Couldn't load campus places"
+          message="The list didn't come through. Check your connection and try again."
+          onRetry={retry}
+        />
+      </div>
+    )
+  }
+
   return (
     <div className="rupv-container rupv-browse">
       {isAdmin && (
         <AdminPanel
-          onEntityChange={fetchEntitiesWithRatings}
+          onEntityChange={refresh}
           pendingEdit={pendingEdit}
           pendingDelete={pendingDelete}
           onConsumed={() => { setPendingEdit(null); setPendingDelete(null) }}
@@ -177,7 +199,7 @@ const Dashboard = () => {
           <Icon name="building" size={40} stroke="var(--rupv-fg-3)" />
           <p className="rupv-h4">Nothing here yet</p>
           <p className="rupv-body-sm">
-            {entities.length === 0
+            {(entities ?? []).length === 0
               ? 'No facilities or services have been added yet.'
               : 'No results match your search. Try a different term or filter.'}
           </p>
@@ -210,7 +232,7 @@ const Dashboard = () => {
               <Link className="rupv-fcard-link" to={`/rating/${entity.id}`}>
                 <div className="rupv-fcard-media">
                   {entity.image_link ? (
-                    <img src={entity.image_link} alt="" loading="lazy" />
+                    <img src={entity.image_link} alt="" loading="lazy" decoding="async" />
                   ) : (
                     <div className="rupv-fcard-media-empty" aria-hidden="true">
                       <Icon name="building" size={36} stroke="var(--rupv-slate-soft)" />

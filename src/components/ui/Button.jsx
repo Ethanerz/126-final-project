@@ -47,7 +47,13 @@ export default function Button({
     )
   }
   return (
-    <button type={type} className={cls} {...rest} disabled={loading || rest.disabled}>
+    <button
+      type={type}
+      className={cls}
+      {...rest}
+      disabled={loading || rest.disabled}
+      aria-busy={loading || undefined}
+    >
       {content}
     </button>
   )

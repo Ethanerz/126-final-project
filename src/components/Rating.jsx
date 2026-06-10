@@ -1,15 +1,22 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { UserAuth } from '../context/AuthContext'
 import Avatar from './ui/Avatar'
 import Button from './ui/Button'
-import EntityMiniMap from './ui/EntityMiniMap'
+import ErrorState from './ui/ErrorState'
 import Icon from './ui/Icon'
 import Pill from './ui/Pill'
 import RatingBadge from './ui/RatingBadge'
 import VoteStack from './ui/VoteStack'
+import { usePageTitle } from '../hooks/usePageTitle'
 import '../styles/Ratings.css'
+
+// MapTiler SDK is heavy — only load it when an entity actually has coordinates.
+const EntityMiniMap = lazy(() => import('./ui/EntityMiniMap'))
+
+const TITLE_MAX = 120
+const REVIEW_MAX = 2000
 
 const formatDate = (value) =>
   new Date(value).toLocaleDateString(undefined, {
@@ -23,20 +30,30 @@ function ReviewForm({ initial, onSubmit, onCancel, error, busy }) {
   const [rating, setRating] = useState(initial?.rating || 0)
   const [title, setTitle] = useState(initial?.title || '')
   const [text, setText] = useState(initial?.review_text || '')
+  const [localError, setLocalError] = useState(null)
 
   const submit = (e) => {
     e.preventDefault()
     if (!rating) return
-    onSubmit({ rating, title, review: text })
+    const cleanTitle = title.trim()
+    const cleanText = text.trim()
+    if (!cleanTitle || !cleanText) {
+      setLocalError('Your title and review can\'t be just spaces.')
+      return
+    }
+    setLocalError(null)
+    onSubmit({ rating, title: cleanTitle, review: cleanText })
   }
+
+  const shownError = localError || error
 
   return (
     <form className="rupv-rform" onSubmit={submit}>
       <h3 className="rupv-h4">{initial ? 'Edit your review' : 'Write a review'}</h3>
 
       <div className="rupv-field">
-        <span className="rupv-field-label">Your rating</span>
-        <div className="rupv-rate-row" role="radiogroup" aria-label="Your rating">
+        <span className="rupv-field-label" id="rate-label">Your rating</span>
+        <div className="rupv-rate-row" role="radiogroup" aria-labelledby="rate-label">
           {[1, 2, 3, 4, 5].map((n) => (
             <button
               key={n}
@@ -58,9 +75,11 @@ function ReviewForm({ initial, onSubmit, onCancel, error, busy }) {
         <input
           type="text"
           required
+          maxLength={TITLE_MAX}
           placeholder="Summarize your experience"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          aria-invalid={localError && !title.trim() ? 'true' : undefined}
         />
       </label>
 
@@ -69,16 +88,18 @@ function ReviewForm({ initial, onSubmit, onCancel, error, busy }) {
         <textarea
           rows="4"
           required
+          maxLength={REVIEW_MAX}
           placeholder="Share the details — what was good, what could be better?"
           value={text}
           onChange={(e) => setText(e.target.value)}
+          aria-invalid={localError && !text.trim() ? 'true' : undefined}
         />
       </label>
 
-      {error && <p className="rupv-alert rupv-alert--error" role="alert">{error}</p>}
+      {shownError && <p className="rupv-alert rupv-alert--error" role="alert">{shownError}</p>}
 
       <div className="rupv-rform-actions">
-        <Button type="submit" variant="primary" size="md" loading={busy} disabled={!rating}>
+        <Button type="submit" variant="primary" size="md" loading={busy} disabled={!rating || busy}>
           {initial ? 'Save changes' : 'Submit review'}
         </Button>
         {onCancel && (
@@ -91,98 +112,126 @@ function ReviewForm({ initial, onSubmit, onCancel, error, busy }) {
   )
 }
 
+async function fetchEntityWithReviews(entityId) {
+  const { data: entity, error: entityError } = await supabase
+    .from('entities')
+    .select('*')
+    .eq('id', entityId)
+    .maybeSingle()
+  if (entityError) throw entityError
+  if (!entity) return null
+
+  const { data: reviews, error: reviewsError } = await supabase
+    .from('reviews')
+    .select('*, user_profiles(full_name)')
+    .eq('entity_id', entityId)
+    .order('created_at', { ascending: false })
+  if (reviewsError) throw reviewsError
+
+  const sortedReviews = (reviews ?? []).sort(
+    (a, b) => b.upvote_count - b.downvote_count - (a.upvote_count - a.downvote_count)
+  )
+  return { ...entity, reviews: sortedReviews }
+}
+
 const Rating = () => {
-  const [currentEntity, setCurrentEntity] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const { entityId } = useParams()
+  // page.key tracks which entity the current data belongs to, so loading is
+  // derived (key mismatch) instead of toggled synchronously in effects.
+  const [page, setPage] = useState({ key: null, entity: null, status: 'idle' })
   const [userVotes, setUserVotes] = useState({})
-  const [userReview, setUserReview] = useState(null)
   const [isEditing, setIsEditing] = useState(false)
   const [reviewError, setReviewError] = useState(null)
   const [busy, setBusy] = useState(false)
-  const { session, isGuest, openAuth } = UserAuth()
-  const { entityId } = useParams()
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const { session, isVisitor, canWrite, openAuth } = UserAuth()
   const formRef = useRef(null)
+  const confirmTimer = useRef(null)
 
+  const loading = page.key !== entityId
+  const currentEntity = loading ? null : page.entity
+  const notFound = !loading && page.status === 'notfound'
+  const fetchFailed = !loading && page.status === 'error'
+
+  usePageTitle(currentEntity?.name)
+
+  // Public data — load for everyone, signed in or not.
   useEffect(() => {
-    if (session && entityId) fetchSingleEntityWithRatings()
-    else setLoading(false)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session, entityId])
+    if (!entityId) return
+    let cancelled = false
+    fetchEntityWithReviews(entityId)
+      .then((entity) => {
+        if (cancelled) return
+        setPage({ key: entityId, entity, status: entity ? 'ready' : 'notfound' })
+      })
+      .catch((err) => {
+        console.error('Error fetching entity:', err)
+        if (!cancelled) setPage({ key: entityId, entity: null, status: 'error' })
+      })
+    return () => { cancelled = true }
+  }, [entityId])
+
+  const retry = () => {
+    setPage({ key: null, entity: null, status: 'idle' })
+    fetchEntityWithReviews(entityId)
+      .then((entity) => setPage({ key: entityId, entity, status: entity ? 'ready' : 'notfound' }))
+      .catch((err) => {
+        console.error('Error fetching entity:', err)
+        setPage({ key: entityId, entity: null, status: 'error' })
+      })
+  }
+
+  // Refresh data in place (after review submit/edit/delete) — no skeleton,
+  // because page.key still matches.
+  const refresh = async () => {
+    try {
+      const entity = await fetchEntityWithReviews(entityId)
+      setPage({ key: entityId, entity, status: entity ? 'ready' : 'notfound' })
+    } catch (err) {
+      console.error('Error refreshing entity:', err)
+    }
+  }
 
   // Reload the user's votes only when the *set* of reviews changes (initial
   // load, a new/removed review) — not when vote counts change — so optimistic
   // vote updates don't get clobbered by a stale refetch.
-  const reviewIdsKey = (currentEntity?.reviews ?? []).map((r) => r.id).join(',')
+  const reviews = useMemo(() => currentEntity?.reviews ?? [], [currentEntity])
+  const reviewIdsKey = reviews.map((r) => r.id).join(',')
   useEffect(() => {
-    if (session && currentEntity?.reviews?.length > 0) loadUserVotes()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (!session || reviewIdsKey === '') return
+    let cancelled = false
+    const load = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('votes')
+          .select('target_id, vote_type')
+          .eq('user_id', session.user.id)
+          .eq('target_type', 'review')
+          .in('target_id', reviewIdsKey.split(','))
+        if (error) throw error
+        if (cancelled) return
+        const votesMap = {}
+        for (const vote of data) votesMap[vote.target_id] = vote.vote_type
+        setUserVotes(votesMap)
+      } catch (err) {
+        console.error('Error loading user votes:', err)
+      }
+    }
+    load()
+    return () => { cancelled = true }
   }, [reviewIdsKey, session])
 
-  useEffect(() => {
-    if (session && currentEntity?.reviews) {
-      const existing = currentEntity.reviews.find((r) => r.user_id === session.user.id)
-      setUserReview(existing || null)
-    }
-  }, [currentEntity?.reviews, session])
+  // The signed-in user's own review — derived, not copied into state.
+  const userReview = useMemo(
+    () => (session ? reviews.find((r) => r.user_id === session.user.id) ?? null : null),
+    [reviews, session]
+  )
 
-  // `silent` refreshes (after a vote / review change) update the data without
-  // flipping on the full-page loading skeleton — otherwise every vote looks
-  // like a page refresh. Only the initial load shows the skeleton.
-  async function fetchSingleEntityWithRatings({ silent = false } = {}) {
-    try {
-      if (!silent) setLoading(true)
-
-      const { data: entity, error: entityError } = await supabase
-        .from('entities')
-        .select('*')
-        .eq('id', entityId)
-        .single()
-
-      if (entityError) throw entityError
-
-      const { data: reviews, error: reviewsError } = await supabase
-        .from('reviews')
-        .select('*, user_profiles(full_name)')
-        .eq('entity_id', entityId)
-        .order('created_at', { ascending: false })
-
-      if (reviewsError) throw reviewsError
-
-      const sortedReviews =
-        reviews?.sort(
-          (a, b) =>
-            b.upvote_count - b.downvote_count - (a.upvote_count - a.downvote_count)
-        ) || []
-
-      setCurrentEntity({ ...entity, reviews: sortedReviews })
-    } catch (error) {
-      console.error('Error fetching entity:', error)
-    } finally {
-      if (!silent) setLoading(false)
-    }
-  }
-
-  async function loadUserVotes() {
-    try {
-      const reviewIds = currentEntity.reviews.map((r) => r.id)
-      const { data, error } = await supabase
-        .from('votes')
-        .select('target_id, vote_type')
-        .eq('user_id', session.user.id)
-        .eq('target_type', 'review')
-        .in('target_id', reviewIds)
-
-      if (error) throw error
-
-      const votesMap = {}
-      for (const vote of data) votesMap[vote.target_id] = vote.vote_type
-      setUserVotes(votesMap)
-    } catch (error) {
-      console.error('Error loading user votes:', error)
-    }
-  }
+  // Clear any pending delete-confirm timer on unmount.
+  useEffect(() => () => clearTimeout(confirmTimer.current), [])
 
   async function handleVote(reviewId, voteType) {
+    if (!canWrite) return
     const existingVote = userVotes[reviewId]
 
     // Figure out the new vote and how the counts shift, then apply it to the UI
@@ -205,7 +254,7 @@ const Rating = () => {
 
     // Snapshots for rollback if the write fails.
     const prevVotes = userVotes
-    const prevEntity = currentEntity
+    const prevPage = page
 
     setUserVotes((prev) => {
       const next = { ...prev }
@@ -213,19 +262,22 @@ const Rating = () => {
       else delete next[reviewId]
       return next
     })
-    setCurrentEntity((prev) =>
-      prev
+    setPage((prev) =>
+      prev.entity
         ? {
             ...prev,
-            reviews: prev.reviews.map((r) =>
-              r.id === reviewId
-                ? {
-                    ...r,
-                    upvote_count: (r.upvote_count || 0) + upDelta,
-                    downvote_count: (r.downvote_count || 0) + downDelta,
-                  }
-                : r
-            ),
+            entity: {
+              ...prev.entity,
+              reviews: prev.entity.reviews.map((r) =>
+                r.id === reviewId
+                  ? {
+                      ...r,
+                      upvote_count: (r.upvote_count || 0) + upDelta,
+                      downvote_count: (r.downvote_count || 0) + downDelta,
+                    }
+                  : r
+              ),
+            },
           }
         : prev
     )
@@ -255,16 +307,15 @@ const Rating = () => {
             target_id: reviewId,
             target_type: 'review',
             vote_type: voteType,
-            created_at: new Date(),
           },
         ])
         if (error) throw error
       }
-    } catch (error) {
-      console.error('Error handling vote:', error)
+    } catch (err) {
+      console.error('Error handling vote:', err)
       // Write failed — undo the optimistic update.
       setUserVotes(prevVotes)
-      setCurrentEntity(prevEntity)
+      setPage(prevPage)
     }
   }
 
@@ -280,10 +331,6 @@ const Rating = () => {
           rating: ratingData.rating,
           title: ratingData.title,
           review_text: ratingData.review,
-          upvote_count: 0,
-          downvote_count: 0,
-          created_at: new Date(),
-          updated_at: new Date(),
         },
       ])
 
@@ -294,9 +341,9 @@ const Rating = () => {
         }
         throw error
       }
-      await fetchSingleEntityWithRatings({ silent: true })
-    } catch (error) {
-      console.error('Error submitting review:', error)
+      await refresh()
+    } catch (err) {
+      console.error('Error submitting review:', err)
       setReviewError('Something went wrong. Please try again.')
     } finally {
       setBusy(false)
@@ -322,18 +369,34 @@ const Rating = () => {
       if (error) throw error
 
       setIsEditing(false)
-      await fetchSingleEntityWithRatings({ silent: true })
-    } catch (error) {
-      console.error('Error updating review:', error)
+      await refresh()
+    } catch (err) {
+      console.error('Error updating review:', err)
       setReviewError('Something went wrong. Please try again.')
     } finally {
       setBusy(false)
     }
   }
 
+  // Two-step inline confirm (replaces window.confirm): first click arms it,
+  // second click within 4s deletes, otherwise it disarms.
+  function requestDelete() {
+    if (!confirmingDelete) {
+      setConfirmingDelete(true)
+      clearTimeout(confirmTimer.current)
+      confirmTimer.current = setTimeout(() => setConfirmingDelete(false), 4000)
+      return
+    }
+    clearTimeout(confirmTimer.current)
+    setConfirmingDelete(false)
+    deleteRating()
+  }
+
   async function deleteRating() {
-    if (!window.confirm('Delete your review? This cannot be undone.')) return
     try {
+      setBusy(true)
+      // Votes cascade-delete with the review (FK ON DELETE CASCADE); the
+      // explicit cleanup is kept for older rows and is harmless otherwise.
       const { error: votesError } = await supabase
         .from('votes')
         .delete()
@@ -348,15 +411,16 @@ const Rating = () => {
         .eq('user_id', session.user.id)
       if (error) throw error
 
-      setUserReview(null)
       setIsEditing(false)
-      await fetchSingleEntityWithRatings({ silent: true })
-    } catch (error) {
-      console.error('Error deleting review:', error)
+      await refresh()
+    } catch (err) {
+      console.error('Error deleting review:', err)
+      setReviewError('Could not delete your review. Please try again.')
+    } finally {
+      setBusy(false)
     }
   }
 
-  const reviews = currentEntity?.reviews || []
   const reviewCount = reviews.length
   const avgRating = useMemo(
     () =>
@@ -419,13 +483,32 @@ const Rating = () => {
     )
   }
 
-  if (!currentEntity) {
+  if (fetchFailed) {
     return (
       <div className="rupv-container rupv-detail">
-        <p className="rupv-detail-status">That place could not be found.</p>
-        <Button variant="ghost" size="md" to="/">
-          <Icon name="arrowLeft" size={18} /> Back to browse
-        </Button>
+        <Link className="rupv-detail-back" to="/">
+          <Icon name="arrowLeft" size={18} /> Browse
+        </Link>
+        <ErrorState
+          title="Couldn't load this place"
+          message="The page didn't come through. Check your connection and try again."
+          onRetry={retry}
+        />
+      </div>
+    )
+  }
+
+  if (notFound || !currentEntity) {
+    return (
+      <div className="rupv-container rupv-detail">
+        <div className="rupv-detail-gone">
+          <Icon name="building" size={44} stroke="var(--rupv-fg-3)" />
+          <p className="rupv-h4">That place could not be found</p>
+          <p className="rupv-body-sm">It may have been removed, or the link may be wrong.</p>
+          <Button variant="ghost" size="md" to="/">
+            <Icon name="arrowLeft" size={18} /> Back to browse
+          </Button>
+        </div>
       </div>
     )
   }
@@ -444,7 +527,7 @@ const Rating = () => {
       <section className="rupv-detail-hero">
         <div className="rupv-detail-media">
           {currentEntity.image_link ? (
-            <img src={currentEntity.image_link} alt="" />
+            <img src={currentEntity.image_link} alt={currentEntity.name} decoding="async" />
           ) : (
             <div className="rupv-detail-media-empty" aria-hidden="true">
               <Icon name="building" size={56} stroke="var(--rupv-slate-soft)" />
@@ -476,21 +559,20 @@ const Rating = () => {
             {currentEntity.address && <Pill>{currentEntity.address}</Pill>}
           </div>
 
-          {!isGuest && ((!userReview || isEditing) ? (
+          {canWrite && (
             <Button variant="slate" size="md" onClick={focusForm} style={{ '--i': 4 }}>
-              <Icon name="edit" size={18} stroke="var(--rupv-cream)" /> Write a review
+              <Icon name="edit" size={18} stroke="var(--rupv-cream)" />{' '}
+              {userReview ? 'Edit your review' : 'Write a review'}
             </Button>
-          ) : (
-            <Button variant="slate" size="md" onClick={focusForm} style={{ '--i': 4 }}>
-              <Icon name="edit" size={18} stroke="var(--rupv-cream)" /> Edit your review
-            </Button>
-          ))}
+          )}
         </div>
       </section>
 
       {hasCoords && (
         <section className="rupv-detail-map">
-          <EntityMiniMap lat={currentEntity.latitude} lng={currentEntity.longitude} zoom={zoom} />
+          <Suspense fallback={<div className="rupv-detail-map-canvas rupv-skeleton" aria-hidden="true" />}>
+            <EntityMiniMap lat={currentEntity.latitude} lng={currentEntity.longitude} zoom={zoom} />
+          </Suspense>
           <Link className="rupv-detail-map-cta" to="/mappreview">
             <Icon name="map" size={16} /> Open campus map
           </Link>
@@ -516,7 +598,7 @@ const Rating = () => {
         ) : (
           <div className="rupv-review-list rupv-stagger">
             {reviews.map((review, i) => {
-              const isOwn = review.user_id === session?.user?.id
+              const isOwn = session && review.user_id === session.user.id
               return (
                 <article key={review.id} className="rupv-review" style={{ '--i': i }}>
                   <header className="rupv-review-head">
@@ -544,7 +626,7 @@ const Rating = () => {
                       active={userVotes[review.id]}
                       onUp={() => handleVote(review.id, 'upvote')}
                       onDown={() => handleVote(review.id, 'downvote')}
-                      disabled={isGuest}
+                      disabled={!canWrite}
                     />
                     <Link
                       to={`/rating/${entityId}/${review.id}`}
@@ -553,7 +635,7 @@ const Rating = () => {
                       <Icon name="message" size={16} /> Replies
                     </Link>
 
-                    {isOwn && !isGuest && (
+                    {isOwn && (
                       <div className="rupv-review-own">
                         <button
                           type="button"
@@ -564,10 +646,13 @@ const Rating = () => {
                         </button>
                         <button
                           type="button"
-                          className="rupv-review-ownbtn rupv-review-ownbtn--danger"
-                          onClick={deleteRating}
+                          className={`rupv-review-ownbtn rupv-review-ownbtn--danger${confirmingDelete ? ' is-arming' : ''}`}
+                          onClick={requestDelete}
+                          disabled={busy}
+                          aria-live="polite"
                         >
-                          <Icon name="trash" size={15} /> Delete
+                          <Icon name="trash" size={15} />{' '}
+                          {confirmingDelete ? 'Confirm delete?' : 'Delete'}
                         </button>
                       </div>
                     )}
@@ -579,13 +664,13 @@ const Rating = () => {
         )}
 
         <div className="rupv-rform-slot" ref={formRef}>
-          {isGuest ? (
+          {isVisitor ? (
             <div className="rupv-rform rupv-rform-guest">
               <p className="rupv-h4">Want to share your experience?</p>
               <p className="rupv-body-sm">Log in with your UP account to write a review.</p>
               <Button variant="primary" size="md" onClick={() => openAuth('signin')}>Log in</Button>
             </div>
-          ) : (
+          ) : canWrite ? (
             <>
               {!userReview && (
                 <ReviewForm
@@ -597,7 +682,7 @@ const Rating = () => {
               )}
               {userReview && isEditing && (
                 <ReviewForm
-                  key="edit"
+                  key={`edit-${userReview.id}`}
                   initial={userReview}
                   onSubmit={updateRating}
                   onCancel={() => {
@@ -609,7 +694,7 @@ const Rating = () => {
                 />
               )}
             </>
-          )}
+          ) : null}
         </div>
       </section>
     </div>

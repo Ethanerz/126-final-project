@@ -244,6 +244,42 @@
   margin-top: 3px;
 }
 
+/* Primary nav links (Browse / Map) — active page gets the filled pill. */
+.rupv-header-links {
+  display: flex;
+  align-items: center;
+  gap: var(--rupv-s-1);
+  margin-right: auto;
+  margin-left: var(--rupv-s-5);
+}
+.rupv-header-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rupv-s-1);
+  padding: 7px 14px;
+  border-radius: var(--rupv-r-pill);
+  font-family: var(--rupv-font-body);
+  font-weight: 500;
+  font-size: var(--rupv-fs-sm);
+  color: var(--rupv-fg-inv-2);
+  text-decoration: none;
+  transition: background var(--rupv-dur-1) var(--rupv-ease),
+    color var(--rupv-dur-1) var(--rupv-ease);
+}
+.rupv-header-link:hover {
+  color: var(--rupv-cream);
+  background: rgba(255, 247, 240, 0.08);
+  text-decoration: none;
+}
+.rupv-header-link.active {
+  color: var(--rupv-cream);
+  background: var(--rupv-grad-maroon);
+}
+.rupv-header-link:focus-visible {
+  outline: var(--rupv-bw-2) solid var(--rupv-cream);
+  outline-offset: 2px;
+}
+
 .rupv-header-nav {
   display: flex;
   align-items: center;
@@ -319,18 +355,42 @@
   color: var(--rupv-fg-3);
   margin-top: 2px;
 }
+.rupv-footer-links {
+  display: flex;
+  align-items: center;
+  gap: var(--rupv-s-5);
+  flex-wrap: wrap;
+}
+.rupv-footer-link {
+  font-family: var(--rupv-font-body);
+  font-weight: 500;
+  font-size: var(--rupv-fs-sm);
+  color: var(--rupv-ink);
+}
+.rupv-footer-link:hover { color: var(--rupv-maroon); text-decoration: underline; }
 
 /* ── Responsive chrome ──────────────────────────────────────────── */
+@media (max-width: 760px) {
+  /* Tuck the nav labels behind icons before the header gets crowded. */
+  .rupv-header-links { margin-left: var(--rupv-s-3); gap: 2px; }
+  .rupv-header-link { padding: 8px 10px; }
+}
 @media (max-width: 640px) {
   :root { --rupv-header-h: 68px; }
   .rupv-header { padding: 0 var(--rupv-s-4); }
-  .rupv-header-logo { height: 38px; }
+  .rupv-header-logo { height: 38px; width: 38px; }
   .rupv-header-name { font-size: var(--rupv-fs-md); }
   .rupv-header-tagline { display: none; }
   .rupv-header-greeting { display: none; }
   .rupv-header-nav { gap: var(--rupv-s-2); }
   .rupv-container { padding: var(--rupv-s-5) var(--rupv-s-4); }
   .rupv-footer-inner { padding: var(--rupv-s-5) var(--rupv-s-4); }
+}
+@media (max-width: 480px) {
+  /* 320–480px: icon-only nav pills; brand wordmark shrinks. */
+  .rupv-header-link span { display: none; }
+  .rupv-header-name { font-size: var(--rupv-fs-body-sm); }
+  .rupv-header-nav .rupv-btn--sm { padding: 8px 12px; font-size: var(--rupv-fs-caption); }
 }
 
 /* ── Filter bar (shared by Browse + Map) ────────────────────────── */
@@ -518,4 +578,67 @@
 .rupv-backbtn:focus-visible {
   outline: var(--rupv-bw-2) solid var(--rupv-slate);
   outline-offset: 2px;
+}
+
+/* ── Error state — fetch failures, with retry ───────────────────── */
+.rupv-error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--rupv-s-3);
+  text-align: center;
+  padding: var(--rupv-s-8) var(--rupv-s-5);
+  background: var(--rupv-bg);
+  border: var(--rupv-bw-2) dashed var(--rupv-error);
+  border-radius: var(--rupv-r-3);
+}
+.rupv-error-state .rupv-body-sm { max-width: 42ch; }
+.rupv-error-state--compact {
+  padding: var(--rupv-s-5) var(--rupv-s-4);
+  border-radius: var(--rupv-r-2);
+}
+
+/* ── 404 page ───────────────────────────────────────────────────── */
+.rupv-notfound {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--rupv-s-3);
+  text-align: center;
+  padding-top: var(--rupv-s-9);
+  padding-bottom: var(--rupv-s-9);
+}
+.rupv-notfound-code {
+  font-family: var(--rupv-font-display);
+  font-weight: 700;
+  font-size: var(--rupv-fs-display);
+  line-height: var(--rupv-lh-tight);
+  letter-spacing: var(--rupv-tracking-display);
+  color: var(--rupv-maroon);
+  margin: 0;
+}
+.rupv-notfound .rupv-body-sm { max-width: 44ch; }
+.rupv-notfound-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--rupv-s-4);
+  margin-top: var(--rupv-s-3);
+}
+.rupv-notfound-maplink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rupv-s-1);
+  font-family: var(--rupv-font-body);
+  font-weight: 500;
+  font-size: var(--rupv-fs-sm);
+  color: var(--rupv-ink);
+}
+.rupv-notfound-maplink:hover { color: var(--rupv-maroon); }
+
+/* ── Focus visibility — baseline for links and custom controls ──── */
+a:focus-visible {
+  outline: var(--rupv-bw-2) solid var(--rupv-slate);
+  outline-offset: 2px;
+  border-radius: var(--rupv-r-1);
 }
