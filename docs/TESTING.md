@@ -1,4 +1,4 @@
-﻿# Testing
+# Testing
 
 MVP verification date: 2026-10-18. Run commands from the repository root with Node 24.
 
@@ -8,10 +8,14 @@ MVP verification date: 2026-10-18. Run commands from the repository root with No
 | Lint              | `npm run lint`      | React/Next/TypeScript rules for the active app                                                            |
 | Unit/regression   | `npm test`          | 80 checks: original 56 plus catalog, ranking, links, contribution validation and deployment configuration |
 | Isolated Postgres | `npm run test:db`   | Actual migration applied to a modeled legacy fixture; 27 authorization/integrity assertions               |
-| Browser           | `npm run test:e2e`  | 20 cases across desktop and Pixel 7 mobile profiles                                                       |
+| Browser           | `npm run test:e2e`  | 28 cases across desktop and Pixel 7 mobile profiles, including system themes and saved preferences        |
 | Production        | `npm run build`     | Next.js compilation, types and static/dynamic route generation                                            |
 
 Install Chromium once with `npx playwright install chromium`. `npm run test:all` runs the full set. Public browser tests need the real populated pilot catalog and local public Supabase configuration. They check anonymous pages, task shortcuts, filtering, empty recovery, old routes, map opt-in, external directions, sign-in draft persistence and actual viewport bounds. Screenshots are saved in ignored `test-results/` for visual review.
+
+Theme cases cover system changes, keyboard switching, persistence across pages/reloads/tabs, light overrides on dark systems, initialization before React hydration and blocked storage. The full browser suite also passes against an existing production server started with `npm run build` and `npm start`.
+
+On machines with limited memory, run checks sequentially and use `npm test -- --maxWorkers=1 --pool=threads` and `npm run test:e2e -- --workers=1`.
 
 Authenticated browser cases use an explicitly fake session and intercept every browser Supabase request. They check review write failure/retry, ownership payloads, private corrections, moderator decisions and hidden-author edits. They do not send real auth mail or publish test contributions. These tests establish the UI/request/response behavior; real authorization is checked separately in Postgres.
 

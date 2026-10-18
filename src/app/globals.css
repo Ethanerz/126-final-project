@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @font-face {
   font-family: "Agency FB";
   src: url("/fonts/AgencyFB-Bold.ttf") format("truetype");
@@ -49,6 +51,7 @@
   --radius-xl: 1rem;
 }
 :root {
+  color-scheme: light;
   --background: #fff7f0;
   --foreground: #1f141b;
   --card: #fffdfb;
@@ -58,7 +61,21 @@
   --muted: #f5eee8;
   --muted-foreground: #675a61;
   --border: #e4d8d4;
+  --selection: #efd3d2;
   --radius: 0.75rem;
+}
+.dark {
+  color-scheme: dark;
+  --background: #181217;
+  --foreground: #fff7f0;
+  --card: #261d23;
+  --primary: #ed8b9a;
+  --primary-foreground: #291018;
+  --secondary: #35252d;
+  --muted: #2b2228;
+  --muted-foreground: #c5afb9;
+  --border: #59434e;
+  --selection: #613341;
 }
 @layer base {
   * {
@@ -92,7 +109,8 @@
     cursor: pointer;
   }
   ::selection {
-    background: #efd3d2;
+    background: var(--selection);
+    color: var(--foreground);
   }
 }
 @layer components {
@@ -110,8 +128,15 @@
   }
   .paper-grid {
     background-image:
-      linear-gradient(#a31f3307 1px, transparent 1px),
-      linear-gradient(90deg, #a31f3307 1px, transparent 1px);
+      linear-gradient(
+        color-mix(in srgb, var(--primary) 4%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--primary) 4%, transparent) 1px,
+        transparent 1px
+      );
     background-size: 32px 32px;
   }
   .map-canvas {

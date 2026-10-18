@@ -39,6 +39,11 @@ export default function Privacy() {
           personal information in a draft on a shared device. Closing the tab
           clears its session draft.
         </p>
+        <p className="body-copy">
+          The display theme follows your device settings until you choose light
+          or dark mode. Your choice is saved in browser storage for future
+          visits on this browser.
+        </p>
         <h2 className="font-heading text-xl font-semibold">
           External services
         </h2>

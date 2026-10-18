@@ -11,6 +11,7 @@ RateUPV is an independent student-built guide to UP Visayas facilities and servi
 - Public search, aliases, categories, useful ordering and shareable place pages.
 - Preparation, location, contacts, hours and source/check dates, with explicit unknown states.
 - A searchable campus map loaded on demand, plus keyless Google Maps walking directions.
+- Light and dark themes follow system settings by default, with a sun/moon button that remembers a manual choice.
 - UP-email accounts, confirmed-mailbox contributions, public display names and visit month.
 - Review create/edit/delete, sign-in draft retention, discussion and honest small-sample ratings.
 - Private corrections, missing-place suggestions, content reports and account-deletion requests.
