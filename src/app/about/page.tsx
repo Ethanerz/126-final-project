@@ -110,13 +110,17 @@ export default function About() {
             channel. For urgent health or safety concerns, contact emergency
             services or campus authorities directly.
           </p>
-          <Button variant="link" className="mt-4 px-0" asChild>
+          <Button
+            variant="link"
+            className="mt-4 h-auto max-w-full justify-start whitespace-normal px-0 py-2 text-left"
+            asChild
+          >
             <a
               href="https://www.upv.edu.ph/files/upv-citizens-charter-2025.pdf"
               target="_blank"
               rel="noreferrer"
             >
-              UPV Citizen’s Charter & feedback channels{" "}
+              <span>UPV Citizen’s Charter & feedback channels</span>
               <ArrowRight data-icon="inline-end" />
             </a>
           </Button>
