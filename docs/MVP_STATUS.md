@@ -39,7 +39,7 @@ This is an **upgrade for the existing schema**, not a fresh-install baseline. Ea
 
 - Type generation and strict TypeScript check pass.
 - ESLint passes; production `next build` passes.
-- 73 Vitest checks pass, including all 56 original regression tests.
+- 80 Vitest checks pass, including all 56 original regression tests and seven deployment-configuration checks.
 - 27 isolated Postgres permission/integrity checks pass using the actual migration and a modeled legacy fixture.
 - Live transactional checks pass for public reads, private profiles, own contribution, private submissions, cross-author denial and admin visibility. All fixtures are rolled back.
 - 20 desktop/mobile browser cases cover discovery, shortcuts, empty states, responsive layouts, legacy redirects, map opt-in, drafts, write failure/retry, private corrections, moderation and hidden-author editing.

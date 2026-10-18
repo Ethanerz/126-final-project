@@ -76,6 +76,8 @@ The applied MVP migration extends the existing schema; it is not a fresh-install
 
 Vercel needs the Next.js preset, the two `NEXT_PUBLIC_*` variables, and no Vite `dist` output override. Supabase auth redirects must allow the actual deployed/local account and recovery destinations. Follow [the launch runbook](docs/LAUNCH_RUNBOOK.md); live email delivery and on-campus accuracy require real verification.
 
+Production builds stop if either public Supabase variable is missing or blank. If a deployed guide cannot load after migrating from Vite, configure the new variable names in Vercel and create a new deployment; the old `VITE_*` variables do not configure Next.js. See [deployment troubleshooting](docs/LAUNCH_RUNBOOK.md#deployed-guide-says-it-could-not-load).
+
 The current views intentionally have pilot-sized limits. Account deletion is a private request and operator procedure, not automated deletion. The MVP does not promise university endorsement, resolution of campus complaints, or a moderation SLA.
 
 ## Product viability
