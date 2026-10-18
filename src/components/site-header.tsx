@@ -46,7 +46,20 @@ export function SiteHeader() {
           aria-label="RateUPV home"
           className="col-start-1 row-start-1 flex items-center gap-2.5 justify-self-start"
         >
-          <img src="/rate-upv-logo.svg" alt="" width="37" height="37" />
+          <img
+            src="/rate-upv-logo.svg"
+            alt=""
+            width="37"
+            height="37"
+            className="dark:hidden"
+          />
+          <img
+            src="/rate-upv-logo-dark.svg"
+            alt=""
+            width="37"
+            height="37"
+            className="hidden dark:block"
+          />
           <span className="font-display text-[32px] leading-none tracking-wide">
             RATE<span className="text-primary">UPV</span>
             <span className="sr-only"> campus guide</span>

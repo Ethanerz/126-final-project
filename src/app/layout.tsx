@@ -8,7 +8,16 @@ export const metadata: Metadata = {
   title: { default: "RateUPV — Know your campus", template: "%s | RateUPV" },
   description:
     "Find UP Visayas campus places and services, prepare for your visit, and learn from firsthand student experiences.",
-  icons: { icon: "/rate-upv-logo.svg" },
+  icons: {
+    icon: [
+      { url: "/rate-upv-logo.svg", type: "image/svg+xml" },
+      {
+        url: "/rate-upv-logo-dark.svg",
+        type: "image/svg+xml",
+        media: "(prefers-color-scheme: dark)",
+      },
+    ],
+  },
 };
 export default function RootLayout({
   children,
