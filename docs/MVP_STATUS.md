@@ -40,7 +40,7 @@ This is an **upgrade for the existing schema**, not a fresh-install baseline. Ea
 
 - Type generation and strict TypeScript check pass.
 - ESLint passes; production `next build` passes.
-- 80 Vitest checks pass, including all 56 original regression tests and seven deployment-configuration checks.
+- 81 Vitest checks pass, including all 56 original regression tests, seven deployment-configuration checks and fresh-data error recovery.
 - 27 isolated Postgres permission/integrity checks pass using the actual migration and a modeled legacy fixture.
 - Live transactional checks pass for public reads, private profiles, own contribution, private submissions, cross-author denial and admin visibility. All fixtures are rolled back.
 - 28 desktop/mobile browser cases cover discovery, shortcuts, empty states, responsive layouts, legacy redirects, map opt-in, drafts, write failure/retry, private corrections, moderation, hidden-author editing and theme behavior.
@@ -56,6 +56,12 @@ Run locally with `npm ci`, configure `.env.local` from `.env.example`, then `npm
 The connected Vercel account returned no accessible RateUPV project or teams. Hosted rollout cannot be asserted through that connection. [LAUNCH_RUNBOOK.md](LAUNCH_RUNBOOK.md) describes the exact Next.js/environment/auth settings required by the existing hosting project. Pushing this feature branch does not promote it to the production branch.
 
 The pilot deliberately has small limits: 200 catalog entries, 100 replies per discussion, 100 latest moderation submissions and 20 latest personal submissions in the current views. Implement pagination before those limits become relevant. Account deletion is a private request plus a documented operator procedure, not automatic deletion. No institutional response guarantee or moderation SLA is published.
+
+Necessary engineering follow-ups that can use the current code and data:
+
+1. Add automated pull-request checks and a public deployment smoke check. The repository currently has no GitHub Actions workflow; a build succeeding does not prove that the deployed catalog can be read.
+2. Give editors a queue of entries missing sources/check dates or preparation details, ordered by completeness and oldest check date. This can flag maintenance work without inventing campus facts or claiming that an old fact is necessarily wrong.
+3. Add pagination to submission histories, the moderator inbox and discussion replies so records remain reachable beyond the current query limits as usage grows.
 
 ## Next product gate
 
