@@ -5,3 +5,9 @@ dist/
 .env.*.local
 .claude/
 .agents/
+.next/
+out/
+*.tsbuildinfo
+test-results/
+playwright-report/
+supabase/.temp/
