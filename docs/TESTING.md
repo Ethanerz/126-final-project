@@ -2,14 +2,14 @@
 
 MVP verification date: 2026-10-18. Run commands from the repository root with Node 24.
 
-| Check             | Command             | Coverage                                                                                                  |
-| ----------------- | ------------------- | --------------------------------------------------------------------------------------------------------- |
-| Types             | `npm run typecheck` | Next route type generation and strict TypeScript                                                          |
-| Lint              | `npm run lint`      | React/Next/TypeScript rules for the active app                                                            |
-| Unit/regression   | `npm test`          | 80 checks: original 56 plus catalog, ranking, links, contribution validation and deployment configuration |
-| Isolated Postgres | `npm run test:db`   | Actual migration applied to a modeled legacy fixture; 27 authorization/integrity assertions               |
-| Browser           | `npm run test:e2e`  | 28 cases across desktop and Pixel 7 mobile profiles, including system themes and saved preferences        |
-| Production        | `npm run build`     | Next.js compilation, types and static/dynamic route generation                                            |
+| Check             | Command             | Coverage                                                                                                                             |
+| ----------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Types             | `npm run typecheck` | Next route type generation and strict TypeScript                                                                                     |
+| Lint              | `npm run lint`      | React/Next/TypeScript rules for the active app                                                                                       |
+| Unit/regression   | `npm test`          | 81 checks: original 56 plus catalog, ranking, links, contribution validation, deployment configuration and fresh-data error recovery |
+| Isolated Postgres | `npm run test:db`   | Actual migration applied to a modeled legacy fixture; 27 authorization/integrity assertions                                          |
+| Browser           | `npm run test:e2e`  | 28 cases across desktop and Pixel 7 mobile profiles, including system themes and saved preferences                                   |
+| Production        | `npm run build`     | Next.js compilation, types and static/dynamic route generation                                                                       |
 
 Install Chromium once with `npx playwright install chromium`. `npm run test:all` runs the full set. Public browser tests need the real populated pilot catalog and local public Supabase configuration. They check anonymous pages, task shortcuts, filtering, empty recovery, old routes, map opt-in, external directions, sign-in draft persistence and actual viewport bounds. Screenshots are saved in ignored `test-results/` for visual review.
 
