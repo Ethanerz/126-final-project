@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { PHASE_PRODUCTION_BUILD } from "next/constants";
 
 const config: NextConfig = {
   poweredByHeader: false,
@@ -41,4 +42,20 @@ const config: NextConfig = {
     ];
   },
 };
-export default config;
+export default function nextConfig(phase: string): NextConfig {
+  if (phase === PHASE_PRODUCTION_BUILD) {
+    const missing = [
+      "NEXT_PUBLIC_SUPABASE_URL",
+      "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+    ].filter((name) => !process.env[name]?.trim());
+    if (missing.length) {
+      throw new Error(
+        `Cannot build RateUPV: missing ${missing.join(", ")}. ` +
+          "Set these variables for the intended Vercel deployment environment, then rebuild. " +
+          "Legacy VITE_* variables are not used by the Next.js app. " +
+          "See .env.example and docs/LAUNCH_RUNBOOK.md.",
+      );
+    }
+  }
+  return config;
+}

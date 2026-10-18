@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { Compass, Lightbulb, MapPinned, UserRound } from "lucide-react";
 import { useAuth } from "./auth-provider";
 import { cn } from "@/lib/utils";
+import { ThemeButton } from "./theme-button";
 
 export function SiteHeader() {
   const path = usePathname();
@@ -39,11 +40,11 @@ export function SiteHeader() {
 
   return (
     <header className="border-b bg-background">
-      <div className="page-shell flex min-h-20 flex-col gap-4 py-4 md:flex-row md:items-center md:justify-between">
+      <div className="page-shell grid min-h-20 grid-cols-[minmax(0,1fr)_auto] items-center gap-4 py-4 lg:grid-cols-[auto_minmax(0,1fr)_auto]">
         <Link
           href="/"
           aria-label="RateUPV home"
-          className="flex shrink-0 items-center gap-2.5 self-start md:self-auto"
+          className="col-start-1 row-start-1 flex items-center gap-2.5 justify-self-start"
         >
           <img src="/rate-upv-logo.svg" alt="" width="37" height="37" />
           <span className="font-display text-[32px] leading-none tracking-wide">
@@ -53,7 +54,7 @@ export function SiteHeader() {
         </Link>
         <nav
           aria-label="Main navigation"
-          className="grid grid-cols-4 gap-1 md:flex md:gap-2"
+          className="col-span-2 row-start-2 grid grid-cols-4 gap-1 lg:col-span-1 lg:col-start-2 lg:row-start-1 lg:flex lg:gap-2 lg:justify-self-end"
         >
           {navigation.map(({ href, label, shortLabel, icon: Icon, routes }) => {
             const active = routes.some(
@@ -89,6 +90,7 @@ export function SiteHeader() {
             );
           })}
         </nav>
+        <ThemeButton className="col-start-2 row-start-1 justify-self-end lg:col-start-3" />
       </div>
     </header>
   );

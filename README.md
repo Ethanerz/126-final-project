@@ -11,6 +11,7 @@ RateUPV is an independent student-built guide to UP Visayas facilities and servi
 - Public search, aliases, categories, useful ordering and shareable place pages.
 - Preparation, location, contacts, hours and source/check dates, with explicit unknown states.
 - A searchable campus map loaded on demand, plus keyless Google Maps walking directions.
+- Light and dark themes follow system settings by default, with a sun/moon button that remembers a manual choice.
 - UP-email accounts, confirmed-mailbox contributions, public display names and visit month.
 - Review create/edit/delete, sign-in draft retention, discussion and honest small-sample ratings.
 - Private corrections, missing-place suggestions, content reports and account-deletion requests.
@@ -75,6 +76,8 @@ npm run build
 The applied MVP migration extends the existing schema; it is not a fresh-install baseline. Existing 15 places, 5 reviews and 7 profiles were preserved, with original content fingerprints unchanged. Three entries have new sourced preparation notes; most catalog facts still need checking. No fabricated reviews were added.
 
 Vercel needs the Next.js preset, the two `NEXT_PUBLIC_*` variables, and no Vite `dist` output override. Supabase auth redirects must allow the actual deployed/local account and recovery destinations. Follow [the launch runbook](docs/LAUNCH_RUNBOOK.md); live email delivery and on-campus accuracy require real verification.
+
+Production builds stop if either public Supabase variable is missing or blank. If a deployed guide cannot load after migrating from Vite, configure the new variable names in Vercel and create a new deployment; the old `VITE_*` variables do not configure Next.js. See [deployment troubleshooting](docs/LAUNCH_RUNBOOK.md#deployed-guide-says-it-could-not-load).
 
 The current views intentionally have pilot-sized limits. Account deletion is a private request and operator procedure, not automated deletion. The MVP does not promise university endorsement, resolution of campus complaints, or a moderation SLA.
 
