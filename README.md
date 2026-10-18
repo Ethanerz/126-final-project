@@ -1,97 +1,86 @@
-<div align="center">
+﻿# RateUPV
 
-<img src="public/rate-upv-logo.svg" alt="Rate UPV logo" width="96" />
+**Find the right campus place. Arrive prepared. Pass on what you learned.**
 
-# Rate UPV
+RateUPV is an independent student-built guide to UP Visayas facilities and services. The MVP starts with Miagao and combines task-based discovery, sourced preparation and firsthand student experience. Its maroon/cream palette and Agency FB, Raleway and Inter fonts are retained.
 
-**Student-driven reviews of UP Visayas campus facilities and services.**
+[Product assessment](docs/PRODUCT_RESEARCH.md) · [MVP status](docs/MVP_STATUS.md) · [Launch runbook](docs/LAUNCH_RUNBOOK.md)
 
-Think *Rate My Professors*, but for the places and services around campus — browse, review, reply, and vote on what's helpful.
+## What works
 
-[Live site](https://rateupv.vercel.app/) · [Report an issue](../../issues)
+- Public search, aliases, categories, useful ordering and shareable place pages.
+- Preparation, location, contacts, hours and source/check dates, with explicit unknown states.
+- A searchable campus map loaded on demand, plus keyless Google Maps walking directions.
+- UP-email accounts, confirmed-mailbox contributions, public display names and visit month.
+- Review create/edit/delete, sign-in draft retention, discussion and honest small-sample ratings.
+- Private corrections, missing-place suggestions, content reports and account-deletion requests.
+- A moderator inbox and catalog editor with response/status, hide/restore and archive/restore.
+- Preserved accounts/content and redirects from the original rating/map/profile URLs.
 
-</div>
+UP email confirmation establishes mailbox access, not current enrollment or UPV affiliation. Reviews are independent experiences; a RateUPV report does not file a university complaint.
 
----
+## Run locally
 
-## Features
+Use Node.js 24 and npm. Connect to the existing upgraded RateUPV schema or an isolated copy of it.
 
-- 🏛️ **Browse & search** — every campus facility and service with an aggregate decimal rating, type filters, minimum-rating filter, and sorting.
-- ✍️ **Reviews, replies & votes** — students post one review per place, discuss in reply threads, and upvote/downvote reviews.
-- 🗺️ **Campus map** — an interactive MapTiler map of every entity, with a filterable floating list and fly-to markers; each place also shows a mini-map on its detail page.
-- 👀 **Anonymous browsing** — everything is readable without an account.
-- 🎓 **UP-only accounts** — registration is restricted to `@up.edu.ph` emails, enforced at the database level, with email confirmation.
-- 🛡️ **Roles** — visitors (read-only), students (review / reply / vote), and admins (manage entities).
-
-## Tech stack
-
-| Layer | Technology |
-|---|---|
-| Frontend | [React 19](https://react.dev) + [Vite 8](https://vite.dev) |
-| Routing | [React Router 7](https://reactrouter.com) |
-| Backend | [Supabase](https://supabase.com) — Postgres, Auth, Row Level Security |
-| Maps | [MapTiler SDK](https://www.maptiler.com) |
-| Styling | Hand-rolled design-token system (CSS custom properties) |
-| Hosting | [Vercel](https://vercel.com) |
-
-## Getting started
-
-### Prerequisites
-
-- Node.js 20+
-- A [Supabase](https://supabase.com) project
-- A [MapTiler](https://www.maptiler.com) API key
-
-### Setup
-
-```bash
-# 1. Install dependencies
-npm install
-
-# 2. Configure environment variables
-cp .env.example .env
-#    …then fill in the values (see below)
-
-# 3. Run the dev server
+```powershell
+npm ci
+Copy-Item .env.example .env.local
+# Fill .env.local with the public Supabase URL and publishable key.
 npm run dev
 ```
 
-### Environment variables
+Open `http://127.0.0.1:3000`. Both required variables are public configuration; database Row Level Security protects access. Never use a service-role/secret key in `NEXT_PUBLIC_*` variables.
 
-| Variable | Description |
-|---|---|
-| `VITE_SUPABASE_URL` | Your Supabase project URL (`https://<ref>.supabase.co`) |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | The project's publishable (client) API key |
-| `VITE_MAPTILER_API_KEY` | MapTiler Cloud API key |
+| Variable                               | Purpose              |
+| -------------------------------------- | -------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`             | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Public client key    |
 
-> These are client-side keys by design. Data access is protected by Postgres Row Level Security, not by key secrecy. Never put a `service_role` / secret key in this project.
+No map key is needed. The OpenStreetMap embed loads only when requested. Its public service is suitable for this small pilot without an availability guarantee; evaluate a hosted provider before wider usage.
 
-### Scripts
+## Stack and structure
 
-| Command | Purpose |
-|---|---|
-| `npm run dev` | Start the Vite dev server |
-| `npm run build` | Production build to `dist/` |
-| `npm run preview` | Preview the production build locally |
-| `npm run lint` | Run ESLint |
+Next.js App Router + TypeScript, Tailwind 4, CLI-installed shadcn/Radix components, Supabase Postgres/Auth/RLS. Inter and Raleway are locally served with their OFL licenses.
 
-## Project structure
-
-```
-src/
-├── components/        # Pages + feature components
-│   ├── layout/        #   Header, Footer, Layout shell
-│   └── ui/            #   Shared primitives (Button, Icon, Avatar, …)
-├── context/           # AuthContext (session, roles, auth modal)
-├── hooks/             # useEntityFilters (shared browse/map filtering)
-├── styles/            # Per-page CSS (all values from design tokens)
-├── index.css          # Design tokens + base styles (single source of truth)
-└── router.jsx         # Route table
+```text
+src/app/           Routes, public server rendering and global brand tokens
+src/components/    Discovery, account, review, moderation and map workflows
+src/components/ui/ Editable shadcn primitives
+src/lib/           Catalog rules, validation, generated database types and clients
+supabase/migrations/  Upgrade to the existing schema
+scripts/           Isolated/live transactional database verification
+tests/e2e/         Desktop/mobile public and intercepted-write journeys
+legacy/vite/       Original source and preserved regression tests
 ```
 
-## Database
+Public server reads use an anonymous client without session cookies. Private operations happen through the authenticated browser client and database policies. No separate API server or privileged browser key is introduced.
 
-Five tables behind Row Level Security: `user_profiles`, `entities`, `reviews`, `review_replies`, `votes`. Integrity is enforced in Postgres — `CHECK` ratings 1–5, one review per user per entity, one vote per user per review, cascading deletes, a trigger-maintained vote count, and a trigger restricting signups to `@up.edu.ph`.
+## Checks
+
+```powershell
+npx playwright install chromium  # Once per machine
+npm run typecheck
+npm run lint
+npm test
+npm run test:db
+npm run test:e2e
+npm run build
+```
+
+`npm run test:all` runs the complete set. Browser public tests require the populated pilot catalog; write tests intercept requests and never publish fixtures. See [testing notes](docs/TESTING.md) for evidence and limits.
+
+## Database and rollout
+
+The applied MVP migration extends the existing schema; it is not a fresh-install baseline. Existing 15 places, 5 reviews and 7 profiles were preserved, with original content fingerprints unchanged. Three entries have new sourced preparation notes; most catalog facts still need checking. No fabricated reviews were added.
+
+Vercel needs the Next.js preset, the two `NEXT_PUBLIC_*` variables, and no Vite `dist` output override. Supabase auth redirects must allow the actual deployed/local account and recovery destinations. Follow [the launch runbook](docs/LAUNCH_RUNBOOK.md); live email delivery and on-campus accuracy require real verification.
+
+The current views intentionally have pilot-sized limits. Account deletion is a private request and operator procedure, not automated deletion. The MVP does not promise university endorsement, resolution of campus complaints, or a moderation SLA.
+
+## Product viability
+
+Google Maps, UPV's own handbook/office resources and Room TBA are meaningful alternatives. RateUPV's proposed advantage is a focused campus preparation workflow with clear sources, uncertainty and recent experience. Validate it through real student tasks and maintain the catalog; a framework migration alone does not prove demand. The research note includes competitors, map options, cold start, proposed pilot gates and funding hypotheses.
 
 ## Team
 
@@ -102,6 +91,4 @@ CMSC 126 final project — **Team JJEM Alert**
 - Marc Raven Sian
 - Joseph Patrick Salomeo
 
----
-
-> 📜 The original course-submission README is preserved as [`README.old.md`](README.old.md).
+The original course-submission README remains in [README.old.md](README.old.md).

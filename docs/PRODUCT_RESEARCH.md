@@ -1,5 +1,7 @@
 # RateUPV product research and MVP direction
 
+Implementation update: the dependency audit subsequently flagged the existing map SDK and no local MapTiler key was configured. The MVP uses an explicit, on-demand OpenStreetMap embed with directions handoff instead. This is a small-pilot choice with provider availability limits, not a claim of free unlimited production tiles. See [MVP_STATUS.md](MVP_STATUS.md) for the implemented decisions and verification.
+
 Research date: 2026-10-18. Evidence: repository README and `docs/REFACTOR_PLAN.md`, plus the primary sources linked below. This is desk research, not student validation. No students were interviewed, production usage was not measured, and no university partnership was established.
 
 ## Product decision

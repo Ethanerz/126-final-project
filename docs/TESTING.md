@@ -1,95 +1,35 @@
-# Testing
+﻿# Testing
 
-## Automated tests
+MVP verification date: 2026-10-18. Run commands from the repository root with Node 24.
 
-```bash
-npm test          # run once
-npm run test:watch
-```
+| Check             | Command             | Coverage                                                                                    |
+| ----------------- | ------------------- | ------------------------------------------------------------------------------------------- |
+| Types             | `npm run typecheck` | Next route type generation and strict TypeScript                                            |
+| Lint              | `npm run lint`      | React/Next/TypeScript rules for the active app                                              |
+| Unit/regression   | `npm test`          | 73 checks: original 56 plus catalog, ranking, links and contribution validation             |
+| Isolated Postgres | `npm run test:db`   | Actual migration applied to a modeled legacy fixture; 27 authorization/integrity assertions |
+| Browser           | `npm run test:e2e`  | 20 cases across desktop and Pixel 7 mobile profiles                                         |
+| Production        | `npm run build`     | Next.js compilation, types and static/dynamic route generation                              |
 
-Unit tests (Vitest + React Testing Library, jsdom) cover the pure logic and
-shared primitives:
+Install Chromium once with `npx playwright install chromium`. `npm run test:all` runs the full set. Public browser tests need the real populated pilot catalog and local public Supabase configuration. They check anonymous pages, task shortcuts, filtering, empty recovery, old routes, map opt-in, external directions, sign-in draft persistence and actual viewport bounds. Screenshots are saved in ignored `test-results/` for visual review.
 
-| Area | File | What it proves |
-|---|---|---|
-| Filtering/sorting | `src/hooks/useEntityFilters.test.jsx` | 0 / 1 / 1500-item lists, both data shapes, unicode + emoji search, null name/description safety, boundary min-rating, filter stacking |
-| Vote math | `src/utils/votes.test.js` | every transition (add, toggle off, switch), deltas never exceed ±1 |
-| Validation | `src/utils/validation.test.js` | UP-email spoofing attempts, lat/lng boundaries, NaN/string input |
-| RatingBadge | `src/components/ui/RatingBadge.test.jsx` | null/zero-count fallback, decimal formatting, score classification at boundaries |
-| Avatar | `src/components/ui/Avatar.test.jsx` | initials, unicode, whitespace, missing-name fallback |
-| ErrorState | `src/components/ui/ErrorState.test.jsx` | alert role, retry callback, optional retry |
+Authenticated browser cases use an explicitly fake session and intercept every browser Supabase request. They check review write failure/retry, ownership payloads, private corrections, moderator decisions and hidden-author edits. They do not send real auth mail or publish test contributions. These tests establish the UI/request/response behavior; real authorization is checked separately in Postgres.
 
-## Database-level guarantees (verified against the live schema)
+`scripts/verify-database.mjs` uses embedded Postgres and never connects remotely. It checks public reads, private profiles, confirmed eligibility, one review per person/place, cross-author denial, counter protection, private report ownership/status, moderator visibility and author inability to unhide content. Its legacy fixture models the relevant schema and is not a substitute for the full live schema.
 
-These were verified by inspecting `pg_constraint`, `pg_policies`, and triggers
-on the production Supabase project — integrity does **not** rely on
-application code:
+`scripts/verify-live-rls.sql` was run against the connected RateUPV project. It inserts disposable auth/catalog/review fixtures inside a transaction, exercises real roles/RLS, and rolls back every fixture. It verified public reads, private profiles, own review editing, private submissions, cross-author denial and admin hide behavior. No test accounts/content remain. Never remove the rollback or treat these fixtures as seed data.
 
-| Guarantee | Mechanism |
-|---|---|
-| Rating must be 1–5 | `reviews_rating_check` CHECK constraint |
-| One review per user per place | `unique_user_entity_review` UNIQUE(user_id, entity_id) — double-submits surface as error 23505, which the UI maps to "You've already reviewed this." |
-| One vote per user per review | `votes_user_id_target_id_target_type_key` UNIQUE — double-clicking vote buttons cannot duplicate votes |
-| Vote/target types constrained | CHECK constraints (`upvote/downvote`, `review` targets only) |
-| Deleting an entity removes its reviews/votes/replies | `ON DELETE CASCADE` chain (entity → reviews → votes + replies) — intentional |
-| Deleting an auth user removes profile + votes | `ON DELETE CASCADE` on `user_profiles.id`, `votes.user_id` |
-| Only `@up.edu.ph` signups | `restrict_up_email_signups` trigger on `auth.users` (server-side; the client check is cosmetic) |
-| Vote counts stay correct | `update_vote_counts` trigger (INSERT/DELETE), clamped at ≥0 |
+The migration retained 15 places, 5 reviews and 7 profiles. Before/after hashes of original place names/descriptions and review content matched. Three existing entries received sourced preparation information through new fields.
 
-**Known limitation (documented, not a bug):** a user who has written reviews
-or replies cannot be hard-deleted — `reviews.user_id` / `review_replies.user_id`
-reference `user_profiles` with no cascade, so Postgres blocks the delete. There
-is no account-deletion feature in the app; if one is added, decide between
-cascading deletes or content anonymization first.
+The mobile navigation regression was a real layout issue: the category strip's minimum width widened an implicit grid track and corrupted mobile scroll/hit testing. Zero-minimum explicit columns fix it. Viewport assertions compare document width to the configured device viewport rather than `window.innerWidth`, which itself expanded during the bug.
 
-**Known limitation (vendor):** `@maptiler/sdk` 4.0.2 (latest stable) logs a
-non-fatal internal TypeError (`migrateProjection`) and style deprecation
-warnings during every map load, regardless of constructor options. The map
-renders and behaves correctly. Re-test and remove this note when upgrading to
-SDK 4.0.3+.
+## Limits of this evidence
 
-**Race conditions reviewed:** the vote flow is delete-then-insert; the worst
-interleaving (two tabs) hits the UNIQUE constraint, the write fails, and the
-optimistic UI rolls back. Review submission races resolve to 23505 → friendly
-message. No unguarded read-then-write paths remain.
+- No real student's password, email confirmation delivery or recovery email was used. Verify those with a real UP mailbox and authorized deployed redirect settings before public launch.
+- The browser tests validate that the OSM iframe loads on demand and has a correct selected-pin URL; they do not guarantee tile availability, map completeness, actual paths or accessible entrances.
+- No on-campus field walk, student interview, usage analytics or product-outcome experiment has been completed.
+- The migration is an upgrade to an existing project. There is no complete fresh-database baseline or Docker-based local Supabase stack in this workspace. Docker is not installed here.
+- Production dependencies audit clean. Development-only Next ESLint `braces` findings remain documented in `SECURITY.md`.
+- Moderation and deletion requests require an operating person. Status changes do not constitute actual account deletion or university issue resolution.
 
-## Manual test plan
-
-Run before releases. ✅ = behavior implemented and code-reviewed; verify it
-still holds.
-
-### Inputs
-- [ ] Review/reply with only spaces → inline "can't be just spaces" error, nothing saved ✅
-- [ ] 10k-character review → input stops at maxLength (2000); title at 120 ✅
-- [ ] Emoji + unicode in review text and profile name → stored and rendered verbatim (React escapes; map popups escape HTML explicitly) ✅
-- [ ] `<script>alert(1)</script>` as review title/entity name → renders as literal text everywhere, including map popups ✅
-- [ ] Admin form: latitude 91, longitude -200, letters in number fields → inline range errors, no request sent ✅
-- [ ] Sign-up with `someone@gmail.com` → client error; bypassing the client (direct API) → DB trigger rejects ✅
-- [ ] Password under 6 chars → client error before request ✅
-
-### State
-- [ ] Double-click any submit → button disabled while pending, single request ✅
-- [ ] Vote rapidly on the same review → counts stay consistent (optimistic + UNIQUE constraint) ✅
-- [ ] Navigate away mid-fetch → no console errors (effects use cancelled flags) ✅
-- [ ] Refresh while writing a review → form is empty again (accepted: no draft persistence; document if users complain)
-- [ ] Sign out in another tab → this tab flips to visitor mode on focus (Supabase auth event) ✅
-- [ ] Back button after submitting a review → Browse shows updated rating after its refetch ✅
-
-### Data
-- [ ] Entity with no reviews → "No reviews yet" empty state + em-dash badge ✅
-- [ ] Entity with no image → patterned placeholder, no broken-image icon ✅
-- [ ] Entity with null description/address → row simply omitted ✅
-- [ ] Reviewer with no profile name → "Student" fallback ✅
-- [ ] Visit `/rating/<deleted-or-garbage-uuid>` → "could not be found" panel (not an error, not a hang) ✅
-- [ ] Visit a malformed UUID (`/rating/abc`) → same not-found panel (Postgres uuid parse error is caught) — **verify**
-- [ ] Unknown URL `/whatever` → 404 page ✅
-
-### Network
-- [ ] Kill the network, load Browse/detail/map/profile → error panel with working Retry on every page ✅
-- [ ] Slow 3G throttle → skeletons everywhere, no layout shift when content lands ✅
-- [ ] Vote with network down → count snaps back (rollback) ✅
-
-### Sessions & authorization (also part of the Phase 4 security review)
-- [ ] Signed-out: write UI hidden, log-in prompts shown; direct API writes rejected by RLS ✅
-- [ ] Edit another user's review id via the API → 0 rows affected (RLS owner check) ✅
-- [ ] Non-admin calls entity insert/update/delete → RLS rejects; UI surfaces the no-rows hint ✅
+See `LAUNCH_RUNBOOK.md` for remaining hosting, auth-mail, source-check and operating checks.

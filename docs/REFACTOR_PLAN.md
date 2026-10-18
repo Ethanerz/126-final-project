@@ -1,5 +1,7 @@
 # RateUPV assessment and refactoring proposal
 
+Historical assessment: the user subsequently authorized the Next.js/shadcn MVP and implementation proceeded. See [MVP_STATUS.md](MVP_STATUS.md) for current scope, applied migration, verification and remaining launch checks. The proposals below record the assessment before implementation.
+
 Date: 2026-10-18. Status: draft for discussion. Recommendations below are proposals, not approved product or stack decisions.
 
 ## Recommendation
