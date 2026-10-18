@@ -13,6 +13,7 @@ This is a working technical MVP and a product hypothesis. Student task completio
 ## Implemented
 
 - Next.js App Router, TypeScript, Tailwind 4 and CLI-installed shadcn/Radix components. Public place pages render on the server; authenticated operations use a browser Supabase client with database authorization.
+- Light/dark themes use the existing warm palette and fonts, follow the system preference until overridden, and persist a manual sun/moon button choice across pages, reloads and tabs. Theme initialization runs before hydration; the icon animation respects reduced-motion settings.
 - Search by names, categories and aliases; task shortcuts; category filters; relevant/name/review-count/adjusted-rating sorting; explicit unreviewed and empty states.
 - Place guides with preparation, campus, contact, hours, source/check date, unknown states and directions.
 - On-demand OpenStreetMap embed with a searchable place list and selected pin. No map SDK, geolocation request or API key. Google Maps walking-direction handoff. The embed is a small-pilot choice, not a guaranteed production tile service.
@@ -39,10 +40,10 @@ This is an **upgrade for the existing schema**, not a fresh-install baseline. Ea
 
 - Type generation and strict TypeScript check pass.
 - ESLint passes; production `next build` passes.
-- 73 Vitest checks pass, including all 56 original regression tests.
+- 80 Vitest checks pass, including all 56 original regression tests and seven deployment-configuration checks.
 - 27 isolated Postgres permission/integrity checks pass using the actual migration and a modeled legacy fixture.
 - Live transactional checks pass for public reads, private profiles, own contribution, private submissions, cross-author denial and admin visibility. All fixtures are rolled back.
-- 20 desktop/mobile browser cases cover discovery, shortcuts, empty states, responsive layouts, legacy redirects, map opt-in, drafts, write failure/retry, private corrections, moderation and hidden-author editing.
+- 28 desktop/mobile browser cases cover discovery, shortcuts, empty states, responsive layouts, legacy redirects, map opt-in, drafts, write failure/retry, private corrections, moderation, hidden-author editing and theme behavior.
 - Browser write-path tests intercept REST requests and use fake sessions; they do not send mail or publish test content. Database authorization is verified separately against real Postgres. Live email delivery/password recovery and field accuracy have not been verified with a real student mailbox or campus visit.
 - Production dependency audit reports zero vulnerabilities. The complete audit still flags five development-only findings through the current Next ESLint plugin's `braces` dependency; npm's suggested forced fix downgrades the framework lint configuration and was not applied.
 

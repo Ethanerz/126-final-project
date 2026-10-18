@@ -18,6 +18,23 @@ Use Node 24 (the current Supabase client requires Node 22+). `npm ci`, copy `.en
 
 The connected Vercel account currently has no accessible RateUPV project/team, so these hosting settings were not changed or claimed verified. Auth redirect configuration and actual email delivery remain rollout checks.
 
+## Deployed guide says it could not load
+
+The Next.js migration changes the public configuration names. A Vercel project with only the previous Vite variables can build the page shell while directory reads fail. Production builds now stop with a named configuration error if either required Next.js variable is missing or blank.
+
+The owner of the existing Vercel project must open **Settings → Environment Variables** and configure:
+
+| Previous Vite variable          | Required Next.js variable              |
+| ------------------------------- | -------------------------------------- |
+| `VITE_SUPABASE_URL`             | `NEXT_PUBLIC_SUPABASE_URL`             |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` |
+
+Use the matching URL and public publishable key for the existing RateUPV Supabase project. The configured local `.env.local` has this pair; it is intentionally not committed. Set the variables for **Production**, and also **Preview** if testing a feature-branch deployment. Check for branch-specific Preview overrides. Do not use a secret/service-role key.
+
+Create a new deployment after saving the variables. `NEXT_PUBLIC_*` values are bundled at build time; refreshing the page or restarting the existing deployment does not update them. Verify the new deployment uses the intended branch/commit, then confirm the home directory, a place guide, and Campus map load on its public URL. See [Next.js environment variable behavior](https://nextjs.org/docs/app/guides/environment-variables#bundling-environment-variables-for-the-browser).
+
+If the error remains with both variables set before the build, inspect that deployment's runtime logs for the first failing directory request and check the URL/key pair and Supabase availability. Public page reads do not depend on the authentication redirect allowlist.
+
 ## Database migration and rollback
 
 The upgrade is applied on project `pfdxjuruayiekxfzkdmc` as `20261018043101_campus_guide_mvp`. It preserves existing places, profiles and review content; all original counts/fingerprints matched after migration. It adds facts, review identity/recency/visibility and private submissions. It also removes public profile-name access, so old clients should fall back to a generic author label.
