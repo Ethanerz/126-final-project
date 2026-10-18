@@ -29,6 +29,9 @@ for (const family of ["Inter", "Raleway"]) {
     `https://raw.githubusercontent.com/google/fonts/main/ofl/${family.toLowerCase()}/OFL.txt`,
   );
   if (!license.ok) throw new Error(`License download failed: ${family}`);
-  await writeFile(new URL(`${family}-OFL.txt`, root), await license.text());
+  await writeFile(
+    new URL(`${family}-OFL.txt`, root),
+    (await license.text()).replace(/[ \t]+$/gm, ""),
+  );
   console.log(`Vendored ${family} Latin variable font and OFL license.`);
 }
