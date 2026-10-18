@@ -7,6 +7,12 @@ test("theme follows system changes until a preference is chosen", async ({
   await page.goto("/about");
   await expect(page.locator("html")).toHaveClass("dark");
   await expect(
+    page.locator('header img[src="/rate-upv-logo-dark.svg"]'),
+  ).toBeVisible();
+  await expect(
+    page.locator('header img[src="/rate-upv-logo.svg"]'),
+  ).not.toBeVisible();
+  await expect(
     page.getByRole("button", { name: "Switch to light mode", exact: true }),
   ).toBeVisible();
   expect(
@@ -15,6 +21,12 @@ test("theme follows system changes until a preference is chosen", async ({
 
   await page.emulateMedia({ colorScheme: "light" });
   await expect(page.locator("html")).toHaveClass("light");
+  await expect(
+    page.locator('header img[src="/rate-upv-logo.svg"]'),
+  ).toBeVisible();
+  await expect(
+    page.locator('header img[src="/rate-upv-logo-dark.svg"]'),
+  ).not.toBeVisible();
   await expect(
     page.getByRole("button", { name: "Switch to dark mode", exact: true }),
   ).toBeVisible();
@@ -89,6 +101,9 @@ test("system theme and correct icon apply before React hydration", async ({
   await page.route("**/_next/static/**/*.js", (route) => route.abort());
   await page.goto("/about");
   await expect(page.locator("html")).toHaveClass("dark");
+  await expect(
+    page.locator('header img[src="/rate-upv-logo-dark.svg"]'),
+  ).toBeVisible();
   await expect(page.locator("body")).toHaveCSS(
     "background-color",
     "rgb(24, 18, 23)",
